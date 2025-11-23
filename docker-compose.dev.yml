@@ -1,0 +1,118 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: payment-postgres
+    environment:
+      POSTGRES_DB: paymentdb
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d paymentdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - payment-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: payment-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - payment-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile.dev
+    container_name: payment-backend
+    volumes:
+      - ./apps/backend:/app/apps/backend
+      - ./libs:/app/libs
+      - ./prisma:/app/prisma
+      - /app/node_modules
+      - /app/apps/backend/node_modules
+    ports:
+      - "3000:3000"
+      - "9229:9229"
+    environment:
+      DATABASE_URL: postgresql://dev:dev123@postgres:5432/paymentdb
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: development
+      JWT_SECRET: dev-secret-change-in-production
+    command: sh -c "find apps/backend/node_modules -mindepth 1 -delete && bun install && bun run --filter backend start:dev"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - payment-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/merchant-web/Dockerfile.dev
+    container_name: payment-frontend
+    volumes:
+      - ./apps/merchant-web:/app/apps/merchant-web
+      - /app/node_modules
+      - /app/apps/merchant-web/node_modules
+    ports:
+      - "4200:4200"
+    command: sh -c "find apps/merchant-web/node_modules -mindepth 1 -delete && bun install && bun run --filter merchant-web start"
+    networks:
+      - payment-network
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: payment-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - payment-network
+
+  mcp-server:
+    build:
+      context: .
+      dockerfile: services/mcp-server/Dockerfile
+    container_name: payment-mcp-server
+    ports:
+      - "8080:8080"
+    environment:
+      OLLAMA_URL: http://ollama:11434
+      DATABASE_URL: postgresql://dev:dev123@postgres:5432/paymentdb
+    depends_on:
+      - ollama
+      - postgres
+    volumes:
+      - ./services/mcp-server:/app/services/mcp-server
+      - /app/node_modules
+      - /app/services/mcp-server/node_modules
+    command: bun run --filter mcp-server dev
+    networks:
+      - payment-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  ollama_data:
+
+networks:
+  payment-network:
+    driver: bridge

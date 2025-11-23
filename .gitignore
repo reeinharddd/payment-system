@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+.bun/
+
+# Build outputs
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Angular
+.angular/
+.cache/
+
+# NestJS
+.nest/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+bun.lockb
+
+# Testing
+coverage/
+playwright-report/
+test-results/
+
+# Turbo
+.turbo/
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+
+# Misc
+tmp/
+temp/

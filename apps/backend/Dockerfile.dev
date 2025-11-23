@@ -1,0 +1,17 @@
+FROM oven/bun:1
+
+WORKDIR /app
+
+# Bun includes git, python, make, g++ might not be needed or can be installed if strictly necessary.
+# For now, keeping it simple.
+
+COPY package.json bun.lock ./
+COPY apps/backend/package.json ./apps/backend/
+
+RUN bun install
+
+COPY . .
+
+EXPOSE 3000 9229
+
+CMD ["bun", "run", "--filter", "backend", "start:dev"]

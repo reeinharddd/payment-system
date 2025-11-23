@@ -1,0 +1,77 @@
+{
+  "name": "payment-system",
+  "version": "1.0.0",
+  "description": "Local payment and business management platform for small merchants",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "libs/*",
+    "services/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "dev:backend": "bun run --filter backend dev",
+    "dev:frontend": "bun run --filter merchant-web dev",
+    "dev:mcp": "bun run --filter mcp-server dev",
+    "build": "turbo run build",
+    "build:backend": "bun run --filter backend build",
+    "build:frontend": "bun run --filter merchant-web build",
+    "build:mcp": "bun run --filter mcp-server build",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "test:cov": "turbo run test:cov",
+    "test:e2e": "turbo run test:e2e",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "db:migrate": "bun run --filter backend db:migrate",
+    "db:seed": "bun run --filter backend db:seed",
+    "db:studio": "bun run --filter backend db:studio",
+    "db:reset": "bun run --filter backend db:reset",
+    "docker:dev": "docker compose -f docker-compose.dev.yml up",
+    "docker:dev:detached": "docker compose -f docker-compose.dev.yml up -d",
+    "docker:dev:down": "docker compose -f docker-compose.dev.yml down",
+    "docker:dev:logs": "docker compose -f docker-compose.dev.yml logs -f",
+    "docker:prod:build": "docker compose -f docker-compose.prod.yml build",
+    "docker:prod:up": "docker compose -f docker-compose.prod.yml up -d",
+    "docker:prod:down": "docker compose -f docker-compose.prod.yml down",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.1",
+    "turbo": "^1.11.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "bun": ">=1.0.0"
+  },
+  "packageManager": "bun@1.3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/payment-system.git"
+  },
+  "keywords": [
+    "payment",
+    "pos",
+    "merchant",
+    "business-management",
+    "nestjs",
+    "angular",
+    "multi-country"
+  ],
+  "author": "Your Team",
+  "license": "UNLICENSED"
+}
