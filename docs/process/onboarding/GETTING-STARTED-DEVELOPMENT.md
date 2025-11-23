@@ -1,5 +1,5 @@
 <!-- AI-INSTRUCTION: START -->
-<!-- 
+<!--
   This document is the MANDATORY ENTRY POINT for all developers.
   1. Preserve the Header Table and Metadata block.
   2. Fill in the "Agent Directives" to guide future AI interactions.
@@ -32,14 +32,14 @@
 
 ## 🤖 Agent Directives (System Prompt)
 
-*This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document.*
+_This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
-| Directive | Instruction |
-| :--- | :--- |
-| **Context** | This is the primary onboarding guide for new developers. |
-| **Constraint** | All code changes must follow the "10-Step Development Cycle" defined here. |
-| **Pattern** | Use the provided templates for Services, Controllers, DTOs, and Components. |
-| **Related** | `docs/process/workflow/DEVELOPMENT-RULES.md`, `docs/technical/architecture/PRELIMINARY-DESIGN.md` |
+| Directive      | Instruction                                                                                       |
+| :------------- | :------------------------------------------------------------------------------------------------ |
+| **Context**    | This is the primary onboarding guide for new developers.                                          |
+| **Constraint** | All code changes must follow the "10-Step Development Cycle" defined here.                        |
+| **Pattern**    | Use the provided templates for Services, Controllers, DTOs, and Components.                       |
+| **Related**    | `docs/process/workflow/DEVELOPMENT-RULES.md`, `docs/technical/architecture/PRELIMINARY-DESIGN.md` |
 
 ---
 
@@ -62,7 +62,8 @@ Before starting development, ensure you have:
   - Docker Desktop
   - PostgreSQL 16+ (or use Docker)
   - Redis 7+ (or use Docker)
-  - VSCode with recommended extensions
+  - VSCode with recommended extensions (auto-prompted when opening project)
+  - Git hooks (Husky) installed automatically via `bun install`
 
 ## 3. The 10-Step Development Cycle
 
@@ -118,16 +119,16 @@ modules/feature-name/
 
 From [Development Rules](../workflow/DEVELOPMENT-RULES.md) - Rule 2:
 
-```typescript
+````typescript
 /**
  * Brief description of what the method does
- * 
+ *
  * @param param1 - Description of param1
  * @param param2 - Description of param2
  * @returns Description of return value
  * @throws {NotFoundException} When resource not found
  * @throws {BadRequestException} When validation fails
- * 
+ *
  * @example
  * ```typescript
  * const result = await service.methodName('value', 123);
@@ -149,10 +150,10 @@ async methodName(
   // 3. BUSINESS LOGIC
   try {
     const result = await this.performOperation(param1, param2);
-    
+
     // 4. SIDE EFFECTS
     // await this.notificationService.notify(...);
-    
+
     return result;
   } catch (error) {
     // 5. ERROR HANDLING
@@ -160,7 +161,7 @@ async methodName(
     throw error;
   }
 }
-```
+````
 
 ### 5.2. Controller Endpoint Template
 
@@ -182,9 +183,9 @@ async create(
   @CurrentUser() user: User,
 ): Promise<ResourceResponseDto> {
   this.logger.log(`Creating resource for user ${user.id}`);
-  
+
   const result = await this.service.create(dto, user.id);
-  
+
   return new ResourceResponseDto(result);
 }
 ```
@@ -194,16 +195,16 @@ async create(
 From [Development Rules](../workflow/DEVELOPMENT-RULES.md) - Rule 4:
 
 ```typescript
-import { IsString, IsNumber, Length, Min, Max } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsNumber, Length, Min, Max } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
 
 /**
  * Data Transfer Object for creating a resource
  */
 export class CreateResourceDto {
   @ApiProperty({
-    description: 'Resource name',
-    example: 'My Resource',
+    description: "Resource name",
+    example: "My Resource",
     minLength: 3,
     maxLength: 100,
   })
@@ -212,7 +213,7 @@ export class CreateResourceDto {
   name: string;
 
   @ApiProperty({
-    description: 'Resource value',
+    description: "Resource value",
     example: 42,
     minimum: 1,
     maximum: 1000000,
@@ -231,19 +232,24 @@ export class CreateResourceDto {
 From [Development Rules](../workflow/DEVELOPMENT-RULES.md) - Rule 5:
 
 ```typescript
-import { Component, signal, computed, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { Component, signal, computed, inject } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import {
+  ReactiveFormsModule,
+  FormGroup,
+  FormControl,
+  Validators,
+} from "@angular/forms";
 
 /**
  * Component description
  */
 @Component({
-  selector: 'app-resource-create',
+  selector: "app-resource-create",
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './resource-create.component.html',
-  styleUrl: './resource-create.component.scss',
+  templateUrl: "./resource-create.component.html",
+  styleUrl: "./resource-create.component.scss",
 })
 export class ResourceCreateComponent {
   // SERVICES
@@ -253,13 +259,13 @@ export class ResourceCreateComponent {
   // SIGNALS
   loading = signal(false);
   error = signal<string | null>(null);
-  
+
   // COMPUTED
   canSubmit = computed(() => !this.loading() && this.form.valid);
 
   // FORM
   form = new FormGroup({
-    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    name: new FormControl("", [Validators.required, Validators.minLength(3)]),
     value: new FormControl(0, [Validators.required, Validators.min(1)]),
   });
 
@@ -277,11 +283,11 @@ export class ResourceCreateComponent {
 
     try {
       const result = await this.resourceService.create(this.form.value);
-      this.toastService.success('Resource created successfully');
+      this.toastService.success("Resource created successfully");
       this.form.reset();
     } catch (err) {
       this.error.set(err.message);
-      this.toastService.error('Failed to create resource');
+      this.toastService.error("Failed to create resource");
     } finally {
       this.loading.set(false);
     }
@@ -295,15 +301,15 @@ From [Design Patterns](../../technical/architecture/DESIGN-PATTERNS.md):
 
 ### 7.1. When to Use What
 
-| Pattern | Use Case | Example |
-|---------|----------|---------|
-| **Factory** | Create objects based on runtime condition | Payment provider selection by country |
-| **Repository** | Complex database queries | Analytics queries with aggregations |
-| **Adapter** | Wrap external API with our interface | SMS provider (Twilio, SNS) |
-| **Strategy** | Interchangeable algorithms | Payment methods (QR, Link, Transfer) |
-| **Observer** | One-to-many notifications | Payment confirmed triggers notifications |
-| **CQRS** | Separate read/write operations | Transaction writes vs. reporting reads |
-| **Signal Store** | Component state management | Payments list with filters and computed values |
+| Pattern          | Use Case                                  | Example                                        |
+| ---------------- | ----------------------------------------- | ---------------------------------------------- |
+| **Factory**      | Create objects based on runtime condition | Payment provider selection by country          |
+| **Repository**   | Complex database queries                  | Analytics queries with aggregations            |
+| **Adapter**      | Wrap external API with our interface      | SMS provider (Twilio, SNS)                     |
+| **Strategy**     | Interchangeable algorithms                | Payment methods (QR, Link, Transfer)           |
+| **Observer**     | One-to-many notifications                 | Payment confirmed triggers notifications       |
+| **CQRS**         | Separate read/write operations            | Transaction writes vs. reporting reads         |
+| **Signal Store** | Component state management                | Payments list with filters and computed values |
 
 ### 7.2. Critical Pattern: Multi-Country Payment
 
@@ -320,8 +326,8 @@ interface IPaymentProvider {
 
 // 2. Adapters (one per country)
 class ConektaPaymentProvider implements IPaymentProvider {
-  readonly country = 'MX';
-  readonly currency = 'MXN';
+  readonly country = "MX";
+  readonly currency = "MXN";
   // Implementation
 }
 
@@ -363,7 +369,7 @@ From [Development Rules](../workflow/DEVELOPMENT-RULES.md):
 ### 8.3. Test Template
 
 ```typescript
-describe('PaymentsService', () => {
+describe("PaymentsService", () => {
   let service: PaymentsService;
   let prisma: PrismaService;
 
@@ -384,13 +390,13 @@ describe('PaymentsService', () => {
     prisma = module.get(PrismaService);
   });
 
-  it('should create payment successfully', async () => {
+  it("should create payment successfully", async () => {
     // ARRANGE
-    const dto = { amount: 100, currency: 'MXN' };
-    
+    const dto = { amount: 100, currency: "MXN" };
+
     // ACT
-    const result = await service.createPayment(dto, 'user-123');
-    
+    const result = await service.createPayment(dto, "user-123");
+
     // ASSERT
     expect(result).toBeDefined();
   });
@@ -444,26 +450,31 @@ From [Development Rules](../workflow/DEVELOPMENT-RULES.md):
 ### 10.1. For Reviewer
 
 **Functionality:**
+
 - [ ] Code does what PR says
 - [ ] Edge cases handled
 - [ ] Error handling present
 
 **Design:**
+
 - [ ] Follows established patterns
 - [ ] No code duplication
 - [ ] Single Responsibility Principle
 
 **Testing:**
+
 - [ ] Tests cover main functionality
 - [ ] Tests cover error cases
 - [ ] Coverage meets 80% minimum
 
 **Security:**
+
 - [ ] No secrets in code
 - [ ] Input validation present
 - [ ] Authorization checks present
 
 **Performance:**
+
 - [ ] No N+1 queries
 - [ ] Large operations paginated
 
@@ -501,9 +512,11 @@ What is the change we're proposing?
 ## Consequences
 
 ### Positive
+
 - Benefit 1
 
 ### Negative
+
 - Cost 1
 
 ## Alternatives Considered
@@ -515,7 +528,7 @@ Why alternatives were rejected.
 
 From [Development Rules](../workflow/DEVELOPMENT-RULES.md):
 
-```markdown
+````markdown
 # Endpoint Name
 
 ## Request
@@ -525,16 +538,19 @@ From [Development Rules](../workflow/DEVELOPMENT-RULES.md):
 **Authentication:** Required
 
 ### Request Body
+
 ```json
 {
   "name": "string",
   "value": 42
 }
 ```
+````
 
 ## Response
 
 ### Success (200 OK)
+
 ```json
 {
   "id": "uuid",
@@ -543,12 +559,14 @@ From [Development Rules](../workflow/DEVELOPMENT-RULES.md):
 ```
 
 ### Error (400 Bad Request)
+
 ```json
 {
   "statusCode": 400,
   "message": "Validation failed"
 }
 ```
+
 ```
 
 ## 13. Quick Start Checklist
@@ -560,7 +578,7 @@ Before writing your first line of code:
 - [ ] Skim [Design Patterns](../../technical/architecture/DESIGN-PATTERNS.md) for pattern reference
 - [ ] Review [Standards](../standards/STANDARDS.md) for documentation style
 - [ ] Setup development environment (Bun, Docker, PostgreSQL, Redis)
-- [ ] Clone repository and run `bun install`
+- [ ] Clone repository and run `bun install` (installs dependencies and git hooks)
 - [ ] Copy `.env.example` to `.env` and configure
 - [ ] Run `docker-compose -f docker-compose.dev.yml up -d` for services
 - [ ] Run `bun run dev` to start development servers
@@ -591,6 +609,7 @@ Before writing your first line of code:
 
 ---
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-11-01  
+**Version:** 1.0.0
+**Last Updated:** 2025-11-01
 **Status:** Mandatory Reading - Start Here
+```

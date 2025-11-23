@@ -1,0 +1,16 @@
+{
+  "apps/backend/**/*.{ts,js}": [
+    "eslint --fix",
+    "prettier --write"
+  ],
+  "apps/merchant-web/**/*.{ts,js,html,css,scss}": [
+    "prettier --write"
+  ],
+  "libs/**/*.{ts,js}": [
+    "eslint --fix",
+    "prettier --write"
+  ],
+  "*.{json,md,yml,yaml}": [
+    "prettier --write"
+  ]
+}

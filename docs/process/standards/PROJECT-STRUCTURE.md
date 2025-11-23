@@ -1,5 +1,5 @@
 <!-- AI-INSTRUCTION: START -->
-<!-- 
+<!--
   This document defines the PROJECT STRUCTURE. When creating new files:
   1. Preserve the Header Table and Metadata block.
   2. Fill in the "Agent Directives" to guide future AI interactions.
@@ -32,14 +32,14 @@
 
 ## 🤖 Agent Directives (System Prompt)
 
-*This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document.*
+_This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
-| Directive | Instruction |
-| :--- | :--- |
-| **Context** | This document defines the file system layout and naming conventions. |
-| **Constraint** | Do NOT create files outside the specified folder structure. |
-| **Pattern** | Use `kebab-case` for files, `PascalCase` for classes, `camelCase` for methods. |
-| **Related** | `docs/process/standards/MONOREPO-GUIDE.md` |
+| Directive      | Instruction                                                                    |
+| :------------- | :----------------------------------------------------------------------------- |
+| **Context**    | This document defines the file system layout and naming conventions.           |
+| **Constraint** | Do NOT create files outside the specified folder structure.                    |
+| **Pattern**    | Use `kebab-case` for files, `PascalCase` for classes, `camelCase` for methods. |
+| **Related**    | `docs/process/standards/MONOREPO-GUIDE.md`                                     |
 
 ---
 
@@ -62,6 +62,8 @@ A consistent project structure is vital for maintainability in a monorepo. By st
 ├── tsconfig.json             # Base TypeScript config
 ├── .eslintrc.json            # Shared ESLint rules
 ├── .prettierrc               # Code formatting config
+├── commitlint.config.js      # Commit message linting rules
+├── .lintstagedrc             # Pre-commit linting config
 │
 ├── apps/
 │   ├── backend/              # NestJS API
@@ -137,6 +139,7 @@ A consistent project structure is vital for maintainability in a monorepo. By st
 │
 ├── docker/                   # Docker configurations
 ├── .github/                  # GitHub workflows and templates
+│   └── workflows/            # CI/CD pipelines
 ├── .husky/                   # Git hooks
 └── .vscode/                  # Editor settings
 ```
@@ -146,6 +149,7 @@ A consistent project structure is vital for maintainability in a monorepo. By st
 #### Backend (NestJS)
 
 **Files:**
+
 - Modules: `*.module.ts`
 - Controllers: `*.controller.ts`
 - Services: `*.service.ts`
@@ -157,19 +161,23 @@ A consistent project structure is vital for maintainability in a monorepo. By st
 - Pipes: `*.pipe.ts`
 
 **Classes:**
+
 - PascalCase: `PaymentService`, `ConektaPaymentProvider`
 - Interfaces: Prefix `I`: `IPaymentProvider`
 
 **Methods:**
+
 - camelCase: `createPaymentIntent()`, `handleWebhook()`
 - Async methods always return `Promise<T>`
 
 **Constants:**
+
 - UPPER_SNAKE_CASE: `DEFAULT_CURRENCY`, `MAX_RETRY_ATTEMPTS`
 
 #### Frontend (Angular)
 
 **Files:**
+
 - Components: `*.component.ts` + `.html` + `.scss`
 - Services: `*.service.ts`
 - Guards: `*.guard.ts`
@@ -179,24 +187,30 @@ A consistent project structure is vital for maintainability in a monorepo. By st
 - Routes: `*.routes.ts`
 
 **Selectors:**
+
 - Prefix `app-`: `<app-button>`, `<app-payment-form>`
 
 **Classes:**
+
 - PascalCase: `PaymentCreateComponent`, `AuthService`
 
 **Signals/Observables:**
+
 - Signals: No suffix: `const count = signal(0)`
 - Observables: Suffix `$`: `payments$`, `loading$`
 
 #### Database (Prisma)
 
 **Tables:**
+
 - PascalCase singular: `User`, `Transaction`, `Business`
 
 **Fields:**
+
 - camelCase: `createdAt`, `businessId`, `taxId`
 
 **Relations:**
+
 - Singular: `business`, `user`
 - Plural: `transactions`, `branches`
 
@@ -290,6 +304,36 @@ Root `.prettierrc`:
 }
 ```
 
+#### Commitlint Configuration
+
+Root `commitlint.config.js`:
+
+```javascript
+module.exports = {
+  extends: ["@commitlint/config-conventional"],
+  rules: {
+    "type-enum": [
+      2,
+      "always",
+      [
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor",
+        "test",
+        "chore",
+        "ci",
+        "perf",
+        "build",
+        "revert",
+      ],
+    ],
+    "scope-case": [2, "always", "kebab-case"],
+  },
+};
+```
+
 #### Husky Pre-commit Hook
 
 `.husky/pre-commit`:
@@ -328,6 +372,7 @@ chore: update Prisma dependencies
 **Format:** `<type>(<scope>): <subject> (<ticket>)`
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -337,6 +382,7 @@ chore: update Prisma dependencies
 - `chore`: Maintenance tasks
 
 **Scope (optional):**
+
 - Module or feature: `payments`, `auth`, `billing`
 
 ## 4. References

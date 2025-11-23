@@ -30,14 +30,14 @@ Comprehensive guide for extreme type safety.
 
 ## 🤖 Agent Directives (System Prompt)
 
-*This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document.*
+_This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
-| Directive | Instruction |
-| :--- | :--- |
-| **Context** | This project uses TypeScript 5.3+ with ALL strict flags enabled. |
+| Directive      | Instruction                                                                      |
+| :------------- | :------------------------------------------------------------------------------- |
+| **Context**    | This project uses TypeScript 5.3+ with ALL strict flags enabled.                 |
 | **Constraint** | NEVER use `any`. Use `unknown` if type is truly dynamic, then validate with Zod. |
-| **Pattern** | Use Branded Types for IDs (`UserId`, `BusinessId`) to prevent mixing them. |
-| **Related** | `docs/technical/foundations/TECHNICAL-FOUNDATIONS.md` |
+| **Pattern**    | Use Branded Types for IDs (`UserId`, `BusinessId`) to prevent mixing them.       |
+| **Related**    | `docs/technical/foundations/TECHNICAL-FOUNDATIONS.md`                            |
 
 ---
 
@@ -64,11 +64,9 @@ This project uses TypeScript 5.3+ with all strict mode flags enabled to catch er
     "rootDir": "./src",
     "baseUrl": "./",
     "paths": {
-      "@/modules/*": ["src/modules/*"],
-      "@/common/*": ["src/common/*"],
-      "@/config/*": ["src/config/*"]
+      "@/*": ["src/*"]
     },
-    
+
     "strict": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
@@ -82,15 +80,15 @@ This project uses TypeScript 5.3+ with all strict mode flags enabled to catch er
     "noPropertyAccessFromIndexSignature": true,
     "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
-    
+
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    
+
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    
+
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
@@ -116,11 +114,12 @@ This project uses TypeScript 5.3+ with all strict mode flags enabled to catch er
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "@/core/*": ["src/app/core/*"],
-      "@/shared/*": ["src/app/shared/*"],
-      "@/features/*": ["src/app/features/*"]
+      "@core/*": ["src/app/core/*"],
+      "@shared/*": ["src/app/shared/*"],
+      "@features/*": ["src/app/features/*"],
+      "@env/*": ["src/environments/*"]
     },
-    
+
     "strict": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
@@ -134,15 +133,15 @@ This project uses TypeScript 5.3+ with all strict mode flags enabled to catch er
     "noPropertyAccessFromIndexSignature": true,
     "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
-    
+
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    
+
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
-    
+
     "sourceMap": true,
     "declaration": false,
     "resolveJsonModule": true
@@ -164,21 +163,27 @@ This project uses TypeScript 5.3+ with all strict mode flags enabled to catch er
 ### 3.1. Schema Definition
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 // Basic schemas
-export const PaymentCurrencySchema = z.enum(['MXN', 'COP', 'ARS', 'CLP']);
-export const PaymentStatusSchema = z.enum(['PENDING', 'CONFIRMED', 'FAILED', 'REFUNDED']);
+export const PaymentCurrencySchema = z.enum(["MXN", "COP", "ARS", "CLP"]);
+export const PaymentStatusSchema = z.enum([
+  "PENDING",
+  "CONFIRMED",
+  "FAILED",
+  "REFUNDED",
+]);
 
 // Complex object schema
 export const CreatePaymentSchema = z.object({
-  amount: z.number()
-    .positive('Amount must be positive')
-    .max(1000000, 'Amount exceeds maximum'),
+  amount: z
+    .number()
+    .positive("Amount must be positive")
+    .max(1000000, "Amount exceeds maximum"),
   currency: PaymentCurrencySchema,
   customerId: z.string().uuid().optional(),
   description: z.string().min(1).max(500).optional(),
-  metadata: z.record(z.string(), z.unknown()).optional()
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 // Infer TypeScript types from schemas
@@ -221,24 +226,24 @@ async createIntent(
 ### 3.3. Angular Form Validation
 
 ```typescript
-import { FormControl, FormGroup } from '@angular/forms';
-import { CreatePaymentSchema } from '@/shared/schemas';
+import { FormControl, FormGroup } from "@angular/forms";
+import { CreatePaymentSchema } from "@/shared/schemas";
 
 export class PaymentFormComponent {
   form = new FormGroup({
     amount: new FormControl<number>(0),
-    currency: new FormControl<PaymentCurrency>('MXN'),
-    description: new FormControl<string>('')
+    currency: new FormControl<PaymentCurrency>("MXN"),
+    description: new FormControl<string>(""),
   });
-  
+
   onSubmit() {
     const result = CreatePaymentSchema.safeParse(this.form.value);
-    
+
     if (!result.success) {
-      console.error('Validation errors:', result.error.errors);
+      console.error("Validation errors:", result.error.errors);
       return;
     }
-    
+
     // result.data is fully typed
     this.paymentService.create(result.data);
   }
@@ -256,18 +261,18 @@ Prevent mixing incompatible IDs:
 type Brand<K, T> = K & { __brand: T };
 
 // Branded ID types
-export type UserId = Brand<string, 'UserId'>;
-export type BusinessId = Brand<string, 'BusinessId'>;
-export type TransactionId = Brand<string, 'TransactionId'>;
+export type UserId = Brand<string, "UserId">;
+export type BusinessId = Brand<string, "BusinessId">;
+export type TransactionId = Brand<string, "TransactionId">;
 
 // Constructor functions
 export function UserId(id: string): UserId {
-  if (!isValidUUID(id)) throw new Error('Invalid UUID');
+  if (!isValidUUID(id)) throw new Error("Invalid UUID");
   return id as UserId;
 }
 
 export function BusinessId(id: string): BusinessId {
-  if (!isValidUUID(id)) throw new Error('Invalid UUID');
+  if (!isValidUUID(id)) throw new Error("Invalid UUID");
   return id as BusinessId;
 }
 
@@ -277,8 +282,8 @@ function getUserTransactions(userId: UserId): Transaction[] {
   return db.transactions.findMany({ where: { userId } });
 }
 
-const userId = UserId('uuid-1');
-const businessId = BusinessId('uuid-2');
+const userId = UserId("uuid-1");
+const businessId = BusinessId("uuid-2");
 
 getUserTransactions(userId); // ✓ Works
 getUserTransactions(businessId); // ✗ Type error
@@ -292,30 +297,42 @@ Model state machines with types:
 
 ```typescript
 // Payment state machine
-type PaymentState = 
-  | { status: 'pending'; intentId: string; expiresAt: Date }
-  | { status: 'processing'; intentId: string; startedAt: Date }
-  | { status: 'confirmed'; transactionId: string; confirmedAt: Date; receipt: string }
-  | { status: 'failed'; intentId: string; error: PaymentError; failedAt: Date }
-  | { status: 'refunded'; transactionId: string; refundId: string; refundedAt: Date };
+type PaymentState =
+  | { status: "pending"; intentId: string; expiresAt: Date }
+  | { status: "processing"; intentId: string; startedAt: Date }
+  | {
+      status: "confirmed";
+      transactionId: string;
+      confirmedAt: Date;
+      receipt: string;
+    }
+  | { status: "failed"; intentId: string; error: PaymentError; failedAt: Date }
+  | {
+      status: "refunded";
+      transactionId: string;
+      refundId: string;
+      refundedAt: Date;
+    };
 
 // Type guards
-function isPending(payment: PaymentState): payment is Extract<PaymentState, { status: 'pending' }> {
-  return payment.status === 'pending';
+function isPending(
+  payment: PaymentState,
+): payment is Extract<PaymentState, { status: "pending" }> {
+  return payment.status === "pending";
 }
 
 // Exhaustive pattern matching
 function handlePayment(payment: PaymentState): string {
   switch (payment.status) {
-    case 'pending':
+    case "pending":
       return `Waiting for payment: ${payment.intentId}`;
-    case 'processing':
+    case "processing":
       return `Processing payment: ${payment.intentId}`;
-    case 'confirmed':
+    case "confirmed":
       return `Payment confirmed: ${payment.transactionId}`;
-    case 'failed':
+    case "failed":
       return `Payment failed: ${payment.error.message}`;
-    case 'refunded':
+    case "refunded":
       return `Payment refunded: ${payment.refundId}`;
     // TypeScript ensures all cases are handled
   }
@@ -330,9 +347,9 @@ function handlePayment(payment: PaymentState): string {
 
 ```typescript
 type DeepReadonly<T> = {
-  readonly [P in keyof T]: T[P] extends object 
-    ? T[P] extends Function 
-      ? T[P] 
+  readonly [P in keyof T]: T[P] extends object
+    ? T[P] extends Function
+      ? T[P]
       : DeepReadonly<T[P]>
     : T[P];
 };
@@ -340,12 +357,12 @@ type DeepReadonly<T> = {
 // Usage
 const config: DeepReadonly<AppConfig> = {
   database: {
-    host: 'localhost',
-    port: 5432
-  }
+    host: "localhost",
+    port: 5432,
+  },
 };
 
-config.database.host = 'other'; // ✗ Type error
+config.database.host = "other"; // ✗ Type error
 ```
 
 ### 6.2. Exact Type Matching
@@ -357,19 +374,24 @@ type Exact<T, Shape> = T extends Shape
     : never
   : never;
 
-function createUser<T extends Exact<T, { name: string; email: string }>>(user: T) {
+function createUser<T extends Exact<T, { name: string; email: string }>>(
+  user: T,
+) {
   return user;
 }
 
-createUser({ name: 'John', email: 'john@example.com' }); // ✓
-createUser({ name: 'John', email: 'john@example.com', extra: 'not allowed' }); // ✗
+createUser({ name: "John", email: "john@example.com" }); // ✓
+createUser({ name: "John", email: "john@example.com", extra: "not allowed" }); // ✗
 ```
 
 ### 6.3. Require At Least One
 
 ```typescript
-type RequireAtLeastOne<T, Keys extends keyof T = keyof T> =
-  Pick<T, Exclude<keyof T, Keys>> & {
+type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<
+  T,
+  Exclude<keyof T, Keys>
+> &
+  {
     [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>;
   }[Keys];
 
@@ -385,8 +407,8 @@ function searchUsers(filters: RequireAtLeastOne<SearchFilters>): User[] {
 }
 
 searchUsers({}); // ✗ Type error
-searchUsers({ name: 'John' }); // ✓
-searchUsers({ name: 'John', email: 'john@example.com' }); // ✓
+searchUsers({ name: "John" }); // ✓
+searchUsers({ name: "John", email: "john@example.com" }); // ✓
 ```
 
 ---
@@ -398,34 +420,34 @@ searchUsers({ name: 'John', email: 'john@example.com' }); // ✓
 ```typescript
 // Bad: Implicit any
 function getUser(id) {
-  return users.find(u => u.id === id);
+  return users.find((u) => u.id === id);
 }
 
 // Good: Explicit nullability
 function getUser(id: string): User | undefined {
-  return users.find(u => u.id === id);
+  return users.find((u) => u.id === id);
 }
 
 // Usage with null coalescing
-const user = getUser('123') ?? { name: 'Guest', email: 'guest@example.com' };
+const user = getUser("123") ?? { name: "Guest", email: "guest@example.com" };
 
 // Optional chaining
-const userName = user?.profile?.displayName ?? 'Anonymous';
+const userName = user?.profile?.displayName ?? "Anonymous";
 ```
 
 ### 7.2. Non-Null Assertion Alternative
 
 ```typescript
 // Bad: Non-null assertion (dangerous)
-const element = document.getElementById('my-id')!;
+const element = document.getElementById("my-id")!;
 
 // Good: Type guard
-const element = document.getElementById('my-id');
+const element = document.getElementById("my-id");
 if (!element) {
-  throw new Error('Element not found');
+  throw new Error("Element not found");
 }
 // element is non-null here
-element.addEventListener('click', handler);
+element.addEventListener("click", handler);
 ```
 
 ---
@@ -437,14 +459,14 @@ element.addEventListener('click', handler);
 ```typescript
 // Return type inferred correctly
 async function fetchPayments(): Promise<Payment[]> {
-  const response = await fetch('/api/payments');
-  
+  const response = await fetch("/api/payments");
+
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
-  
+
   const data: unknown = await response.json();
-  
+
   // Validate at runtime
   const PaymentsArraySchema = z.array(PaymentSchema);
   return PaymentsArraySchema.parse(data);
@@ -458,10 +480,10 @@ class PaymentError extends Error {
   constructor(
     message: string,
     public code: string,
-    public details?: unknown
+    public details?: unknown,
   ) {
     super(message);
-    this.name = 'PaymentError';
+    this.name = "PaymentError";
   }
 }
 
@@ -469,7 +491,9 @@ type Result<T, E extends Error = Error> =
   | { success: true; data: T }
   | { success: false; error: E };
 
-async function createPayment(dto: CreatePaymentDto): Promise<Result<Payment, PaymentError>> {
+async function createPayment(
+  dto: CreatePaymentDto,
+): Promise<Result<Payment, PaymentError>> {
   try {
     const payment = await api.createPayment(dto);
     return { success: true, data: payment };
@@ -477,9 +501,9 @@ async function createPayment(dto: CreatePaymentDto): Promise<Result<Payment, Pay
     if (error instanceof PaymentError) {
       return { success: false, error };
     }
-    return { 
-      success: false, 
-      error: new PaymentError('Unknown error', 'UNKNOWN', error) 
+    return {
+      success: false,
+      error: new PaymentError("Unknown error", "UNKNOWN", error),
     };
   }
 }
@@ -488,9 +512,9 @@ async function createPayment(dto: CreatePaymentDto): Promise<Result<Payment, Pay
 const result = await createPayment(dto);
 
 if (result.success) {
-  console.log('Payment created:', result.data.id);
+  console.log("Payment created:", result.data.id);
 } else {
-  console.error('Payment failed:', result.error.code);
+  console.error("Payment failed:", result.error.code);
 }
 ```
 
@@ -568,26 +592,26 @@ Use `tsd` for type assertion testing:
 **types.test-d.ts:**
 
 ```typescript
-import { expectType, expectError, expectAssignable } from 'tsd';
-import { UserId, BusinessId, getUserTransactions } from './types';
+import { expectType, expectError, expectAssignable } from "tsd";
+import { UserId, BusinessId, getUserTransactions } from "./types";
 
 // Test branded types
-const userId = UserId('uuid-1');
+const userId = UserId("uuid-1");
 expectType<UserId>(userId);
 
-const businessId = BusinessId('uuid-2');
+const businessId = BusinessId("uuid-2");
 expectType<BusinessId>(businessId);
 
 // Should not be interchangeable
 expectError(getUserTransactions(businessId));
 
 // Test discriminated unions
-type PaymentState = 
-  | { status: 'pending'; intentId: string }
-  | { status: 'confirmed'; transactionId: string };
+type PaymentState =
+  | { status: "pending"; intentId: string }
+  | { status: "confirmed"; transactionId: string };
 
 function handlePayment(payment: PaymentState): void {
-  if (payment.status === 'pending') {
+  if (payment.status === "pending") {
     expectType<string>(payment.intentId);
     expectError(payment.transactionId);
   } else {
@@ -634,7 +658,7 @@ interface ApiResponse<T> {
 }
 
 interface PaginatedApiResponse<T> extends ApiResponse<T[]> {
-  meta: ApiResponse<T>['meta'] & {
+  meta: ApiResponse<T>["meta"] & {
     page: number;
     pageSize: number;
     total: number;
@@ -642,7 +666,9 @@ interface PaginatedApiResponse<T> extends ApiResponse<T[]> {
 }
 
 // Usage
-async function getPayments(page: number): Promise<PaginatedApiResponse<Payment>> {
+async function getPayments(
+  page: number,
+): Promise<PaginatedApiResponse<Payment>> {
   const response = await fetch(`/api/payments?page=${page}`);
   return response.json();
 }
@@ -653,34 +679,34 @@ async function getPayments(page: number): Promise<PaginatedApiResponse<Payment>>
 ```typescript
 class PaymentBuilder {
   private payment: Partial<Payment> = {};
-  
+
   withAmount(amount: number): this {
     this.payment.amount = amount;
     return this;
   }
-  
+
   withCurrency(currency: PaymentCurrency): this {
     this.payment.currency = currency;
     return this;
   }
-  
+
   withCustomer(customerId: UserId): this {
     this.payment.customerId = customerId;
     return this;
   }
-  
+
   build(): Payment {
     if (!this.payment.amount || !this.payment.currency) {
-      throw new Error('Amount and currency are required');
+      throw new Error("Amount and currency are required");
     }
-    
+
     return {
       id: TransactionId(generateUUID()),
       amount: this.payment.amount,
       currency: this.payment.currency,
       customerId: this.payment.customerId,
       createdAt: new Date(),
-      status: 'pending'
+      status: "pending",
     };
   }
 }
@@ -688,7 +714,7 @@ class PaymentBuilder {
 // Usage
 const payment = new PaymentBuilder()
   .withAmount(500)
-  .withCurrency('MXN')
-  .withCustomer(UserId('uuid-1'))
+  .withCurrency("MXN")
+  .withCustomer(UserId("uuid-1"))
   .build();
 ```

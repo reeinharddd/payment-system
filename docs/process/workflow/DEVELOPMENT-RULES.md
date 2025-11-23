@@ -1,5 +1,5 @@
 <!-- AI-INSTRUCTION: START -->
-<!-- 
+<!--
   This document defines the STRICT DEVELOPMENT RULES.
   1. Preserve the Header Table and Metadata block.
   2. Fill in the "Agent Directives" to guide future AI interactions.
@@ -32,14 +32,14 @@
 
 ## 🤖 Agent Directives (System Prompt)
 
-*This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document.*
+_This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
-| Directive | Instruction |
-| :--- | :--- |
-| **Context** | This document defines the non-negotiable rules for code construction. |
-| **Constraint** | All generated code MUST follow the templates in Section 2. |
-| **Pattern** | Use the "Universal Development Cycle" (Section 1) for all tasks. |
-| **Related** | `docs/process/onboarding/GETTING-STARTED-DEVELOPMENT.md` |
+| Directive      | Instruction                                                           |
+| :------------- | :-------------------------------------------------------------------- |
+| **Context**    | This document defines the non-negotiable rules for code construction. |
+| **Constraint** | All generated code MUST follow the templates in Section 2.            |
+| **Pattern**    | Use the "Universal Development Cycle" (Section 1) for all tasks.      |
+| **Related**    | `docs/process/onboarding/GETTING-STARTED-DEVELOPMENT.md`              |
 
 ---
 
@@ -116,6 +116,7 @@
 ```
 
 **Estimated Time Allocation:**
+
 - Planning: 10%
 - Design: 15%
 - Implementation: 40%
@@ -159,16 +160,16 @@ modules/
 
 **Every service method MUST follow this structure:**
 
-```typescript
+````typescript
 /**
  * Brief description of what the method does
- * 
+ *
  * @param param1 - Description of param1
  * @param param2 - Description of param2
  * @returns Description of return value
  * @throws {NotFoundException} When resource not found
  * @throws {BadRequestException} When validation fails
- * 
+ *
  * @example
  * ```typescript
  * const result = await service.methodName('value', 123);
@@ -191,26 +192,26 @@ async methodName(
   try {
     // Main implementation
     const result = await this.performOperation(param1, param2);
-    
+
     // 4. SIDE EFFECTS (after success)
     // await this.notificationService.notify(...);
     // await this.auditService.log(...);
-    
+
     return result;
   } catch (error) {
     // 5. ERROR HANDLING
     this.logger.error(`Error in methodName: ${error.message}`, error.stack);
-    
+
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
         throw new ConflictException('Resource already exists');
       }
     }
-    
+
     throw error;
   }
 }
-```
+````
 
 #### Rule 3: Controller Endpoint Template
 
@@ -219,11 +220,11 @@ async methodName(
 ```typescript
 /**
  * Brief description of endpoint purpose
- * 
+ *
  * @param dto - Request body validation
  * @param user - Current authenticated user (from JWT)
  * @returns Response with created resource
- * 
+ *
  * @example
  * POST /api/resource
  * Body: { "name": "Example", "value": 123 }
@@ -242,9 +243,9 @@ async create(
   @CurrentUser() user: User,
 ): Promise<ResourceResponseDto> {
   this.logger.log(`Creating resource for user ${user.id}`);
-  
+
   const result = await this.service.create(dto, user.id);
-  
+
   return new ResourceResponseDto(result);
 }
 ```
@@ -254,8 +255,15 @@ async create(
 **Every DTO MUST have validation and documentation:**
 
 ```typescript
-import { IsString, IsNumber, IsOptional, Min, Max, Length } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  Min,
+  Max,
+  Length,
+} from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 /**
  * Data Transfer Object for creating a resource
@@ -266,8 +274,8 @@ export class CreateResourceDto {
    * @example "My Resource"
    */
   @ApiProperty({
-    description: 'Resource name',
-    example: 'My Resource',
+    description: "Resource name",
+    example: "My Resource",
     minLength: 3,
     maxLength: 100,
   })
@@ -280,7 +288,7 @@ export class CreateResourceDto {
    * @example 42
    */
   @ApiProperty({
-    description: 'Resource value',
+    description: "Resource value",
     example: 42,
     minimum: 1,
     maximum: 1000000,
@@ -295,8 +303,8 @@ export class CreateResourceDto {
    * @example "This is a description"
    */
   @ApiPropertyOptional({
-    description: 'Optional description',
-    example: 'This is a description',
+    description: "Optional description",
+    example: "This is a description",
   })
   @IsOptional()
   @IsString()
@@ -311,25 +319,30 @@ export class CreateResourceDto {
 
 **Every component MUST follow this structure:**
 
-```typescript
-import { Component, signal, computed, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+````typescript
+import { Component, signal, computed, inject } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import {
+  ReactiveFormsModule,
+  FormGroup,
+  FormControl,
+  Validators,
+} from "@angular/forms";
 
 /**
  * Component description
- * 
+ *
  * @example
  * ```html
  * <app-resource-create (created)="handleCreated($event)" />
  * ```
  */
 @Component({
-  selector: 'app-resource-create',
+  selector: "app-resource-create",
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './resource-create.component.html',
-  styleUrl: './resource-create.component.scss',
+  templateUrl: "./resource-create.component.html",
+  styleUrl: "./resource-create.component.scss",
 })
 export class ResourceCreateComponent {
   // SERVICES (inject at top)
@@ -339,13 +352,13 @@ export class ResourceCreateComponent {
   // SIGNALS (state)
   loading = signal(false);
   error = signal<string | null>(null);
-  
+
   // COMPUTED (derived state)
   canSubmit = computed(() => !this.loading() && this.form.valid);
 
   // FORM
   form = new FormGroup({
-    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    name: new FormControl("", [Validators.required, Validators.minLength(3)]),
     value: new FormControl(0, [Validators.required, Validators.min(1)]),
   });
 
@@ -363,11 +376,11 @@ export class ResourceCreateComponent {
 
     try {
       const result = await this.resourceService.create(this.form.value);
-      this.toastService.success('Resource created successfully');
+      this.toastService.success("Resource created successfully");
       this.form.reset();
     } catch (err) {
       this.error.set(err.message);
-      this.toastService.error('Failed to create resource');
+      this.toastService.error("Failed to create resource");
     } finally {
       this.loading.set(false);
     }
@@ -379,21 +392,21 @@ export class ResourceCreateComponent {
     return true;
   }
 }
-```
+````
 
 #### Rule 6: Service Template
 
 **Every service MUST follow this structure:**
 
-```typescript
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
-import { environment } from '@env/environment';
+````typescript
+import { Injectable, inject } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { firstValueFrom } from "rxjs";
+import { environment } from "@env/environment";
 
 /**
  * Service for managing resources
- * 
+ *
  * @example
  * ```typescript
  * const service = inject(ResourceService);
@@ -401,7 +414,7 @@ import { environment } from '@env/environment';
  * ```
  */
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class ResourceService {
   private http = inject(HttpClient);
@@ -409,34 +422,30 @@ export class ResourceService {
 
   /**
    * Get all resources
-   * 
+   *
    * @returns Promise resolving to array of resources
    * @throws {HttpErrorResponse} When API request fails
    */
   async getAll(): Promise<Resource[]> {
     try {
-      return await firstValueFrom(
-        this.http.get<Resource[]>(this.baseUrl)
-      );
+      return await firstValueFrom(this.http.get<Resource[]>(this.baseUrl));
     } catch (error) {
-      console.error('Failed to fetch resources:', error);
+      console.error("Failed to fetch resources:", error);
       throw error;
     }
   }
 
   /**
    * Create new resource
-   * 
+   *
    * @param data - Resource creation data
    * @returns Promise resolving to created resource
    */
   async create(data: CreateResourceDto): Promise<Resource> {
-    return await firstValueFrom(
-      this.http.post<Resource>(this.baseUrl, data)
-    );
+    return await firstValueFrom(this.http.post<Resource>(this.baseUrl, data));
   }
 }
-```
+````
 
 ## 3. Documentation Templates
 
@@ -468,22 +477,27 @@ What is the change that we're proposing and/or doing?
 What becomes easier or more difficult to do because of this change?
 
 ### Positive
+
 - Benefit 1
 - Benefit 2
 
 ### Negative
+
 - Cost 1
 - Cost 2
 
 ### Neutral
+
 - Tradeoff 1
 
 ## Alternatives Considered
 
 ### Alternative 1
+
 Description of alternative 1 and why it was rejected.
 
 ### Alternative 2
+
 Description of alternative 2 and why it was rejected.
 
 ## References
@@ -497,7 +511,7 @@ Description of alternative 2 and why it was rejected.
 
 **File:** `docs/api/endpoint-name.md`
 
-```markdown
+````markdown
 # Endpoint Name
 
 Brief description of what this endpoint does.
@@ -516,16 +530,16 @@ Brief description of what this endpoint does.
 
 ### Path Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | string (UUID) | Yes | Resource identifier |
+| Parameter | Type          | Required | Description         |
+| --------- | ------------- | -------- | ------------------- |
+| id        | string (UUID) | Yes      | Resource identifier |
 
 ### Query Parameters
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| page | number | No | 1 | Page number |
-| limit | number | No | 20 | Items per page |
+| Parameter | Type   | Required | Default | Description    |
+| --------- | ------ | -------- | ------- | -------------- |
+| page      | number | No       | 1       | Page number    |
+| limit     | number | No       | 20      | Items per page |
 
 ### Request Body
 
@@ -536,6 +550,7 @@ Brief description of what this endpoint does.
   "description": "optional string"
 }
 ```
+````
 
 ### Headers
 
@@ -564,6 +579,7 @@ Content-Type: application/json
 ### Error Responses
 
 **400 Bad Request**
+
 ```json
 {
   "statusCode": 400,
@@ -578,6 +594,7 @@ Content-Type: application/json
 ```
 
 **401 Unauthorized**
+
 ```json
 {
   "statusCode": 401,
@@ -586,6 +603,7 @@ Content-Type: application/json
 ```
 
 **404 Not Found**
+
 ```json
 {
   "statusCode": 404,
@@ -613,8 +631,8 @@ curl -X POST https://api.example.com/api/v1/resource \
 
 ```typescript
 const resource = await resourceService.create({
-  name: 'Example Resource',
-  value: 42
+  name: "Example Resource",
+  value: 42,
 });
 console.log(resource.id);
 ```
@@ -644,7 +662,8 @@ console.log(resource.id);
 
 **Version:** 1.0.0
 **Last Updated:** 2025-11-01
-```
+
+````
 
 ## 4. Architecture Patterns
 
@@ -659,7 +678,7 @@ console.log(resource.id);
 export interface IPaymentProvider {
   readonly country: string;
   readonly currency: string;
-  
+
   createPaymentIntent(dto: CreatePaymentDto): Promise<PaymentIntent>;
   generateQRCode(intentId: string): Promise<QRCodeData>;
   confirmPayment(intentId: string): Promise<PaymentConfirmation>;
@@ -671,11 +690,11 @@ export interface IPaymentProvider {
 export class ConektaPaymentProvider implements IPaymentProvider {
   readonly country = 'MX';
   readonly currency = 'MXN';
-  
+
   constructor(
     @Inject('CONEKTA_CONFIG') private config: ConektaConfig,
   ) {}
-  
+
   async createPaymentIntent(dto: CreatePaymentDto): Promise<PaymentIntent> {
     // Conekta-specific implementation
   }
@@ -687,7 +706,7 @@ export class PaymentProviderFactory {
   constructor(
     @Inject('PAYMENT_PROVIDERS') private providers: Map<string, IPaymentProvider>,
   ) {}
-  
+
   getProvider(country: string): IPaymentProvider {
     const provider = this.providers.get(country);
     if (!provider) {
@@ -704,21 +723,22 @@ export class PaymentsService {
     private factory: PaymentProviderFactory,
     private prisma: PrismaService,
   ) {}
-  
+
   async createPayment(dto: CreatePaymentDto, userId: string): Promise<PaymentIntent> {
     // Get user's business to determine country
     const business = await this.getBusinessByUserId(userId);
-    
+
     // Get appropriate provider
     const provider = this.factory.getProvider(business.country);
-    
+
     // Use provider
     return await provider.createPaymentIntent(dto);
   }
 }
-```
+````
 
 **When to create new adapter:**
+
 - Adding new country support
 - Integrating different payment gateway
 - Switching providers for existing country
@@ -733,7 +753,7 @@ export class PaymentsService {
 @Injectable()
 export class TransactionRepository {
   constructor(private prisma: PrismaService) {}
-  
+
   /**
    * Find transactions with complex filtering
    */
@@ -746,21 +766,21 @@ export class TransactionRepository {
         lte: filters.endDate,
       },
     };
-    
+
     if (filters.minAmount || filters.maxAmount) {
       where.amount = {
         gte: filters.minAmount,
         lte: filters.maxAmount,
       };
     }
-    
+
     return this.prisma.transaction.findMany({
       where,
       include: {
         business: true,
         paymentMethod: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       skip: filters.skip,
       take: filters.take,
     });
@@ -788,13 +808,13 @@ export class PaymentConfirmedEvent {
 @Injectable()
 export class PaymentsService {
   constructor(private eventEmitter: EventEmitter2) {}
-  
+
   async confirmPayment(id: string): Promise<void> {
-    const transaction = await this.updateStatus(id, 'CONFIRMED');
-    
+    const transaction = await this.updateStatus(id, "CONFIRMED");
+
     // Emit event (non-blocking)
     this.eventEmitter.emit(
-      'payment.confirmed',
+      "payment.confirmed",
       new PaymentConfirmedEvent(
         transaction.id,
         transaction.businessId,
@@ -811,8 +831,8 @@ export class PaymentEventsListener {
     private notificationService: NotificationService,
     private analyticsService: AnalyticsService,
   ) {}
-  
-  @OnEvent('payment.confirmed')
+
+  @OnEvent("payment.confirmed")
   async handlePaymentConfirmed(event: PaymentConfirmedEvent): Promise<void> {
     // These run async, don't block main flow
     await Promise.all([
@@ -830,8 +850,13 @@ export class PaymentEventsListener {
 **Structure:**
 
 ```typescript
-import { signalStore, withState, withComputed, withMethods } from '@ngrx/signals';
-import { computed, inject } from '@angular/core';
+import {
+  signalStore,
+  withState,
+  withComputed,
+  withMethods,
+} from "@ngrx/signals";
+import { computed, inject } from "@angular/core";
 
 // 1. STATE INTERFACE
 interface PaymentsState {
@@ -846,42 +871,42 @@ const initialState: PaymentsState = {
   payments: [],
   loading: false,
   error: null,
-  filters: { status: 'ALL', dateRange: 'THIS_MONTH' },
+  filters: { status: "ALL", dateRange: "THIS_MONTH" },
 };
 
 // 3. STORE DEFINITION
 export const PaymentsStore = signalStore(
-  { providedIn: 'root' },
-  
+  { providedIn: "root" },
+
   withState(initialState),
-  
+
   withComputed(({ payments, filters }) => ({
     filteredPayments: computed(() => {
-      return payments().filter(p => matchesFilters(p, filters()));
+      return payments().filter((p) => matchesFilters(p, filters()));
     }),
-    
+
     totalAmount: computed(() => {
       return payments().reduce((sum, p) => sum + p.amount, 0);
     }),
-    
+
     isEmpty: computed(() => payments().length === 0),
   })),
-  
+
   withMethods((store, api = inject(PaymentsService)) => ({
     async loadPayments(): Promise<void> {
       patchState(store, { loading: true, error: null });
-      
+
       try {
         const payments = await api.getAll();
         patchState(store, { payments, loading: false });
       } catch (error) {
-        patchState(store, { 
-          error: error.message, 
-          loading: false 
+        patchState(store, {
+          error: error.message,
+          loading: false,
         });
       }
     },
-    
+
     setFilters(filters: Partial<PaymentFilters>): void {
       patchState(store, {
         filters: { ...store.filters(), ...filters },
@@ -896,6 +921,7 @@ export const PaymentsStore = signalStore(
 ### 5.1. Test Coverage Rules
 
 **Minimum Coverage:**
+
 - Unit tests: 80% line coverage
 - Integration tests: Critical paths only
 - E2E tests: Happy path + 1 error case per feature
@@ -920,6 +946,7 @@ export const PaymentsStore = signalStore(
    - Computed values
 
 **What CAN be skipped:**
+
 - Pure DTOs (only validation decorators)
 - Simple getters/setters
 - Prisma generated code
@@ -928,13 +955,13 @@ export const PaymentsStore = signalStore(
 ### 5.2. Test Template (Backend)
 
 ```typescript
-import { Test, TestingModule } from '@nestjs/testing';
-import { PaymentsService } from './payments.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { PaymentProviderFactory } from './factories/payment-provider.factory';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from "@nestjs/testing";
+import { PaymentsService } from "./payments.service";
+import { PrismaService } from "../prisma/prisma.service";
+import { PaymentProviderFactory } from "./factories/payment-provider.factory";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 
-describe('PaymentsService', () => {
+describe("PaymentsService", () => {
   let service: PaymentsService;
   let prisma: PrismaService;
   let factory: PaymentProviderFactory;
@@ -974,32 +1001,34 @@ describe('PaymentsService', () => {
   });
 
   // TESTS ORGANIZED BY METHOD
-  describe('createPayment', () => {
-    it('should create payment successfully', async () => {
+  describe("createPayment", () => {
+    it("should create payment successfully", async () => {
       // ARRANGE
-      const dto = { amount: 100, currency: 'MXN' };
-      const userId = 'user-123';
+      const dto = { amount: 100, currency: "MXN" };
+      const userId = "user-123";
       const mockProvider = {
-        createPaymentIntent: jest.fn().mockResolvedValue({ id: 'intent-123' }),
+        createPaymentIntent: jest.fn().mockResolvedValue({ id: "intent-123" }),
       };
-      
-      jest.spyOn(factory, 'getProvider').mockReturnValue(mockProvider as any);
-      jest.spyOn(prisma.transaction, 'create').mockResolvedValue({ id: 'tx-123' } as any);
+
+      jest.spyOn(factory, "getProvider").mockReturnValue(mockProvider as any);
+      jest
+        .spyOn(prisma.transaction, "create")
+        .mockResolvedValue({ id: "tx-123" } as any);
 
       // ACT
       const result = await service.createPayment(dto, userId);
 
       // ASSERT
       expect(result).toBeDefined();
-      expect(factory.getProvider).toHaveBeenCalledWith('MX');
+      expect(factory.getProvider).toHaveBeenCalledWith("MX");
       expect(mockProvider.createPaymentIntent).toHaveBeenCalledWith(dto);
       expect(prisma.transaction.create).toHaveBeenCalled();
     });
 
-    it('should throw BadRequestException for invalid amount', async () => {
+    it("should throw BadRequestException for invalid amount", async () => {
       // ARRANGE
-      const dto = { amount: -100, currency: 'MXN' };
-      const userId = 'user-123';
+      const dto = { amount: -100, currency: "MXN" };
+      const userId = "user-123";
 
       // ACT & ASSERT
       await expect(service.createPayment(dto, userId)).rejects.toThrow(
@@ -1007,12 +1036,12 @@ describe('PaymentsService', () => {
       );
     });
 
-    it('should throw NotFoundException when business not found', async () => {
+    it("should throw NotFoundException when business not found", async () => {
       // ARRANGE
-      const dto = { amount: 100, currency: 'MXN' };
-      const userId = 'invalid-user';
-      
-      jest.spyOn(prisma.transaction, 'findFirst').mockResolvedValue(null);
+      const dto = { amount: 100, currency: "MXN" };
+      const userId = "invalid-user";
+
+      jest.spyOn(prisma.transaction, "findFirst").mockResolvedValue(null);
 
       // ACT & ASSERT
       await expect(service.createPayment(dto, userId)).rejects.toThrow(
@@ -1026,33 +1055,30 @@ describe('PaymentsService', () => {
 ### 5.3. Test Template (Frontend)
 
 ```typescript
-import { TestBed } from '@angular/core/testing';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ResourceService } from './resource.service';
-import { provideHttpClient } from '@angular/common/http';
+import { TestBed } from "@angular/core/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
+import { ResourceService } from "./resource.service";
+import { provideHttpClient } from "@angular/common/http";
 
-describe('ResourceService', () => {
+describe("ResourceService", () => {
   let service: ResourceService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
     service = TestBed.inject(ResourceService);
   });
 
-  it('should be created', () => {
+  it("should be created", () => {
     expect(service).toBeTruthy();
   });
 
-  it('should fetch all resources', async () => {
-    const mockResources = [{ id: '1', name: 'Test' }];
-    
+  it("should fetch all resources", async () => {
+    const mockResources = [{ id: "1", name: "Test" }];
+
     // Use HttpTestingController here for actual http mocking
-    
+
     const result = await service.getAll();
     expect(result).toEqual(mockResources);
   });
@@ -1066,6 +1092,7 @@ describe('ResourceService', () => {
 **Format:** `<type>/<ticket-id>-<short-description>`
 
 **Types:**
+
 - `feat/` - New feature
 - `fix/` - Bug fix
 - `refactor/` - Code refactoring
@@ -1074,15 +1101,22 @@ describe('ResourceService', () => {
 - `chore/` - Maintenance tasks
 
 **Examples:**
+
 - `feat/PAY-123-add-qr-generation`
 - `fix/PAY-456-transaction-validation`
 - `refactor/PAY-789-extract-payment-adapter`
 
 ### 6.2. Commit Messages
 
+**Enforcement:**
+
+- Commit messages are linted by `commitlint` via Husky hooks.
+- Non-compliant commits will be rejected automatically.
+
 **Format:** `<type>(<scope>): <subject>`
 
 **Types:**
+
 - `feat` - New feature
 - `fix` - Bug fix
 - `docs` - Documentation
@@ -1092,6 +1126,7 @@ describe('ResourceService', () => {
 - `chore` - Maintenance
 
 **Examples:**
+
 ```
 feat(payments): add QR code generation
 fix(auth): correct JWT expiration validation
@@ -1143,6 +1178,7 @@ Closes #TICKET_NUMBER
 - [ ] No secrets in code
 - [ ] Tests added/updated
 - [ ] All tests pass
+- [ ] CI checks pass (Lint, Test, Build)
 - [ ] No merge conflicts
 ```
 
@@ -1151,30 +1187,35 @@ Closes #TICKET_NUMBER
 ### 7.1. For Reviewer
 
 **Functionality:**
+
 - [ ] Code does what PR description says
 - [ ] Edge cases handled
 - [ ] Error handling present and appropriate
 - [ ] No obvious bugs
 
 **Design:**
+
 - [ ] Follows established patterns
 - [ ] No code duplication
 - [ ] Appropriate abstraction level
 - [ ] Single Responsibility Principle followed
 
 **Testing:**
+
 - [ ] Tests cover main functionality
 - [ ] Tests cover error cases
 - [ ] Tests are readable and maintainable
 - [ ] Coverage meets 80% minimum
 
 **Documentation:**
+
 - [ ] JSDoc comments for public APIs
 - [ ] Inline comments for complex logic
 - [ ] README updated if needed
 - [ ] API docs updated if endpoints changed
 
 **Security:**
+
 - [ ] No secrets in code
 - [ ] Input validation present
 - [ ] Authorization checks present
@@ -1182,12 +1223,14 @@ Closes #TICKET_NUMBER
 - [ ] XSS prevention implemented
 
 **Performance:**
+
 - [ ] No N+1 queries
 - [ ] Appropriate indexes used
 - [ ] Large operations paginated
 - [ ] No blocking operations in critical path
 
 **Style:**
+
 - [ ] Linter passes
 - [ ] Consistent naming
 - [ ] No commented-out code
