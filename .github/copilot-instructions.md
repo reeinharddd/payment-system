@@ -6,6 +6,8 @@ This project uses a **Model Context Protocol (MCP)** server to enforce standards
 **Before starting any task, you MUST:**
 
 1. **Check for Standards:** Use the `payment-system-mcp` server to retrieve the latest rules.
+   - List resources to see available documentation (`docs://...`).
+   - Use `search_docs` tool to find specific rules if needed.
 2. **Use Templates:** When creating features, use `get_prompt('scaffold-feature')`.
 3. **Commit Rules:** When committing, use `get_prompt('generate-commit')`.
 4. **Documentation:** If you are unsure about a pattern, read the resource `docs://standards/development`.

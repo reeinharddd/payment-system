@@ -13,12 +13,64 @@ import {
 	McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
-import { join, resolve } from 'path';
+import { join, resolve, relative, extname, basename, dirname } from 'path';
 import { readdir, readFile, stat } from 'fs/promises';
+import { fileURLToPath } from 'url';
 
 // Configuration
-const PROJECT_ROOT = resolve(process.cwd(), '../../');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const PROJECT_ROOT = resolve(__dirname, '../../../'); // src -> mcp-server -> services -> root
 const DOCS_DIR = join(PROJECT_ROOT, 'docs');
+
+// Helper to recursively find markdown files
+async function getDocsFiles(
+	dir: string,
+	baseDir: string = dir
+): Promise<
+	Array<{ uri: string; name: string; description: string; filePath: string }>
+> {
+	try {
+		// Verify directory exists first
+		try {
+			await stat(dir);
+		} catch (e) {
+			return [];
+		}
+
+		const entries = await readdir(dir, { withFileTypes: true });
+		const results: Array<{
+			uri: string;
+			name: string;
+			description: string;
+			filePath: string;
+		}> = [];
+
+		for (const entry of entries) {
+			const fullPath = join(dir, entry.name);
+			if (entry.isDirectory()) {
+				// Avoid hidden directories and node_modules
+				if (!entry.name.startsWith('.') && entry.name !== 'node_modules') {
+					results.push(...(await getDocsFiles(fullPath, baseDir)));
+				}
+			} else if (entry.isFile() && entry.name.endsWith('.md')) {
+				const relPath = relative(baseDir, fullPath);
+				const uriPath = relPath.replace(/\\/g, '/').replace(/\.md$/, '');
+				const uri = `docs://${uriPath}`;
+
+				results.push({
+					uri,
+					name: basename(entry.name, '.md').replace(/-/g, ' '),
+					description: `Documentation for ${relPath}`,
+					filePath: fullPath,
+				});
+			}
+		}
+		return results;
+	} catch (error) {
+		return [];
+	}
+}
 
 // Initialize Server
 const server = new Server(
@@ -39,46 +91,39 @@ const server = new Server(
  * RESOURCES: Expose documentation as read-only resources
  */
 server.setRequestHandler(ListResourcesRequestSchema, async () => {
-	// In a real implementation, we would recursively walk the docs directory
-	// For now, we'll expose key documentation files
-	return {
-		resources: [
-			{
-				uri: 'docs://standards/commits',
-				name: 'Commit Standards',
-				description: 'Rules for writing commit messages',
+	try {
+		const docs = await getDocsFiles(DOCS_DIR);
+		return {
+			resources: docs.map((doc) => ({
+				uri: doc.uri,
+				name: doc.name,
+				description: doc.description,
 				mimeType: 'text/markdown',
-			},
-			{
-				uri: 'docs://standards/development',
-				name: 'Development Rules',
-				description: 'Core development workflow and rules',
-				mimeType: 'text/markdown',
-			},
-			{
-				uri: 'docs://templates/feature',
-				name: 'Feature Template',
-				description: 'Template for designing new features',
-				mimeType: 'text/markdown',
-			},
-		],
-	};
+			})),
+		};
+	} catch (error) {
+		return { resources: [] };
+	}
 });
-
 server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
 	const uri = request.params.uri;
 
-	let filePath = '';
-	if (uri === 'docs://standards/commits') {
-		// Extract commit section from DEVELOPMENT-RULES.md or similar
-		// For simplicity, we'll read the whole file where rules are defined
-		filePath = join(DOCS_DIR, 'process/workflow/DEVELOPMENT-RULES.md');
-	} else if (uri === 'docs://standards/development') {
-		filePath = join(DOCS_DIR, 'process/workflow/DEVELOPMENT-RULES.md');
-	} else if (uri === 'docs://templates/feature') {
-		filePath = join(DOCS_DIR, 'templates/01-FEATURE-DESIGN-TEMPLATE.md');
-	} else {
-		throw new McpError(ErrorCode.InvalidRequest, `Unknown resource: ${uri}`);
+	if (!uri.startsWith('docs://')) {
+		throw new McpError(
+			ErrorCode.InvalidRequest,
+			`Unknown resource scheme: ${uri}`
+		);
+	}
+
+	// Convert URI back to file path
+	// docs://folder/file -> docs/folder/file.md
+	const relPath = uri.substring('docs://'.length);
+	const filePath = join(DOCS_DIR, `${relPath}.md`);
+
+	// Security check: ensure we are still inside DOCS_DIR
+	const resolvedPath = resolve(filePath);
+	if (!resolvedPath.startsWith(resolve(DOCS_DIR))) {
+		throw new McpError(ErrorCode.InvalidRequest, `Access denied: ${uri}`);
 	}
 
 	try {
@@ -194,12 +239,70 @@ ${template}
 });
 
 /**
- * TOOLS: Executable actions (Optional for now, but good for future)
+ * TOOLS: Executable actions
  */
 server.setRequestHandler(ListToolsRequestSchema, async () => {
 	return {
-		tools: [],
+		tools: [
+			{
+				name: 'search_docs',
+				description: 'Search documentation for a specific query',
+				inputSchema: {
+					type: 'object',
+					properties: {
+						query: {
+							type: 'string',
+							description: 'The search query',
+						},
+					},
+					required: ['query'],
+				},
+			},
+		],
 	};
+});
+
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+	const name = request.params.name;
+	const args = request.params.arguments;
+
+	if (name === 'search_docs') {
+		const query = (args?.query as string).toLowerCase();
+		const docs = await getDocsFiles(DOCS_DIR);
+		const matches = [];
+
+		for (const doc of docs) {
+			try {
+				const content = await readFile(doc.filePath, 'utf-8');
+				if (content.toLowerCase().includes(query)) {
+					// Extract a snippet
+					const index = content.toLowerCase().indexOf(query);
+					const start = Math.max(0, index - 50);
+					const end = Math.min(content.length, index + 150);
+					const snippet = content.substring(start, end).replace(/\n/g, ' ');
+
+					matches.push({
+						uri: doc.uri,
+						name: doc.name,
+						snippet: `...${snippet}...`,
+					});
+				}
+			} catch (err) {
+				// Ignore read errors
+			}
+		}
+
+		return {
+			content: [
+				{
+					type: 'text',
+					text: JSON.stringify(matches, null, 2),
+				},
+			],
+		};
+	}
+
+	throw new McpError(ErrorCode.InvalidRequest, `Unknown tool: ${name}`);
 });
 
 // Start the server
