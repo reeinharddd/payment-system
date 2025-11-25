@@ -20,7 +20,7 @@
 </table>
 
 <div align="center">
-  
+
   <!-- METADATA BADGES -->
   <img src="https://img.shields.io/badge/Status-Mandatory-red?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-Developers-blue?style=flat-square" alt="Audience" />
@@ -581,7 +581,8 @@ Before writing your first line of code:
 - [ ] Clone repository and run `bun install` (installs dependencies and git hooks)
 - [ ] Copy `.env.example` to `.env` and configure
 - [ ] Run `docker-compose -f docker-compose.dev.yml up -d` for services
-- [ ] Run `bun run dev` to start development servers
+- [ ] Run `bun run docker:dev` to start development servers (Hot Reload enabled)
+- [ ] **NEVER** start servers independently (e.g., `ng serve` or `nest start`)
 - [ ] Verify tests pass: `bun test`
 - [ ] Create feature branch following naming convention
 - [ ] Code following templates and patterns

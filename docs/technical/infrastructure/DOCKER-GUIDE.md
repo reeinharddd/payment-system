@@ -1,5 +1,5 @@
 <!-- AI-INSTRUCTION: START -->
-<!-- 
+<!--
   This document defines the DOCKER CONFIGURATION GUIDE.
   1. Preserve the Header Table and Metadata block.
   2. Fill in the "Agent Directives" to guide future AI interactions.
@@ -20,7 +20,7 @@
 </table>
 
 <div align="center">
-  
+
   <!-- METADATA BADGES -->
   <img src="https://img.shields.io/badge/Status-Active-success?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-DevOps-blue?style=flat-square" alt="Audience" />
@@ -32,14 +32,14 @@
 
 ## 🤖 Agent Directives (System Prompt)
 
-*This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document.*
+_This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
-| Directive | Instruction |
-| :--- | :--- |
-| **Context** | This project uses Docker with **Bun** as the runtime. |
+| Directive      | Instruction                                                     |
+| :------------- | :-------------------------------------------------------------- |
+| **Context**    | This project uses Docker with **Bun** as the runtime.           |
 | **Constraint** | Always use `oven/bun:1` as the base image for backend services. |
-| **Pattern** | Use multi-stage builds to minimize image size. |
-| **Related** | `docs/technical/foundations/TECHNICAL-FOUNDATIONS.md` |
+| **Pattern**    | Use multi-stage builds to minimize image size.                  |
+| **Related**    | `docs/technical/foundations/TECHNICAL-FOUNDATIONS.md`           |
 
 ---
 
@@ -79,6 +79,7 @@ Orchestrates all services for local development with hot reload and debugging ca
 ### 3.2. Services
 
 **postgres:**
+
 - PostgreSQL 16 database
 - Exposed on port 5432
 - Persistent volume for data
@@ -86,12 +87,14 @@ Orchestrates all services for local development with hot reload and debugging ca
 - Default credentials: dev/dev123
 
 **redis:**
+
 - Redis 7 for caching and queuing
 - Exposed on port 6379
 - Append-only file persistence
 - Health checks with ping command
 
 **backend:**
+
 - NestJS API server (running on Bun)
 - Hot reload via volume mounts
 - Debug port 9229 exposed
@@ -99,12 +102,14 @@ Orchestrates all services for local development with hot reload and debugging ca
 - Environment variables injected
 
 **ollama:**
+
 - Local LLM service
 - Exposed on port 11434
 - Persistent model storage
 - Optional GPU support (commented)
 
 **mcp-server:**
+
 - Model Context Protocol server
 - Exposed on port 8080
 - Connects to ollama and postgres
@@ -122,10 +127,10 @@ Single bridge network `payment-network` connects all services.
 
 ### 3.5. Usage
 
-We recommend using the `bun run` scripts defined in `package.json` for convenience.
+**MANDATORY:** Always use the `bun run` scripts defined in `package.json`. Do not start services independently.
 
 ```bash
-# Start all services (equivalent to docker compose up)
+# Start all services (Hot Reload enabled) - PRIMARY COMMAND
 bun run docker:dev
 
 # Run in background (detached mode)
@@ -138,7 +143,7 @@ bun run docker:dev:down
 bun run docker:dev:logs
 ```
 
-Alternatively, you can use standard Docker Compose commands:
+**Note:** While standard Docker Compose commands work, the `bun run docker:dev` scripts ensure all environment variables and contexts are set correctly for the project.
 
 ```bash
 # Start all services
@@ -169,6 +174,7 @@ docker compose -f docker-compose.dev.yml down -v
 **Purpose:** Multi-stage build for optimized production image using Bun.
 
 **Stage 1: Builder**
+
 - Base: `oven/bun:1`
 - Installs all dependencies including devDependencies
 - Copies source code and libraries
@@ -176,6 +182,7 @@ docker compose -f docker-compose.dev.yml down -v
 - Compiles TypeScript to JavaScript (or runs directly with Bun)
 
 **Stage 2: Production**
+
 - Fresh `oven/bun:1` base
 - Installs only production dependencies
 - Copies compiled code from builder
@@ -185,12 +192,14 @@ docker compose -f docker-compose.dev.yml down -v
 - Health check endpoint at `/health`
 
 **Security Features:**
+
 - Non-root user execution
 - Minimal attack surface
 - No source code in final image
 - Health checks for container orchestration
 
 **Size Optimization:**
+
 - Multi-stage build removes dev dependencies
 - Bun image is relatively small
 - Only production artifacts included
@@ -200,6 +209,7 @@ docker compose -f docker-compose.dev.yml down -v
 **Purpose:** Development image with hot reload and debugging.
 
 **Features:**
+
 - Base: `oven/bun:1`
 - All dependencies installed (including dev)
 - Source code mounted as volume (not copied)
@@ -207,6 +217,7 @@ docker compose -f docker-compose.dev.yml down -v
 - Hot reload via `bun --watch`
 
 **Usage:**
+
 ```bash
 # Used automatically by docker-compose.dev.yml
 docker-compose up backend
@@ -225,12 +236,14 @@ docker run -p 3000:3000 -p 9229:9229 payment-backend-dev
 **Purpose:** Multi-stage build serving static Angular app with nginx.
 
 **Stage 1: Builder**
+
 - Base: `oven/bun:1` (for faster builds)
 - Installs Angular dependencies
 - Runs production build with optimizations
 - Output: `dist/browser/` directory
 
 **Stage 2: Nginx Server**
+
 - Base: `nginx:alpine` (minimal web server)
 - Copies built static files
 - Configures nginx for SPA routing
@@ -239,12 +252,14 @@ docker run -p 3000:3000 -p 9229:9229 payment-backend-dev
 - Health check on `/health` endpoint
 
 **Security Headers:**
+
 - `X-Frame-Options: SAMEORIGIN` - Prevents clickjacking
 - `X-Content-Type-Options: nosniff` - MIME type sniffing protection
 - `X-XSS-Protection: 1; mode=block` - XSS filter
 - `Referrer-Policy: strict-origin-when-cross-origin` - Referrer control
 
 **Nginx Features:**
+
 - Gzip compression for assets
 - Long cache for static files (1 year)
 - No cache for index.html
@@ -256,6 +271,7 @@ docker run -p 3000:3000 -p 9229:9229 payment-backend-dev
 **Purpose:** Development server with hot reload.
 
 **Features:**
+
 - Full Angular CLI installation
 - Source code mounted as volume
 - Exposed on port 4200
@@ -301,6 +317,7 @@ location /health {
 **Purpose:** Containerize Model Context Protocol server for AI agents.
 
 **Build Process:**
+
 1. Base: `oven/bun:1`
 2. Copy package files
 3. Install dependencies (`bun install`)
@@ -309,16 +326,19 @@ location /health {
 6. Run server (`bun run start`)
 
 **Integration:**
+
 - Connects to Ollama for LLM capabilities
 - Accesses PostgreSQL for data queries
 - Provides tools for AI agents to interact with payment system
 
 **Usage in Development:**
+
 ```bash
 docker-compose up mcp-server
 ```
 
 **Environment Variables:**
+
 - `OLLAMA_URL`: Connection to LLM service
 - `DATABASE_URL`: PostgreSQL connection string
 - `NODE_ENV`: Runtime environment
@@ -330,6 +350,7 @@ docker-compose up mcp-server
 ### 7.1. Purpose
 
 Excludes unnecessary files from Docker build context to:
+
 - Reduce build time
 - Decrease image size
 - Prevent sensitive data inclusion
@@ -337,26 +358,32 @@ Excludes unnecessary files from Docker build context to:
 ### 7.2. Excluded Categories
 
 **Dependencies:**
+
 - `node_modules/` - Reinstalled in container
 - Package manager logs
 
 **Build Outputs:**
+
 - `dist/`, `build/` - Generated during build
 - `.angular/` - Angular cache
 
 **Environment:**
+
 - `.env` files - Injected at runtime
 - Local configurations
 
 **Development:**
+
 - IDE files (`.vscode/`, `.idea/`)
 - OS files (`.DS_Store`, `Thumbs.db`)
 - Git directory
 
 **Documentation:**
+
 - `docs/`, `*.md` - Not needed in runtime
 
 **Testing:**
+
 - `coverage/`, test results
 
 ---
@@ -366,6 +393,7 @@ Excludes unnecessary files from Docker build context to:
 ### 8.1. Development Workflow
 
 **1. Initial Setup:**
+
 ```bash
 # Copy environment variables
 cp .env.example .env
@@ -381,6 +409,7 @@ bun run docker:dev:logs
 ```
 
 **2. Database Setup:**
+
 ```bash
 # Run migrations
 bun run db:migrate
@@ -393,11 +422,13 @@ bun run db:studio
 ```
 
 **3. Development:**
+
 - Backend: Edit files in `apps/backend/src/` - auto-reload enabled
 - Frontend: Edit files in `apps/merchant-web/src/` - auto-reload enabled
 - MCP: Edit files in `services/mcp-server/src/` - auto-reload enabled
 
 **4. Debugging:**
+
 ```bash
 # Attach to backend debugger on port 9229
 # In VSCode: Launch configuration or attach to process
@@ -410,6 +441,7 @@ docker exec -it payment-backend bun test
 ```
 
 **5. Cleanup:**
+
 ```bash
 # Stop services
 bun run docker:dev:down
@@ -424,6 +456,7 @@ docker compose -f docker-compose.dev.yml down --rmi all
 ### 8.2. Production Build
 
 **Backend:**
+
 ```bash
 docker build -f apps/backend/Dockerfile -t payment-backend:latest .
 docker run -p 3000:3000 \
@@ -433,6 +466,7 @@ docker run -p 3000:3000 \
 ```
 
 **Frontend:**
+
 ```bash
 docker build -f apps/merchant-web/Dockerfile -t payment-frontend:latest .
 docker run -p 80:80 payment-frontend:latest
@@ -441,8 +475,9 @@ docker run -p 80:80 payment-frontend:latest
 ### 8.3. Docker Compose Production
 
 Create `docker-compose.prod.yml`:
+
 ```yaml
-version: '3.9'
+version: "3.9"
 services:
   backend:
     build:
@@ -452,7 +487,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL}
     restart: always
-  
+
   frontend:
     build:
       context: .
@@ -473,6 +508,7 @@ services:
 **Problem:** `Error: bind: address already in use`
 
 **Solution:**
+
 ```bash
 # Find process using port
 lsof -i :3000
@@ -492,6 +528,7 @@ ports:
 **Problem:** Backend cannot connect to PostgreSQL
 
 **Solution:**
+
 ```bash
 # Check postgres health
 docker-compose ps postgres
@@ -509,6 +546,7 @@ DATABASE_URL=postgresql://dev:dev123@postgres:5432/paymentdb
 **Problem:** Changes not reflected in running container
 
 **Solution:**
+
 ```bash
 # Ensure volume mounts are correct
 volumes:
@@ -526,6 +564,7 @@ docker-compose restart backend
 **Problem:** Cannot write to mounted volumes
 
 **Solution:**
+
 ```bash
 # Fix file permissions
 sudo chown -R $USER:$USER .
@@ -539,6 +578,7 @@ docker-compose run --user $(id -u):$(id -g) backend bun install
 **Problem:** Docker consuming too much space
 
 **Solution:**
+
 ```bash
 # View disk usage
 docker system df
@@ -558,6 +598,7 @@ docker system prune -a --volumes
 **Problem:** Container marked as unhealthy
 
 **Solution:**
+
 ```bash
 # Check health check logs
 docker inspect <container_id> | jq '.[0].State.Health'
@@ -578,6 +619,7 @@ healthcheck:
 **Problem:** Service running but cannot connect from localhost
 
 **Solution:**
+
 ```bash
 # Ensure ports are published
 ports:
@@ -598,6 +640,7 @@ curl http://0.0.0.0:3000/health
 **Problem:** Docker builds taking too long
 
 **Solution:**
+
 ```bash
 # Use BuildKit for faster builds
 export DOCKER_BUILDKIT=1

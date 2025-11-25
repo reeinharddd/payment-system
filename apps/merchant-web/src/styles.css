@@ -1,3 +1,13 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @source "./**/*.{html,ts}";
 
+@theme {
+  --font-sans: 'Inter', sans-serif;
+
+  --color-brand-base: #cbc3e3;
+  --color-brand-primary: #4c1d95;
+  --color-brand-secondary: #10b981;
+  --color-brand-accent: #f97316;
+  --color-brand-gold: #fcc242;
+  --color-brand-surface: #f3f0ff;
+}

@@ -69,6 +69,7 @@ services:
     container_name: payment-frontend
     volumes:
       - ./apps/merchant-web:/app/apps/merchant-web
+      - ./libs:/app/libs
       - /app/node_modules
       - /app/apps/merchant-web/node_modules
     ports:

@@ -20,7 +20,7 @@
 </table>
 
 <div align="center">
-  
+
   <!-- METADATA BADGES -->
   <img src="https://img.shields.io/badge/Status-Approved-green?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-Developers-blue?style=flat-square" alt="Audience" />

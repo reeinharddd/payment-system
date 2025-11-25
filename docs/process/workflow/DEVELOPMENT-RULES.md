@@ -20,7 +20,7 @@
 </table>
 
 <div align="center">
-  
+
   <!-- METADATA BADGES -->
   <img src="https://img.shields.io/badge/Status-Mandatory-red?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-Developers-blue?style=flat-square" alt="Audience" />
@@ -84,7 +84,7 @@ _This section contains mandatory instructions for AI Agents (Copilot, Cursor, et
 6. TEST
    ├── Unit tests pass (bun test)
    ├── Integration tests pass (bun run test:e2e)
-   ├── Manual testing in dev environment
+   ├── Manual testing in dev environment (via `bun run docker:dev`)
    ├── Check coverage (minimum 80%)
    └── Test edge cases and error scenarios
 
@@ -1252,7 +1252,7 @@ Before requesting review:
 
 ---
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-11-01  
-**Author:** Engineering Team  
+**Version:** 1.0.0
+**Last Updated:** 2025-11-01
+**Author:** Engineering Team
 **Status:** Active - MUST FOLLOW

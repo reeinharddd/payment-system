@@ -1,5 +1,5 @@
 <!-- AI-INSTRUCTION: START -->
-<!-- 
+<!--
   This document is the PROJECT ROOT. When creating new docs:
   1. Preserve the Header Table and Metadata block.
   2. Fill in the "Agent Directives" to guide future AI interactions.
@@ -20,7 +20,7 @@
 </table>
 
 <div align="center">
-  
+
   <!-- METADATA BADGES -->
   <img src="https://img.shields.io/badge/Status-Active_Development-green?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-Developers-blue?style=flat-square" alt="Audience" />
@@ -32,14 +32,14 @@
 
 ## 🤖 Agent Directives (System Prompt)
 
-*This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document.*
+_This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
-| Directive | Instruction |
-| :--- | :--- |
-| **Context** | This is the ROOT document. It defines the project structure and entry points. |
+| Directive      | Instruction                                                                             |
+| :------------- | :-------------------------------------------------------------------------------------- |
+| **Context**    | This is the ROOT document. It defines the project structure and entry points.           |
 | **Constraint** | Always check `docs/process/workflow/AI-DEVELOPMENT-STANDARD.md` before generating code. |
-| **Pattern** | Follow the Monorepo structure defined in `docs/process/standards/PROJECT-STRUCTURE.md`. |
-| **Related** | `docs/`, `apps/`, `libs/` |
+| **Pattern**    | Follow the Monorepo structure defined in `docs/process/standards/PROJECT-STRUCTURE.md`. |
+| **Related**    | `docs/`, `apps/`, `libs/`                                                               |
 
 ---
 
@@ -69,8 +69,9 @@ bun install
 docker-compose -f docker-compose.dev.yml up -d
 bun run db:migrate
 
-# Start development servers
-bun run dev
+# Start development servers (Hot Reload enabled)
+# ALWAYS use this command. DO NOT start servers independently.
+bun run docker:dev
 ```
 
 ### 3.2. Project Structure
@@ -90,13 +91,16 @@ bun run dev
 ### 3.3. Documentation Index
 
 #### Getting Started
+
 - **[Getting Started with Development](docs/process/onboarding/GETTING-STARTED-DEVELOPMENT.md)** - START HERE - Complete development guide
 
 #### Business & Strategy
+
 - [Business Model Analysis](docs/business/strategy/BUSINESS-MODEL-ANALYSIS.md) - Viability, unit economics, and scalability
 - [No Customer App Advantage](docs/business/strategy/NO-CUSTOMER-APP-ADVANTAGE.md) - Why one-sided adoption wins
 
 #### Development Process
+
 - [AI Development Standard](docs/process/workflow/AI-DEVELOPMENT-STANDARD.md) - **MANDATORY** for AI interactions
 - [Development Rules](docs/process/workflow/DEVELOPMENT-RULES.md) - Mandatory development workflow and standards
 - [Construction Checklist](docs/process/workflow/CONSTRUCTION-CHECKLIST.md) - Quick reference for coding
@@ -105,11 +109,13 @@ bun run dev
 - [Monorepo Guide](docs/process/standards/MONOREPO-GUIDE.md) - Bun workspaces and Turborepo
 
 #### Technical Architecture
+
 - [System Architecture](docs/technical/architecture/SYSTEM-ARCHITECTURE.md) - System design and architecture patterns
 - [Preliminary Design](docs/technical/architecture/PRELIMINARY-DESIGN.md) - Base architecture and module design
 - [Design Patterns](docs/technical/architecture/DESIGN-PATTERNS.md) - Patterns with concrete examples
 
 #### Technical Guides
+
 - [Docker Guide](docs/technical/infrastructure/DOCKER-GUIDE.md) - Container configuration and deployment
 - [Angular Zoneless](docs/technical/frontend/ANGULAR-ZONELESS.md) - Angular 19 zoneless patterns
 - [TypeScript Strict](docs/technical/backend/TYPESCRIPT-STRICT.md) - Type safety patterns

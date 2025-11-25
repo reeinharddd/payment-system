@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background: Soft Lavender Squircle -->
+  <rect x="0" y="0" width="512" height="512" rx="120" fill="#CBC3E3"/>
+
+  <!-- Central Dot -->
+  <circle cx="256" cy="230" r="36" fill="#4C1D95"/>
+
+  <!-- Antenna Line -->
+  <line x1="256" y1="280" x2="256" y2="380" stroke="#4C1D95" stroke-width="36" stroke-linecap="round"/>
+
+  <!-- Inner Waves -->
+  <path d="M 186 180 A 85 85 0 0 0 186 280" fill="none" stroke="#4C1D95" stroke-width="36" stroke-linecap="round"/>
+  <path d="M 326 180 A 85 85 0 0 1 326 280" fill="none" stroke="#4C1D95" stroke-width="36" stroke-linecap="round"/>
+
+  <!-- Outer Waves -->
+  <path d="M 136 130 A 145 145 0 0 0 136 330" fill="none" stroke="#4C1D95" stroke-width="36" stroke-linecap="round"/>
+  <path d="M 376 130 A 145 145 0 0 1 376 330" fill="none" stroke="#4C1D95" stroke-width="36" stroke-linecap="round"/>
+</svg>
