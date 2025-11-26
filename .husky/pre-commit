@@ -1,5 +1,9 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# 1. Lint & Format Staged Files
 npx lint-staged
-npx lint-staged
+
+# 2. Typecheck (Cached by Turbo)
+# This ensures no type errors are committed, even in files not staged but affected
+bun run typecheck --filter='[HEAD]'

@@ -1,4 +1,3 @@
-````markdown
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document is a TEMPLATE for Feature Designs.
@@ -63,7 +62,8 @@ model Example {
   id String @id @default(uuid())
 }
 ```
-````
+
+```
 
 ### 3.2. API Endpoints (Backend)
 
@@ -85,9 +85,7 @@ model Example {
 
 ## 5. Open Questions / Risks
 
-- _Are there any performance concerns?_
-- _Dependencies on other teams?_
-
-```
+- *Are there any performance concerns?*
+- *Dependencies on other teams?*
 
 ```
