@@ -1,5 +1,5 @@
 <!-- AI-INSTRUCTION: START -->
-<!-- 
+<!--
   This document defines the BUSINESS MODEL ANALYSIS.
   1. Preserve the Header Table and Metadata block.
   2. Fill in the "Agent Directives" to guide future AI interactions.
@@ -20,7 +20,7 @@
 </table>
 
 <div align="center">
-  
+
   <!-- METADATA BADGES -->
   <img src="https://img.shields.io/badge/Status-Strategic-purple?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-Stakeholders-blue?style=flat-square" alt="Audience" />
@@ -32,14 +32,14 @@
 
 ## 🤖 Agent Directives (System Prompt)
 
-*This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document.*
+_This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
-| Directive | Instruction |
-| :--- | :--- |
-| **Context** | This document defines the core business logic and value proposition. |
+| Directive      | Instruction                                                               |
+| :------------- | :------------------------------------------------------------------------ |
+| **Context**    | This document defines the core business logic and value proposition.      |
 | **Constraint** | All technical decisions MUST align with the "Value Proposition Analysis". |
-| **Pattern** | Prioritize features that support the "One-Sided Adoption Model". |
-| **Related** | `docs/business/strategy/NO-CUSTOMER-APP-ADVANTAGE.md` |
+| **Pattern**    | Prioritize features that support the "One-Sided Adoption Model".          |
+| **Related**    | `docs/business/strategy/NO-CUSTOMER-APP-ADVANTAGE.md`                     |
 
 ---
 
@@ -58,12 +58,14 @@ The real business is not payment processing (commodity with thin margins), but t
 ### 2.1. What We Actually Sell
 
 **Primary Value (What merchants think they buy):**
+
 - Accept digital payments (QR, links, cards)
 - No expensive hardware required
 - Instant payment confirmation
 - **Customers don't need to download anything** (frictionless for buyers)
 
 **Hidden Value (What keeps them using it):**
+
 - Automatic inventory management
 - Sales analytics they never had
 - Customer database building
@@ -74,6 +76,7 @@ The real business is not payment processing (commodity with thin margins), but t
 **Critical Differentiator: Zero Friction for Customers**
 
 Unlike competitor apps that require BOTH merchant AND customer to have the app:
+
 - Our QR codes work with ANY banking app the customer already has
 - Payment links work in WhatsApp, SMS, email (no app needed)
 - Customer just scans → pays with their existing bank app → done
@@ -81,12 +84,14 @@ Unlike competitor apps that require BOTH merchant AND customer to have the app:
 - Customer never knows they used "our" system (invisible infrastructure)
 
 **Why This Matters:**
+
 - Merchant adoption is NOT blocked by customer adoption
 - Works day 1 with 100% of customers (everyone has a banking app)
 - Network effects work differently: more merchants = more trust, not more required users
 - Merchant can switch from cash to digital TODAY, not "when customers download app"
 
 **Transformational Value (Why they can't leave):**
+
 - Access to credit based on real transaction history
 - Insurance products (inventory, life, health)
 - Supplier financing and better terms
@@ -96,6 +101,7 @@ Unlike competitor apps that require BOTH merchant AND customer to have the app:
 ### 2.2. The "Not Making Them Pay More, Making Them Earn More" Thesis
 
 **Traditional Model (Competitors):**
+
 ```
 Merchant Revenue: $10,000/month
 Payment Processing Fee: 3.5% = $350
@@ -105,6 +111,7 @@ Value Delivered: Payment acceptance only
 ```
 
 **Our Model:**
+
 ```
 Merchant Revenue: $10,000/month (Month 1)
 Payment Processing Fee: 2.9% = $290
@@ -128,8 +135,28 @@ Additional Revenue Streams for Us:
 Total Revenue per Merchant: $290 + $48 = $338/month
 ```
 
-**Key Metric:**
-If we increase merchant revenue by 10%+, a 3% fee feels like a gift, not a cost.
+### 2.3. The "Tiendita" vs "Restaurante" Duality
+
+We recognize two distinct archetypes of small businesses with different needs but shared core infrastructure.
+
+**Archetype A: "La Tiendita" (Retail)**
+
+- **Focus:** Speed, simple inventory, cash management.
+- **Structure:** Owner + Family helpers.
+- **Key Feature:** Barcode scanning (Pack vs Individual).
+- **Pain Point:** "I bought a box of 10 chips, I sell them individually. How do I track that?"
+- **Solution:** `ProductComponent` (Pack) logic.
+
+**Archetype B: "El Puesto/Restaurante" (Food Service)**
+
+- **Focus:** Customization, kitchen workflow, table management.
+- **Structure:** Waiters + Kitchen + Cashier.
+- **Key Feature:** Product Modifiers (Salsa, No Onion) & Recipes.
+- **Pain Point:** "Customer wants a taco without onion. Kitchen needs to know."
+- **Solution:** `ProductModifier` & `SaleItem.notes`.
+
+**Unified Platform:**
+Instead of building two apps, we build **one flexible data model** (see `DATABASE-DESIGN.md`) where features are toggled based on the "Business Type" setting.
 
 ---
 
@@ -138,12 +165,14 @@ If we increase merchant revenue by 10%+, a 3% fee feels like a gift, not a cost.
 ### 3.1. What Exists Today (Latin America Focus)
 
 **Large Merchants:**
+
 - Sophisticated POS systems (Aloha, Oracle Micros)
 - ERP integrations (SAP, Odoo)
 - Multiple payment processors
 - Dedicated IT staff
 
 **Micro/Small Merchants (Our Target):**
+
 - Cash register or notebook
 - No inventory system
 - No customer database
@@ -152,6 +181,7 @@ If we increase merchant revenue by 10%+, a 3% fee feels like a gift, not a cost.
 - Manual counting at end of day
 
 **What's Missing (The Gap We Fill):**
+
 1. Integrated solution (payments + inventory + analytics)
 2. Zero-friction onboarding (no paperwork, instant activation)
 3. Progressive formalization (not binary formal/informal)
@@ -163,12 +193,14 @@ If we increase merchant revenue by 10%+, a 3% fee feels like a gift, not a cost.
 ### 3.2. Competitor Landscape
 
 **Payment-Only Players:**
+
 - Clip, SumUp, iZettle (acquired by PayPal)
 - Strengths: Brand, simple, work everywhere
 - Weaknesses: Commodity product, no lock-in, race to bottom on fees
 - **Critical Weakness: QR/links work with any bank app (open standard)**
 
 **App-Dependent Solutions:**
+
 - Mercado Pago, PayPal, Venmo
 - Strengths: Large user base, trust, full ecosystem
 - **Critical Weakness: Requires BOTH merchant AND customer to have app**
@@ -176,11 +208,13 @@ If we increase merchant revenue by 10%+, a 3% fee feels like a gift, not a cost.
 - Chicken-and-egg problem (why download if merchants don't accept? why accept if customers don't have app?)
 
 **Full POS Systems:**
+
 - Square (US), Toast (restaurants), Lightspeed
 - Strengths: Feature-rich, proven model
 - Weaknesses: Too complex for tiny shops, expensive hardware, US-centric
 
 **Fintech Neo-banks:**
+
 - Nubank, Ualá, Mercado Pago
 - Strengths: Customer base, financial licenses
 - Weaknesses: Not merchant-focused, no inventory/ops tools
@@ -195,6 +229,7 @@ If we increase merchant revenue by 10%+, a 3% fee feels like a gift, not a cost.
 ### 4.1. Revenue Streams (Year 1 - 3 Evolution)
 
 **Year 1: Transactional Revenue**
+
 ```
 Payment Processing: 2.5-3.0% per transaction
 Average Ticket: $15
@@ -208,6 +243,7 @@ Annual Run Rate: $1,344,000
 ```
 
 **Year 2: Value-Added Services**
+
 ```
 Payment Processing: $112/month (as before)
 
@@ -227,6 +263,7 @@ Annual Run Rate: $7,110,000
 ```
 
 **Year 3: Financial Services Marketplace**
+
 ```
 Payment + SaaS: $118.50/month
 
@@ -253,6 +290,7 @@ Annual Run Rate: $31,836,000
 ### 4.2. Unit Economics (Fully Loaded)
 
 **Customer Acquisition Cost (CAC):**
+
 ```
 Field Sales Agent Commission: $30 per signup
 Marketing/Promos: $20 per signup
@@ -264,6 +302,7 @@ Effective CAC: $60 / 0.7 = $85.71 per active merchant
 ```
 
 **Monthly Cost to Service:**
+
 ```
 Payment Processing Costs (wholesale): 1.8% of GMV = $81/month
 Cloud Infrastructure (AWS): $2/month per merchant
@@ -275,6 +314,7 @@ Total Cost to Service: $95/month
 ```
 
 **Gross Profit (Year 1):**
+
 ```
 Revenue: $112/month
 Cost to Service: $95/month
@@ -285,6 +325,7 @@ Months to Payback CAC: $85.71 / $17 = 5.0 months
 ```
 
 **Gross Profit (Year 3 with marketplace):**
+
 ```
 Revenue: $132.65/month
 Cost to Service: $98/month (infrastructure scales slower)
@@ -295,6 +336,7 @@ Months to Payback CAC: $85.71 / $34.65 = 2.5 months
 ```
 
 **Churn Analysis:**
+
 ```
 Optimistic Churn: 2% monthly (70% annual retention)
 Realistic Churn: 4% monthly (38% annual retention)
@@ -316,6 +358,7 @@ LTV:CAC Ratio: $866.25 / $85.71 = 10.11:1 (Excellent)
 ### 5.1. Technical Scalability
 
 **Infrastructure Costs vs Revenue:**
+
 ```
 1,000 merchants:
 - AWS/GCP: $2,000/month
@@ -342,6 +385,7 @@ Fixed costs scale sub-linearly (1.2% vs 2.2%), improving margins at scale.
 ### 5.2. Operational Scalability
 
 **Support Model:**
+
 ```
 Tier 1 (Chat/Bot): Handles 60% of queries, $0 marginal cost
 Tier 2 (Phone Support): Handles 35% of queries, 1 agent per 500 merchants
@@ -357,6 +401,7 @@ Support Cost per Merchant: $4/month
 ### 5.3. Geographic Scalability
 
 **Country Expansion Costs:**
+
 ```
 New Country Launch:
 - Payment adapter development: $15,000 (one-time)
@@ -383,12 +428,14 @@ Mostly already built - just adapter layer. Cost drops to $15,000 total.
 **Model 1: Tax Formalization Program**
 
 **Value to Government:**
+
 - Increase tax base (20-30% of economy is informal)
 - Real-time transaction data for policy making
 - Reduce cash economy (anti-corruption)
 - Financial inclusion metrics for international rankings
 
 **Example Structure (Mexico SAT):**
+
 ```
 Government pays: $5/month per merchant subsidy
 Our price to merchant: $0-2/month (instead of $10)
@@ -412,12 +459,14 @@ Additional Upside:
 **Model 2: MSME Digitalization Initiative**
 
 **Value to Government:**
+
 - Economic development and productivity gains
 - Job creation (formalized merchants hire more)
 - Better disaster response (know who needs help)
 - Export promotion (digitized businesses can scale)
 
 **Example Structure (Colombia):**
+
 ```
 Government contract: $20 million over 3 years
 Deliverables:
@@ -447,12 +496,14 @@ ROI to Us:
 Several countries exploring CBDCs need merchant acceptance infrastructure.
 
 **Value Proposition:**
+
 - Last-mile distribution network (we have the merchants)
 - KYC/compliance already done (progressive levels)
 - Instant settlement infrastructure built
 - Offline payment capability (QR codes work without internet)
 
 **Example Structure:**
+
 ```
 Central Bank partnership:
 - We become authorized CBDC wallet provider
@@ -473,6 +524,7 @@ Plus: All the marketplace revenue
 Traditional banks want merchant acquiring but lack tech.
 
 **Structure:**
+
 ```
 Bank provides:
 - Customer base (existing merchant accounts)
@@ -520,6 +572,7 @@ Walmart Mexico has 5,000 small local suppliers (produce, bakeries, crafts).
 Current pain: Manual invoicing, poor inventory visibility, high spoilage.
 
 **Structure:**
+
 ```
 Walmart pays: $15/month per supplier (vs $0 to supplier)
 Suppliers get:
@@ -556,6 +609,7 @@ Scalability:
 This is our BIGGEST competitive advantage and often overlooked:
 
 **The Two-Sided Adoption Problem (Our Competitors):**
+
 ```
 Merchant thinks: "I'll adopt when my customers have the app"
 Customer thinks: "I'll download when merchants accept it"
@@ -563,6 +617,7 @@ Result: DEADLOCK - neither side moves first
 ```
 
 **Our One-Sided Adoption Model:**
+
 ```
 Merchant adopts: Gets QR code that works with ANY bank app
 Customer: Uses their existing BBVA/Santander/Banco Azteca app
@@ -572,6 +627,7 @@ Result: Merchant can start accepting digital payments IMMEDIATELY
 **Real-World Example:**
 
 **Mercado Pago approach:**
+
 ```
 Day 1: Merchant signs up
 - Tells customer: "Download Mercado Pago app"
@@ -584,6 +640,7 @@ Adoption rate: ~10% (merchant gives up)
 ```
 
 **Our approach:**
+
 ```
 Day 1: Merchant signs up
 - Shows customer QR code
@@ -668,16 +725,19 @@ Us (One-Sided Model):
 ### 7.2. Network Effects
 
 **Merchant-Side:**
+
 - More merchants = better benchmark data for all
 - Regional merchant groups (peer learning)
 - Supplier marketplace liquidity (more buyers = better prices)
 
 **Customer-Side:**
+
 - Loyalty programs cross-merchant (scan at multiple shops)
 - Unified purchase history
 - Recommendations based on community
 
 **Data Moat:**
+
 - Transaction history = credit scores no one else has
 - Inventory patterns = demand forecasting
 - Regional economic data = new product opportunities
@@ -685,11 +745,13 @@ Us (One-Sided Model):
 ### 7.3. Switching Costs (Why Merchants Don't Leave)
 
 **Year 1:**
+
 - Low switching costs (just payment processing)
 - Churn risk: HIGH
 - Defense: Make inventory/analytics indispensable fast
 
 **Year 2:**
+
 - Historical sales data in our system
 - Customer database built up
 - Inventory history and automated reordering
@@ -697,6 +759,7 @@ Us (One-Sided Model):
 - Churn risk: MEDIUM
 
 **Year 3:**
+
 - Active business loan with us
 - Insurance policies through platform
 - Employee payroll integrated
@@ -707,6 +770,7 @@ Us (One-Sided Model):
 ### 7.4. Regulatory Moat
 
 **Licenses and Compliance:**
+
 - Payment processor licenses (expensive, slow to get)
 - Banking partnerships for fund holding
 - Tax authority API integrations (exclusive in some countries)
@@ -714,6 +778,7 @@ Us (One-Sided Model):
 - Data privacy compliance (GDPR equivalent)
 
 **First-Mover Advantage:**
+
 - Government partnerships lock out competitors (exclusive contracts)
 - Tax authority integration queue (18+ months in some countries)
 - Banking relationships (banks hesitant to work with many providers)
@@ -734,6 +799,7 @@ Margins compress to 1% or less (currently 2.9%).
 **Impact:** CRITICAL if we stay payment-only
 
 **Mitigation:**
+
 - Build lock-in through non-payment features (inventory, analytics, financial services)
 - Target: 40% of revenue from non-payment sources by Year 3
 - Volume discounts from payment processors as we scale
@@ -748,6 +814,7 @@ Small businesses have 50% failure rate in first 5 years.
 **Impact:** HIGH (destroys LTV calculations)
 
 **Mitigation:**
+
 - Our analytics REDUCE failure rate (better inventory management, cash flow visibility)
 - Target: 20% better survival rate than industry average
 - Offer emergency working capital to prevent closures
@@ -764,6 +831,7 @@ Square, PayPal, Stripe copy our model for Latin America.
 **Impact:** HIGH (price war, talent war)
 
 **Mitigation:**
+
 - Deep local integrations (tax, suppliers, insurance) they won't prioritize
 - Government relationships (multi-year exclusive contracts)
 - Community and brand (we're "for the small guy," they're corporate)
@@ -780,6 +848,7 @@ New regulations make payment processing harder or require expensive licenses.
 **Impact:** MEDIUM to HIGH
 
 **Mitigation:**
+
 - Bank partnerships provide regulatory umbrella
 - Diversify across countries (not all regulate at once)
 - Maintain strong government relationships (be part of regulation drafting)
@@ -795,6 +864,7 @@ Merchant or customer fraud bankrupts us.
 **Impact:** CRITICAL (can lose payment processor partnership)
 
 **Mitigation:**
+
 - ML fraud detection from day 1
 - Progressive KYC (higher limits require more verification)
 - Chargeback insurance for merchants (we eat some cost, builds trust)
@@ -808,23 +878,27 @@ Merchant or customer fraud bankrupts us.
 ### 9.1. Phase 1: Beachhead (Months 1-6)
 
 **Target:**
+
 - 500 merchants
 - Single city (Mexico City or Bogotá)
 - Single vertical (corner stores/abarrotes)
 
 **Why This Segment:**
+
 - High transaction frequency (300+ per month)
 - Simple inventory (packaged goods)
 - Strong community networks (word of mouth)
 - Immediate pain point (cash management, theft)
 
 **Acquisition Strategy:**
+
 - Field sales team (10 agents)
 - Door-to-door in commercial districts
 - Commission: $30 per activated merchant
 - Demo: Instant - show them their first QR sale in < 2 minutes
 
 **Success Metrics:**
+
 - CAC < $80
 - Activation rate > 65%
 - Monthly churn < 5%
@@ -833,23 +907,27 @@ Merchant or customer fraud bankrupts us.
 ### 9.2. Phase 2: Vertical Expansion (Months 7-18)
 
 **Add Verticals:**
+
 - Restaurants and food stalls
 - Beauty salons and barbers
 - Hardware stores
 - Pharmacies
 
 **Why:**
+
 - Same geography, lower CAC (brand awareness)
 - Different payment patterns (validation of model)
 - Higher average ticket sizes
 - Cross-sell opportunities (salon inventory very different)
 
 **Acquisition Strategy:**
+
 - Referral program (existing merchants get $10 per referral)
 - Trade association partnerships (salon owners association)
 - Content marketing (industry-specific blogs and YouTube)
 
 **Success Metrics:**
+
 - Reach 2,500 merchants
 - CAC < $70 (referrals reduce cost)
 - < 1% of merchants are multi-vertical (proves it works everywhere)
@@ -857,17 +935,20 @@ Merchant or customer fraud bankrupts us.
 ### 9.3. Phase 3: Geographic Expansion (Months 19-36)
 
 **Add Cities:**
+
 - Guadalajara, Monterrey (Mexico)
 - Medellín, Cali (Colombia)
 - Buenos Aires, Rosario (Argentina)
 
 **Acquisition Strategy:**
+
 - Regional managers (hire from local bank branches)
 - University student ambassador program (part-time field sales)
 - Digital marketing (Facebook, Instagram for small business owners)
 - Government partnerships (MSME digitalization programs)
 
 **Success Metrics:**
+
 - 20,000 merchants across 10 cities
 - CAC < $60 (economies of scale in marketing)
 - Revenue > $2M/month
@@ -876,18 +957,21 @@ Merchant or customer fraud bankrupts us.
 ### 9.4. Phase 4: Platform Play (Year 3+)
 
 **Launch Marketplace:**
+
 - Financial products (loans, insurance, savings)
 - Supplier marketplace (B2B procurement)
 - Employee management and payroll
 - Accounting software integrations
 
 **Acquisition Strategy:**
+
 - Inbound (merchants find us)
 - B2B2C partnerships (banks, retail chains, CPG companies)
 - Government contracts (tax formalization, CBDC distribution)
 - API for developers (build on our merchant network)
 
 **Success Metrics:**
+
 - 100,000+ merchants
 - 40% of revenue from non-payment sources
 - LTV:CAC > 8:1
@@ -909,6 +993,7 @@ Merchant or customer fraud bankrupts us.
 ### 10.2. The Math at Scale
 
 **Year 3 Target (Conservative):**
+
 ```
 Merchants: 25,000
 Average Revenue per Merchant: $130/month
@@ -927,6 +1012,7 @@ EBITDA: $4.8M (12% margin)
 ```
 
 **Year 5 Target (Growth Case):**
+
 ```
 Merchants: 120,000 (direct) + 80,000 (B2B2C)
 Average Revenue: $140/month (direct), $60/month (B2B2C)
@@ -949,6 +1035,7 @@ EBITDA: $50M (25% margin with scale economies)
 Build to 100,000+ merchants, $100M+ revenue, get acquired for $500M-1B by regional player who needs merchant network.
 
 **Why This Works:**
+
 - Solves real pain (cash management, inventory chaos, no business insights)
 - Aligns incentives (we win when merchants earn more)
 - Defensible through data and integrations (not just tech)
