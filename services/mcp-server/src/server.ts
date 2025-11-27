@@ -1,7 +1,8 @@
 /** @format */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import {
   CallToolRequestSchema,
   ErrorCode,
@@ -12,6 +13,8 @@ import {
   McpError,
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import cors from "cors";
+import express from "express";
 import { readdir, readFile, stat } from "fs/promises";
 import { basename, dirname, join, relative, resolve } from "path";
 import { fileURLToPath } from "url";
@@ -305,6 +308,62 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 });
 
 // Start the server
-const transport = new StdioServerTransport();
-await server.connect(transport);
-console.error("MCP Server running on stdio");
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+const transports: Record<string, SSEServerTransport> = {};
+
+app.get("/", (req, res) => {
+  res.send("MCP Server is running. Connect via SSE at /sse");
+});
+
+app.get("/sse", async (req, res) => {
+  const transport = new SSEServerTransport("/messages", res);
+  transports[transport.sessionId] = transport;
+
+  res.on("close", () => {
+    delete transports[transport.sessionId];
+  });
+
+  await server.connect(transport);
+});
+
+app.post("/messages", async (req, res) => {
+  console.log(
+    `Received message on /messages. Query: ${JSON.stringify(req.query)}`,
+  );
+  const sessionId = req.query.sessionId as string;
+  const transport = transports[sessionId];
+  if (transport) {
+    try {
+      await transport.handlePostMessage(req, res, req.body);
+    } catch (error) {
+      console.error("Error handling message:", error);
+      res.status(500).send(String(error));
+    }
+  } else {
+    console.warn(`No transport found for sessionId: ${sessionId}`);
+    res.status(400).send("No transport found for sessionId");
+  }
+});
+
+app.post("/mcp", async (req, res) => {
+  console.log("Received message on /mcp");
+  const transport = new StreamableHTTPServerTransport({
+    sessionIdGenerator: undefined,
+    enableJsonResponse: true,
+  });
+
+  res.on("close", () => {
+    transport.close();
+  });
+
+  await server.connect(transport);
+  await transport.handleRequest(req, res, req.body);
+});
+
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`MCP Server running on http://localhost:${PORT}`);
+});

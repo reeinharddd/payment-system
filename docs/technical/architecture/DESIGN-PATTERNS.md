@@ -30,6 +30,18 @@ Comprehensive guide to design patterns used throughout the system with concrete 
 
 ---
 
+## 🤖 Agent Directives (System Prompt)
+
+_This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
+
+| Directive      | Instruction                                                                     |
+| :------------- | :------------------------------------------------------------------------------ |
+| **Context**    | This document defines the design patterns and best practices.                   |
+| **Constraint** | Refer to specific patterns when implementing new features.                      |
+| **Pattern**    | Use the Factory Pattern for payment providers and Strategy Pattern for methods. |
+
+---
+
 ## Table of Contents
 
 - [Creational Patterns](#creational-patterns)
@@ -63,46 +75,50 @@ export interface IPaymentProvider {
 // 2. CONCRETE PRODUCTS
 @Injectable()
 export class ConektaPaymentProvider implements IPaymentProvider {
-  readonly country = 'MX';
-  readonly currency = 'MXN';
-  
+  readonly country = "MX";
+  readonly currency = "MXN";
+
   constructor(
-    @Inject('CONEKTA_CONFIG') private config: ConektaConfig,
+    @Inject("CONEKTA_CONFIG") private config: ConektaConfig,
     private http: HttpService,
   ) {}
-  
+
   async createPaymentIntent(dto: CreatePaymentDto): Promise<PaymentIntent> {
     // Conekta-specific API call
-    const response = await this.http.post(
-      'https://api.conekta.io/orders',
-      {
-        amount: dto.amount * 100, // Conekta uses cents
-        currency: 'MXN',
-        customer_info: {
-          phone: dto.customerPhone,
+    const response = await this.http
+      .post(
+        "https://api.conekta.io/orders",
+        {
+          amount: dto.amount * 100, // Conekta uses cents
+          currency: "MXN",
+          customer_info: {
+            phone: dto.customerPhone,
+          },
+          charges: [
+            {
+              payment_method: { type: "spei" },
+            },
+          ],
         },
-        charges: [{
-          payment_method: { type: 'spei' },
-        }],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${this.config.apiKey}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.config.apiKey}`,
+          },
         },
-      },
-    ).toPromise();
-    
+      )
+      .toPromise();
+
     return {
       id: response.data.id,
       amount: dto.amount,
-      currency: 'MXN',
+      currency: "MXN",
       qrCodeUrl: response.data.charges[0].payment_method.clabe,
       paymentLink: response.data.checkout_url,
       expiresAt: new Date(response.data.charges[0].payment_method.expires_at),
       providerData: response.data,
     };
   }
-  
+
   async generateQRCode(intentId: string): Promise<QRCodeData> {
     // Implementation
   }
@@ -110,9 +126,9 @@ export class ConektaPaymentProvider implements IPaymentProvider {
 
 @Injectable()
 export class PayUPaymentProvider implements IPaymentProvider {
-  readonly country = 'CO';
-  readonly currency = 'COP';
-  
+  readonly country = "CO";
+  readonly currency = "COP";
+
   // Similar implementation for Colombia
 }
 
@@ -120,29 +136,29 @@ export class PayUPaymentProvider implements IPaymentProvider {
 @Injectable()
 export class PaymentProviderFactory {
   constructor(
-    @Inject('PAYMENT_PROVIDERS') 
+    @Inject("PAYMENT_PROVIDERS")
     private providers: Map<string, IPaymentProvider>,
   ) {}
-  
+
   getProvider(country: string): IPaymentProvider {
     const provider = this.providers.get(country);
-    
+
     if (!provider) {
       throw new BadRequestException(
         `Payment provider not available for country: ${country}`,
       );
     }
-    
+
     return provider;
   }
-  
+
   getProviderByName(name: string): IPaymentProvider {
     for (const provider of this.providers.values()) {
       if (provider.constructor.name === name) {
         return provider;
       }
     }
-    
+
     throw new NotFoundException(`Provider ${name} not found`);
   }
 }
@@ -155,7 +171,7 @@ export class PaymentProviderFactory {
     MercadoPagoPaymentProvider,
     KhipuPaymentProvider,
     {
-      provide: 'PAYMENT_PROVIDERS',
+      provide: "PAYMENT_PROVIDERS",
       useFactory: (
         conekta: ConektaPaymentProvider,
         payu: PayUPaymentProvider,
@@ -163,10 +179,10 @@ export class PaymentProviderFactory {
         khipu: KhipuPaymentProvider,
       ) => {
         const map = new Map<string, IPaymentProvider>();
-        map.set('MX', conekta);
-        map.set('CO', payu);
-        map.set('AR', mercadopago);
-        map.set('CL', khipu);
+        map.set("MX", conekta);
+        map.set("CO", payu);
+        map.set("AR", mercadopago);
+        map.set("CL", khipu);
         return map;
       },
       inject: [
@@ -189,31 +205,34 @@ export class PaymentsService {
     private factory: PaymentProviderFactory,
     private prisma: PrismaService,
   ) {}
-  
-  async createPayment(dto: CreatePaymentDto, userId: string): Promise<PaymentIntent> {
+
+  async createPayment(
+    dto: CreatePaymentDto,
+    userId: string,
+  ): Promise<PaymentIntent> {
     // Get business to determine country
     const business = await this.prisma.business.findFirst({
       where: { ownerId: userId },
     });
-    
+
     if (!business) {
-      throw new NotFoundException('Business not found');
+      throw new NotFoundException("Business not found");
     }
-    
+
     // Get provider for business country
     const provider = this.factory.getProvider(business.country);
-    
+
     // Create payment intent
     const intent = await provider.createPaymentIntent(dto);
-    
+
     // Save to database
     await this.prisma.transaction.create({
       data: {
         businessId: business.id,
         amount: dto.amount,
         currency: provider.currency,
-        status: 'PENDING',
-        paymentMethod: 'QR',
+        status: "PENDING",
+        paymentMethod: "QR",
         country: provider.country,
         providerAdapter: provider.constructor.name,
         providerData: intent.providerData,
@@ -221,13 +240,14 @@ export class PaymentsService {
         paymentLink: intent.paymentLink,
       },
     });
-    
+
     return intent;
   }
 }
 ```
 
 **Benefits:**
+
 - Easy to add new country (just implement interface + register in map)
 - Business logic doesn't know about specific providers
 - Testable (mock factory in tests)
@@ -245,7 +265,7 @@ export class PaymentsService {
 // BAD - Tight coupling
 export class PaymentsService {
   private prisma = new PrismaService(); // Hard dependency
-  
+
   async createPayment() {
     await this.prisma.transaction.create({...});
   }
@@ -259,7 +279,7 @@ export class PaymentsService {
     private factory: PaymentProviderFactory, // Injected
     private events: EventEmitter2,        // Injected
   ) {}
-  
+
   async createPayment() {
     // Use injected dependencies
   }
@@ -269,7 +289,7 @@ export class PaymentsService {
 describe('PaymentsService', () => {
   let service: PaymentsService;
   let prisma: PrismaService;
-  
+
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
@@ -285,11 +305,11 @@ describe('PaymentsService', () => {
         // ... other mocks
       ],
     }).compile();
-    
+
     service = module.get(PaymentsService);
     prisma = module.get(PrismaService);
   });
-  
+
   it('should create payment', async () => {
     // Test with mocked dependencies
   });
@@ -305,6 +325,7 @@ describe('PaymentsService', () => {
 **Purpose:** Separate data access logic from business logic
 
 **When to Use:**
+
 - Complex queries with multiple conditions
 - Reusable query logic
 - Need to mock data layer in tests
@@ -316,11 +337,13 @@ describe('PaymentsService', () => {
 @Injectable()
 export class TransactionRepository {
   constructor(private prisma: PrismaService) {}
-  
+
   /**
    * Find transactions with complex filtering and aggregation
    */
-  async findWithAnalytics(filters: TransactionFilters): Promise<TransactionAnalytics> {
+  async findWithAnalytics(
+    filters: TransactionFilters,
+  ): Promise<TransactionAnalytics> {
     const where: Prisma.TransactionWhereInput = {
       businessId: filters.businessId,
       status: filters.status,
@@ -329,14 +352,14 @@ export class TransactionRepository {
         lte: filters.endDate,
       },
     };
-    
+
     if (filters.minAmount || filters.maxAmount) {
       where.amount = {
         gte: filters.minAmount,
         lte: filters.maxAmount,
       };
     }
-    
+
     const [transactions, total, sum] = await Promise.all([
       // Main query with pagination
       this.prisma.transaction.findMany({
@@ -346,14 +369,14 @@ export class TransactionRepository {
             select: { name: true, country: true },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip: filters.skip,
         take: filters.take,
       }),
-      
+
       // Count for pagination
       this.prisma.transaction.count({ where }),
-      
+
       // Aggregate for analytics
       this.prisma.transaction.aggregate({
         where,
@@ -362,7 +385,7 @@ export class TransactionRepository {
         _count: true,
       }),
     ]);
-    
+
     return {
       transactions,
       total,
@@ -373,7 +396,7 @@ export class TransactionRepository {
       },
     };
   }
-  
+
   /**
    * Find transactions by status with business info
    */
@@ -387,7 +410,7 @@ export class TransactionRepository {
         business: true,
         sale: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 }
@@ -395,10 +418,8 @@ export class TransactionRepository {
 // 2. SERVICE (BUSINESS LOGIC)
 @Injectable()
 export class AnalyticsService {
-  constructor(
-    private transactionRepo: TransactionRepository,
-  ) {}
-  
+  constructor(private transactionRepo: TransactionRepository) {}
+
   async getPaymentAnalytics(
     businessId: string,
     dateRange: DateRange,
@@ -406,13 +427,13 @@ export class AnalyticsService {
     // Use repository for complex query
     const data = await this.transactionRepo.findWithAnalytics({
       businessId,
-      status: 'CONFIRMED',
+      status: "CONFIRMED",
       startDate: dateRange.start,
       endDate: dateRange.end,
       skip: 0,
       take: 1000,
     });
-    
+
     // Apply business logic
     return {
       totalRevenue: data.analytics.totalAmount,
@@ -422,7 +443,7 @@ export class AnalyticsService {
       growth: this.calculateGrowth(data.transactions),
     };
   }
-  
+
   private calculateTopDays(transactions: Transaction[]): DayAnalytics[] {
     // Business logic for analytics
   }
@@ -430,6 +451,7 @@ export class AnalyticsService {
 ```
 
 **Benefits:**
+
 - Service layer stays clean (business logic only)
 - Repository reusable across multiple services
 - Easy to mock in tests
@@ -456,11 +478,11 @@ export interface ISMSProvider {
 @Injectable()
 export class TwilioSMSAdapter implements ISMSProvider {
   private client: Twilio;
-  
-  constructor(@Inject('TWILIO_CONFIG') config: TwilioConfig) {
+
+  constructor(@Inject("TWILIO_CONFIG") config: TwilioConfig) {
     this.client = new Twilio(config.accountSid, config.authToken);
   }
-  
+
   async sendSMS(to: string, message: string): Promise<SMSResult> {
     try {
       // Twilio-specific API call
@@ -469,7 +491,7 @@ export class TwilioSMSAdapter implements ISMSProvider {
         from: this.config.fromNumber,
         body: message,
       });
-      
+
       // Adapt Twilio response to our interface
       return {
         messageId: result.sid,
@@ -477,42 +499,40 @@ export class TwilioSMSAdapter implements ISMSProvider {
         sentAt: new Date(result.dateCreated),
       };
     } catch (error) {
-      throw new SMSDeliveryException('Failed to send SMS via Twilio', error);
+      throw new SMSDeliveryException("Failed to send SMS via Twilio", error);
     }
   }
-  
+
   async getDeliveryStatus(messageId: string): Promise<DeliveryStatus> {
     const message = await this.client.messages(messageId).fetch();
-    
+
     return {
       messageId: message.sid,
       status: this.mapStatus(message.status),
       deliveredAt: message.dateUpdated ? new Date(message.dateUpdated) : null,
     };
   }
-  
+
   private mapStatus(twilioStatus: string): SMSStatus {
     const statusMap = {
-      'queued': 'PENDING',
-      'sent': 'SENT',
-      'delivered': 'DELIVERED',
-      'failed': 'FAILED',
+      queued: "PENDING",
+      sent: "SENT",
+      delivered: "DELIVERED",
+      failed: "FAILED",
     };
-    
-    return statusMap[twilioStatus] || 'UNKNOWN';
+
+    return statusMap[twilioStatus] || "UNKNOWN";
   }
 }
 
 // 3. USAGE
 @Injectable()
 export class NotificationService {
-  constructor(
-    @Inject('SMS_PROVIDER') private sms: ISMSProvider,
-  ) {}
-  
+  constructor(@Inject("SMS_PROVIDER") private sms: ISMSProvider) {}
+
   async notifyMerchant(phone: string, amount: number): Promise<void> {
     const message = `Pago confirmado por $${amount}. ¡Gracias!`;
-    
+
     // Use our interface (doesn't care if Twilio, SNS, etc)
     await this.sms.sendSMS(phone, message);
   }
@@ -520,6 +540,7 @@ export class NotificationService {
 ```
 
 **Benefits:**
+
 - Can swap SMS providers without changing business logic
 - Testable (mock ISMSProvider)
 - Consistent interface across different providers
@@ -551,24 +572,24 @@ export class QRCodeStrategy implements IPaymentMethodStrategy {
     private qrGenerator: QRCodeService,
     private providerFactory: PaymentProviderFactory,
   ) {}
-  
+
   async generatePaymentData(transaction: Transaction): Promise<PaymentData> {
     const provider = this.providerFactory.getProvider(transaction.country);
-    
+
     // Generate QR code with SPEI/PSE/PIX format
     const qrData = await provider.generateQRCode(transaction.id);
-    
+
     // Generate QR image
     const qrImage = await this.qrGenerator.generate(qrData.content);
-    
+
     return {
-      type: 'QR_CODE',
+      type: "QR_CODE",
       qrImageUrl: qrImage.url,
       instructions: `Scan this QR code with your bank app to pay`,
       expiresIn: 3600, // 1 hour
     };
   }
-  
+
   async validatePayment(transaction: Transaction): Promise<boolean> {
     // QR-specific validation
     return transaction.qrCodeUrl !== null;
@@ -578,20 +599,20 @@ export class QRCodeStrategy implements IPaymentMethodStrategy {
 @Injectable()
 export class PaymentLinkStrategy implements IPaymentMethodStrategy {
   constructor(private urlService: URLShortenerService) {}
-  
+
   async generatePaymentData(transaction: Transaction): Promise<PaymentData> {
     // Generate short payment link
     const longUrl = `${process.env.APP_URL}/pay/${transaction.id}`;
     const shortUrl = await this.urlService.shorten(longUrl);
-    
+
     return {
-      type: 'PAYMENT_LINK',
+      type: "PAYMENT_LINK",
       paymentLink: shortUrl,
       instructions: `Share this link via WhatsApp, SMS, or email`,
       expiresIn: 86400, // 24 hours
     };
   }
-  
+
   async validatePayment(transaction: Transaction): Promise<boolean> {
     return transaction.paymentLink !== null;
   }
@@ -601,34 +622,37 @@ export class PaymentLinkStrategy implements IPaymentMethodStrategy {
 @Injectable()
 export class PaymentMethodService {
   private strategies: Map<string, IPaymentMethodStrategy>;
-  
+
   constructor(
     qrStrategy: QRCodeStrategy,
     linkStrategy: PaymentLinkStrategy,
     transferStrategy: BankTransferStrategy,
   ) {
     this.strategies = new Map();
-    this.strategies.set('QR', qrStrategy);
-    this.strategies.set('LINK', linkStrategy);
-    this.strategies.set('TRANSFER', transferStrategy);
+    this.strategies.set("QR", qrStrategy);
+    this.strategies.set("LINK", linkStrategy);
+    this.strategies.set("TRANSFER", transferStrategy);
   }
-  
+
   async generatePaymentMethod(
     transaction: Transaction,
     methodType: string,
   ): Promise<PaymentData> {
     const strategy = this.strategies.get(methodType);
-    
+
     if (!strategy) {
-      throw new BadRequestException(`Payment method ${methodType} not supported`);
+      throw new BadRequestException(
+        `Payment method ${methodType} not supported`,
+      );
     }
-    
+
     return await strategy.generatePaymentData(transaction);
   }
 }
 ```
 
 **Benefits:**
+
 - Easy to add new payment methods
 - Each strategy isolated and testable
 - Client code doesn't know implementation details
@@ -662,21 +686,21 @@ export class PaymentsService {
     private prisma: PrismaService,
     private eventEmitter: EventEmitter2, // NestJS event emitter
   ) {}
-  
+
   async confirmPayment(transactionId: string): Promise<void> {
     // Update transaction
     const transaction = await this.prisma.transaction.update({
       where: { id: transactionId },
       data: {
-        status: 'CONFIRMED',
+        status: "CONFIRMED",
         confirmedAt: new Date(),
       },
       include: { business: true },
     });
-    
+
     // Emit event (fire and forget - non-blocking)
     this.eventEmitter.emit(
-      'payment.confirmed',
+      "payment.confirmed",
       new PaymentConfirmedEvent(
         transaction.id,
         transaction.businessId,
@@ -685,7 +709,7 @@ export class PaymentsService {
         transaction.confirmedAt!,
       ),
     );
-    
+
     this.logger.log(`Payment ${transactionId} confirmed`);
   }
 }
@@ -698,8 +722,8 @@ export class NotificationListener {
     private email: IEmailProvider,
     private prisma: PrismaService,
   ) {}
-  
-  @OnEvent('payment.confirmed')
+
+  @OnEvent("payment.confirmed")
   async handlePaymentConfirmed(event: PaymentConfirmedEvent): Promise<void> {
     try {
       // Get business owner contact
@@ -707,19 +731,19 @@ export class NotificationListener {
         where: { id: event.businessId },
         include: { owner: true },
       });
-      
+
       // Send SMS
       await this.sms.sendSMS(
         business.owner.phone,
         `¡Pago confirmado! Recibiste ${event.currency} ${event.amount}`,
       );
-      
+
       // Send email if available
       if (business.owner.email) {
         await this.email.send({
           to: business.owner.email,
-          subject: 'Pago confirmado',
-          template: 'payment-confirmed',
+          subject: "Pago confirmado",
+          template: "payment-confirmed",
           data: {
             amount: event.amount,
             currency: event.currency,
@@ -740,8 +764,8 @@ export class AnalyticsListener {
     private analytics: AnalyticsService,
     private redis: RedisService,
   ) {}
-  
-  @OnEvent('payment.confirmed')
+
+  @OnEvent("payment.confirmed")
   async handlePaymentConfirmed(event: PaymentConfirmedEvent): Promise<void> {
     try {
       // Track payment in analytics
@@ -751,11 +775,11 @@ export class AnalyticsListener {
         currency: event.currency,
         timestamp: event.confirmedAt,
       });
-      
+
       // Increment daily counter in Redis
-      const dateKey = format(event.confirmedAt, 'yyyy-MM-dd');
+      const dateKey = format(event.confirmedAt, "yyyy-MM-dd");
       await this.redis.incr(`payments:${event.businessId}:${dateKey}`);
-      
+
       // Update business metrics
       await this.redis.zincrby(
         `revenue:${event.businessId}`,
@@ -771,8 +795,8 @@ export class AnalyticsListener {
 @Injectable()
 export class InventoryListener {
   constructor(private inventory: InventoryService) {}
-  
-  @OnEvent('payment.confirmed')
+
+  @OnEvent("payment.confirmed")
   async handlePaymentConfirmed(event: PaymentConfirmedEvent): Promise<void> {
     // Only process if transaction has associated sale
     const transaction = await this.prisma.transaction.findUnique({
@@ -783,7 +807,7 @@ export class InventoryListener {
         },
       },
     });
-    
+
     if (transaction?.sale) {
       // Update stock for sold items
       await this.inventory.decrementStock(transaction.sale.items);
@@ -804,6 +828,7 @@ export class PaymentsModule {}
 ```
 
 **Benefits:**
+
 - Loose coupling (service doesn't know about listeners)
 - Easy to add new side effects (just add listener)
 - Non-blocking (events processed async)
@@ -829,28 +854,28 @@ export class TransactionCommands {
     private prisma: PrismaService,
     private events: EventEmitter2,
   ) {}
-  
+
   async createTransaction(dto: CreateTransactionDto): Promise<Transaction> {
     const transaction = await this.prisma.transaction.create({
       data: dto,
     });
-    
-    this.events.emit('transaction.created', transaction);
-    
+
+    this.events.emit("transaction.created", transaction);
+
     return transaction;
   }
-  
+
   async confirmTransaction(id: string): Promise<Transaction> {
     const transaction = await this.prisma.transaction.update({
       where: { id },
       data: {
-        status: 'CONFIRMED',
+        status: "CONFIRMED",
         confirmedAt: new Date(),
       },
     });
-    
-    this.events.emit('transaction.confirmed', transaction);
-    
+
+    this.events.emit("transaction.confirmed", transaction);
+
     return transaction;
   }
 }
@@ -862,12 +887,12 @@ export class TransactionQueries {
     private prisma: PrismaService,
     private cache: CacheService,
   ) {}
-  
+
   async getTransactionById(id: string): Promise<TransactionDto> {
     // Try cache first
     const cached = await this.cache.get(`transaction:${id}`);
     if (cached) return cached;
-    
+
     const transaction = await this.prisma.transaction.findUnique({
       where: { id },
       include: {
@@ -879,17 +904,17 @@ export class TransactionQueries {
         },
       },
     });
-    
+
     if (!transaction) {
-      throw new NotFoundException('Transaction not found');
+      throw new NotFoundException("Transaction not found");
     }
-    
+
     // Cache for 5 minutes
     await this.cache.set(`transaction:${id}`, transaction, 300);
-    
+
     return transaction;
   }
-  
+
   async getBusinessTransactions(
     businessId: string,
     filters: TransactionFilters,
@@ -903,7 +928,7 @@ export class TransactionQueries {
         lte: filters.endDate,
       },
     };
-    
+
     const [transactions, total] = await Promise.all([
       this.prisma.transaction.findMany({
         where,
@@ -916,13 +941,13 @@ export class TransactionQueries {
           paymentMethod: true,
           createdAt: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip: filters.skip,
         take: filters.take,
       }),
       this.prisma.transaction.count({ where }),
     ]);
-    
+
     return {
       data: transactions,
       meta: {
@@ -936,34 +961,32 @@ export class TransactionQueries {
 }
 
 // CONTROLLER USES BOTH
-@Controller('transactions')
+@Controller("transactions")
 export class TransactionsController {
   constructor(
-    private commands: TransactionCommands,  // Writes
-    private queries: TransactionQueries,    // Reads
+    private commands: TransactionCommands, // Writes
+    private queries: TransactionQueries, // Reads
   ) {}
-  
+
   @Post()
   async create(@Body() dto: CreateTransactionDto) {
     return this.commands.createTransaction(dto);
   }
-  
-  @Get(':id')
-  async getById(@Param('id') id: string) {
+
+  @Get(":id")
+  async getById(@Param("id") id: string) {
     return this.queries.getTransactionById(id);
   }
-  
+
   @Get()
   async getAll(@Query() filters: TransactionFilters) {
-    return this.queries.getBusinessTransactions(
-      filters.businessId,
-      filters,
-    );
+    return this.queries.getBusinessTransactions(filters.businessId, filters);
   }
 }
 ```
 
 **Benefits:**
+
 - Optimize writes and reads independently
 - Cache read model aggressively
 - Scale read and write databases separately
@@ -980,8 +1003,13 @@ export class TransactionsController {
 **Implementation:**
 
 ```typescript
-import { signalStore, withState, withComputed, withMethods } from '@ngrx/signals';
-import { computed, inject } from '@angular/core';
+import {
+  signalStore,
+  withState,
+  withComputed,
+  withMethods,
+} from "@ngrx/signals";
+import { computed, inject } from "@angular/core";
 
 // 1. STATE INTERFACE
 interface PaymentsState {
@@ -989,7 +1017,7 @@ interface PaymentsState {
   loading: boolean;
   error: string | null;
   filters: {
-    status: TransactionStatus | 'ALL';
+    status: TransactionStatus | "ALL";
     dateRange: DateRange;
     searchTerm: string;
   };
@@ -1001,70 +1029,71 @@ const initialState: PaymentsState = {
   loading: false,
   error: null,
   filters: {
-    status: 'ALL',
+    status: "ALL",
     dateRange: { start: startOfMonth(new Date()), end: new Date() },
-    searchTerm: '',
+    searchTerm: "",
   },
 };
 
 // 3. STORE DEFINITION
 export const PaymentsStore = signalStore(
-  { providedIn: 'root' },
-  
+  { providedIn: "root" },
+
   // State
   withState(initialState),
-  
+
   // Computed values (derived state)
   withComputed(({ payments, filters }) => ({
     // Filter payments based on filters
     filteredPayments: computed(() => {
       let filtered = payments();
-      
+
       // Filter by status
-      if (filters().status !== 'ALL') {
-        filtered = filtered.filter(p => p.status === filters().status);
+      if (filters().status !== "ALL") {
+        filtered = filtered.filter((p) => p.status === filters().status);
       }
-      
+
       // Filter by search term
       if (filters().searchTerm) {
         const term = filters().searchTerm.toLowerCase();
-        filtered = filtered.filter(p =>
-          p.id.toLowerCase().includes(term) ||
-          p.business.name.toLowerCase().includes(term)
+        filtered = filtered.filter(
+          (p) =>
+            p.id.toLowerCase().includes(term) ||
+            p.business.name.toLowerCase().includes(term),
         );
       }
-      
+
       return filtered;
     }),
-    
+
     // Calculate total amount
     totalAmount: computed(() => {
       return payments().reduce((sum, p) => sum + p.amount, 0);
     }),
-    
+
     // Count by status
     statusCounts: computed(() => {
       const payments = payments();
       return {
-        pending: payments.filter(p => p.status === 'PENDING').length,
-        confirmed: payments.filter(p => p.status === 'CONFIRMED').length,
-        failed: payments.filter(p => p.status === 'FAILED').length,
+        pending: payments.filter((p) => p.status === "PENDING").length,
+        confirmed: payments.filter((p) => p.status === "CONFIRMED").length,
+        failed: payments.filter((p) => p.status === "FAILED").length,
       };
     }),
-    
+
     // Check if empty
     isEmpty: computed(() => payments().length === 0),
-    
+
     // Check if has errors
     hasError: computed(() => error() !== null),
   })),
-  
+
   // Methods (actions)
   withMethods((store, api = inject(PaymentsService)) => ({
     // Load payments
     async loadPayments(): Promise<void> {
       patchState(store, { loading: true, error: null });
-      
+
       try {
         const payments = await api.getAll(store.filters());
         patchState(store, { payments, loading: false });
@@ -1075,20 +1104,20 @@ export const PaymentsStore = signalStore(
         });
       }
     },
-    
+
     // Create payment
     async createPayment(dto: CreatePaymentDto): Promise<Payment> {
       patchState(store, { loading: true, error: null });
-      
+
       try {
         const payment = await api.create(dto);
-        
+
         // Add to existing payments
         patchState(store, {
           payments: [payment, ...store.payments()],
           loading: false,
         });
-        
+
         return payment;
       } catch (error) {
         patchState(store, {
@@ -1098,19 +1127,19 @@ export const PaymentsStore = signalStore(
         throw error;
       }
     },
-    
+
     // Update filters
-    setFilters(filters: Partial<PaymentsState['filters']>): void {
+    setFilters(filters: Partial<PaymentsState["filters"]>): void {
       patchState(store, {
         filters: { ...store.filters(), ...filters },
       });
     },
-    
+
     // Clear error
     clearError(): void {
       patchState(store, { error: null });
     },
-    
+
     // Refresh
     async refresh(): Promise<void> {
       await this.loadPayments();
@@ -1120,7 +1149,7 @@ export const PaymentsStore = signalStore(
 
 // 4. USAGE IN COMPONENT
 @Component({
-  selector: 'app-payments-list',
+  selector: "app-payments-list",
   standalone: true,
   imports: [CommonModule],
   template: `
@@ -1136,7 +1165,7 @@ export const PaymentsStore = signalStore(
           <app-payment-card [payment]="payment" />
         }
       </div>
-      
+
       <div class="summary">
         <p>Total: {{ store.totalAmount() | currency }}</p>
         <p>Pending: {{ store.statusCounts().pending }}</p>
@@ -1147,15 +1176,15 @@ export const PaymentsStore = signalStore(
 })
 export class PaymentsListComponent {
   protected store = inject(PaymentsStore);
-  
+
   ngOnInit(): void {
     this.store.loadPayments();
   }
-  
-  onFilterChange(status: TransactionStatus | 'ALL'): void {
+
+  onFilterChange(status: TransactionStatus | "ALL"): void {
     this.store.setFilters({ status });
   }
-  
+
   onSearch(term: string): void {
     this.store.setFilters({ searchTerm: term });
   }
@@ -1163,6 +1192,7 @@ export class PaymentsListComponent {
 ```
 
 **Benefits:**
+
 - Reactive state updates
 - Computed values automatically recalculate
 - Type-safe (TypeScript)
@@ -1176,21 +1206,23 @@ export class PaymentsListComponent {
 ### 1. God Objects
 
 **BAD:**
+
 ```typescript
 @Injectable()
 export class PaymentsService {
   // Handles EVERYTHING: payments, inventory, notifications, analytics
-  async createPayment() { }
-  async updateInventory() { }
-  async sendNotification() { }
-  async trackAnalytics() { }
-  async generateInvoice() { }
-  async processRefund() { }
+  async createPayment() {}
+  async updateInventory() {}
+  async sendNotification() {}
+  async trackAnalytics() {}
+  async generateInvoice() {}
+  async processRefund() {}
   // ... 50 more methods
 }
 ```
 
 **GOOD:**
+
 ```typescript
 @Injectable()
 export class PaymentsService {
@@ -1199,7 +1231,7 @@ export class PaymentsService {
     private notifications: NotificationService,
     private analytics: AnalyticsService,
   ) {}
-  
+
   async createPayment() {
     // Only payment logic
     // Delegate to other services
@@ -1210,6 +1242,7 @@ export class PaymentsService {
 ### 2. Hardcoded Values
 
 **BAD:**
+
 ```typescript
 async createPayment() {
   const response = await this.http.post(
@@ -1221,6 +1254,7 @@ async createPayment() {
 ```
 
 **GOOD:**
+
 ```typescript
 constructor(
   @Inject('CONEKTA_CONFIG') private config: ConektaConfig,
@@ -1238,6 +1272,7 @@ async createPayment() {
 ### 3. Callback Hell
 
 **BAD:**
+
 ```typescript
 createPayment(dto, (payment) => {
   saveToDatabase(payment, (saved) => {
@@ -1253,14 +1288,15 @@ createPayment(dto, (payment) => {
 ```
 
 **GOOD:**
+
 ```typescript
 async createPayment(dto: CreatePaymentDto): Promise<Payment> {
   const payment = await this.provider.create(dto);
   const saved = await this.prisma.transaction.create({ data: payment });
-  
+
   // Side effects async
   this.events.emit('payment.created', saved);
-  
+
   return saved;
 }
 ```
@@ -1268,28 +1304,28 @@ async createPayment(dto: CreatePaymentDto): Promise<Payment> {
 ### 4. Not Using Interfaces
 
 **BAD:**
+
 ```typescript
 // Directly using Conekta class everywhere
 @Injectable()
 export class PaymentsService {
   constructor(private conekta: ConektaPaymentProvider) {}
-  
+
   async create() {
-    return this.conekta.createOrder();  // Locked to Conekta
+    return this.conekta.createOrder(); // Locked to Conekta
   }
 }
 ```
 
 **GOOD:**
+
 ```typescript
 @Injectable()
 export class PaymentsService {
-  constructor(
-    @Inject('PAYMENT_PROVIDER') private provider: IPaymentProvider,
-  ) {}
-  
+  constructor(@Inject("PAYMENT_PROVIDER") private provider: IPaymentProvider) {}
+
   async create() {
-    return this.provider.createPaymentIntent();  // Any provider
+    return this.provider.createPaymentIntent(); // Any provider
   }
 }
 ```
@@ -1297,6 +1333,7 @@ export class PaymentsService {
 ### 5. Ignoring Errors
 
 **BAD:**
+
 ```typescript
 async createPayment() {
   try {
@@ -1308,17 +1345,18 @@ async createPayment() {
 ```
 
 **GOOD:**
+
 ```typescript
 async createPayment() {
   try {
     return await this.provider.create(dto);
   } catch (error) {
     this.logger.error(`Payment creation failed: ${error.message}`, error.stack);
-    
+
     if (error.code === 'PROVIDER_TIMEOUT') {
       throw new ServiceUnavailableException('Payment provider temporarily unavailable');
     }
-    
+
     throw new InternalServerErrorException('Failed to create payment');
   }
 }
@@ -1326,6 +1364,6 @@ async createPayment() {
 
 ---
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-11-01  
+**Version:** 1.0.0
+**Last Updated:** 2025-11-01
 **Status:** Active Reference

@@ -21,13 +21,13 @@
 
 ![System Architecture](https://img.shields.io/badge/System-Architecture-blue?style=for-the-badge&logo=architecture)
 ![Status Active](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
-![Last Updated](https://img.shields.io/badge/Last%20Updated-October%202025-lightgrey?style=for-the-badge)
+![Last Updated](https://img.shields.io/badge/Last%20Updated-November%202025-lightgrey?style=for-the-badge)
 
 </div>
 
-Local payment system designed to modernize small businesses without expensive infrastructure. Single codebase supporting multiple countries by swapping only the payment processing layer.
+**Platform-First Architecture:** A unified ecosystem where a single user identity can access multiple specialized business products (Restaurant, Retail, Services).
 
-**Philosophy:** "Not making them pay more, making them earn more"
+**Philosophy:** "One Account, Infinite Possibilities."
 
 ---
 
@@ -39,7 +39,7 @@ _This section contains mandatory instructions for AI Agents (Copilot, Cursor, et
 | :------------- | :------------------------------------------------------------------------------- |
 | **Context**    | This document defines the high-level architecture, tech stack, and core modules. |
 | **Constraint** | All architectural changes MUST be reflected here first.                          |
-| **Pattern**    | Follow the 'Modular Monolith' pattern defined in the text.                       |
+| **Pattern**    | Follow the 'Platform vs Product' pattern defined in the text.                    |
 | **Related**    | `docs/technical/backend/DATABASE-DESIGN.md`                                      |
 
 ---
@@ -47,6 +47,7 @@ _This section contains mandatory instructions for AI Agents (Copilot, Cursor, et
 ## Table of Contents
 
 - [Overview](#overview)
+- [Platform Strategy](#platform-strategy)
 - [Technology Stack](#technology-stack)
 - [System Architecture](#system-architecture)
 - [Multi-Country Design](#multi-country-design)
@@ -63,25 +64,40 @@ _This section contains mandatory instructions for AI Agents (Copilot, Cursor, et
 
 **For Merchants:**
 
-- Immediate payment collection (QR, NFC, links)
-- Simplified management (inventory, sales, reports, invoices)
-- Business insights (analytics, predictions, cash control)
-- Transparent pricing (low, clear commissions)
+- **Unified Identity:** One account to manage multiple businesses of different types.
+- **Specialized Tools:** Interfaces adapted to the specific business type (Restaurant vs Retail).
+- **Shared Ecosystem:** Centralized payments, notifications, and analytics across all products.
 
 **For Customers:**
 
 - Fast payments with any bank account
 - Automatic receipts and invoices
 - Financial control (categorized expense history)
-- Rewards (discounts, points, cashback)
 
-### Strategic Objectives
+---
 
-- Digitize traditional businesses while preserving their essence
-- Democratize professional financial tools
-- Create mutual value network between merchants and customers
-- Reduce technological and economic entry barriers
-- **Support Offline-First operations for business continuity**
+## Platform Strategy
+
+We differentiate between the **Platform** (Shared Services) and the **Products** (Vertical Experiences).
+
+### 1. The Platform (Shared Layer)
+
+Common infrastructure used by all products:
+
+- **Identity:** Auth, User Profiles, KYC.
+- **Payments:** Gateway abstraction, Transaction processing.
+- **Communication:** SMS, Email, Push Notifications.
+- **Billing:** Fiscal compliance and invoicing.
+
+### 2. The Products (Vertical Layer)
+
+Specialized experiences activated by the `Business.type` field:
+
+| Product        | Target                       | Key Features                                                       |
+| :------------- | :--------------------------- | :----------------------------------------------------------------- |
+| **Restaurant** | Cafes, Bars, Restaurants     | Table management, Kitchen Display System (KDS), Tips, Split bills. |
+| **Retail**     | Shops, Grocery, Boutiques    | Barcode scanning, Inventory variants, Quick checkout.              |
+| **Service**    | Consultants, Salons, Repairs | Appointment scheduling, Hourly billing, Service catalog.           |
 
 ---
 
@@ -89,7 +105,7 @@ _This section contains mandatory instructions for AI Agents (Copilot, Cursor, et
 
 ### Backend
 
-- **Runtime:** Bun 1.0+
+- **Runtime:** Bun 1.3+
 - **Framework:** NestJS 10+
 - **Language:** TypeScript 5.3+ (strict mode)
 - **ORM:** Prisma 5+
@@ -102,7 +118,7 @@ _This section contains mandatory instructions for AI Agents (Copilot, Cursor, et
 
 ### Frontend (PWA)
 
-- **Framework:** Angular 19+
+- **Framework:** Angular 21+
 - **Architecture:** Progressive Web App (PWA)
 - **Offline Storage:** IndexedDB (via Dexie.js)
 - **Sync Strategy:** Background Sync with Conflict Resolution
@@ -112,7 +128,7 @@ _This section contains mandatory instructions for AI Agents (Copilot, Cursor, et
 - **UI:** Angular Material 18+ or PrimeNG
 - **Forms:** Reactive Forms with typed validators
 - **HTTP:** HttpClient with interceptors
-- **Testing:** Jasmine/Karma + Playwright
+- **Testing:** Vitest + Playwright
 
 ### Infrastructure
 
@@ -135,90 +151,110 @@ _This section contains mandatory instructions for AI Agents (Copilot, Cursor, et
 
 ### High-Level Architecture
 
-```mermaid
-graph TB
-    subgraph Presentation Layer
-        WebApp[Web Application<br/>Angular 19]
-        MobileApp[Mobile Application<br/>Ionic + Angular]
-        Dashboard[Admin Dashboard]
-    end
+```plantuml
+@startuml
+!theme plain
+package "Presentation Layer" {
+  [Web Application
+Angular 19] as WebApp
+  [Mobile Application
+Ionic + Angular] as MobileApp
+  [Admin Dashboard] as Dashboard
+}
 
-    subgraph API Layer
-        Gateway[API Gateway<br/>JWT Auth, Rate Limiting]
-    end
+package "API Layer" {
+  [API Gateway
+JWT Auth, Rate Limiting] as Gateway
+}
 
-    subgraph Business Logic Layer
-        Auth[Auth Module<br/>Login, KYC, Roles]
-        Payment[Payment Module<br/>Multi-Country Abstraction]
-        Business[Business Module<br/>Merchants, Branches]
-        Sales[Sales Module<br/>Transactions, Cash Register]
-        Billing[Billing Module<br/>Invoices, Receipts]
-        Inventory[Inventory Module<br/>Products, Stock, Recipes]
-        Notifications[Notifications Module<br/>SMS, Email, Push]
-        Analytics[Analytics Module<br/>Reports, Metrics]
-    end
+package "Business Logic Layer" {
+  [Auth Module
+Login, KYC, Roles] as Auth
+  [Payment Module
+Multi-Country Abstraction] as Payment
+  [Business Module
+Merchants, Branches] as Business
+  [Sales Module
+Transactions, Cash Register] as Sales
+  [Billing Module
+Invoices, Receipts] as Billing
+  [Inventory Module
+Products, Stock, Recipes] as Inventory
+  [Notifications Module
+SMS, Email, Push] as Notifications
+  [Analytics Module
+Reports, Metrics] as Analytics
+}
 
-    subgraph Data Layer
-        DB[(PostgreSQL<br/>Primary Data)]
-        Cache[(Redis<br/>Cache + Queue)]
-    end
+package "Data Layer" {
+  database "PostgreSQL
+Primary Data" as DB
+  database "Redis
+Cache + Queue" as Cache
+}
 
-    subgraph External Integrations
-        PaymentGateways[Payment Gateways<br/>Conekta, PayU, MercadoPago]
-        FiscalServices[Fiscal Services<br/>SAT, DIAN, AFIP]
-        CommsProviders[Communications<br/>Twilio, SendGrid, Firebase]
-    end
+package "External Integrations" {
+  [Payment Gateways
+Conekta, PayU, MercadoPago] as PaymentGateways
+  [Fiscal Services
+SAT, DIAN, AFIP] as FiscalServices
+  [Communications
+Twilio, SendGrid, Firebase] as CommsProviders
+}
 
-    WebApp --> Gateway
-    MobileApp --> Gateway
-    Dashboard --> Gateway
+WebApp --> Gateway
+MobileApp --> Gateway
+Dashboard --> Gateway
 
-    Gateway --> Auth
-    Gateway --> Payment
-    Gateway --> Business
-    Gateway --> Sales
-    Gateway --> Billing
+Gateway --> Auth
+Gateway --> Payment
+Gateway --> Business
+Gateway --> Sales
+Gateway --> Billing
 
-    Payment --> PaymentGateways
-    Billing --> FiscalServices
-    Notifications --> CommsProviders
+Payment --> PaymentGateways
+Billing --> FiscalServices
+Notifications --> CommsProviders
 
-    Auth --> DB
-    Payment --> DB
-    Business --> DB
-    Sales --> DB
-    Billing --> DB
+Auth --> DB
+Payment --> DB
+Business --> DB
+Sales --> DB
+Billing --> DB
 
-    Payment --> Cache
-    Notifications --> Cache
-    Auth --> Cache
+Payment --> Cache
+Notifications --> Cache
+Auth --> Cache
+@enduml
 ```
 
 ### Module Communication
 
-```mermaid
-sequenceDiagram
-    participant Client
-    participant Gateway
-    participant Payment
-    participant Billing
-    participant Notification
-    participant Queue
+```plantuml
+@startuml
+!theme plain
+participant Client
+participant Gateway
+participant Payment
+participant Billing
+participant Notification
+participant Queue
 
-    Client->>Gateway: POST /payments/create
-    Gateway->>Payment: createPaymentIntent()
-    Payment->>Payment: Save to DB
-    Payment-->>Gateway: Payment ID + QR
-    Gateway-->>Client: 201 Created
+Client -> Gateway: POST /payments/create
+Gateway -> Payment: createPaymentIntent()
+Payment -> Payment: Save to DB
+Payment --> Gateway: Payment ID + QR
+Gateway --> Client: 201 Created
 
-    Note over Payment,Queue: Async processing
+note over Payment, Queue: Async processing
 
-    Payment->>Queue: Publish payment.confirmed
-    Queue->>Billing: Generate invoice
-    Queue->>Notification: Send SMS/Email
+Payment -> Queue: Publish payment.confirmed
+Queue -> Billing: Generate invoice
+Queue -> Notification: Send SMS/Email
 
-    Billing->>Client: WebSocket: invoice_ready
-    Notification->>Client: SMS: Receipt link
+Billing -> Client: WebSocket: invoice_ready
+Notification -> Client: SMS: Receipt link
+@enduml
 ```
 
 ---
@@ -229,42 +265,44 @@ sequenceDiagram
 
 Strategy + Factory pattern enables same application to operate in multiple countries by swapping only the payment provider layer.
 
-```mermaid
-graph TB
-    subgraph Business Logic - Country Agnostic
-        Service[Payment Service<br/>Orchestration Logic]
-        Factory[Payment Provider Factory<br/>Country-based Injection]
-    end
+```plantuml
+@startuml
+!theme plain
+package "Business Logic - Country Agnostic" {
+  [Payment Service\nOrchestration Logic] as Service
+  [Payment Provider Factory\nCountry-based Injection] as Factory
+}
 
-    subgraph Payment Provider Interface
-        Interface[IPaymentProvider<br/>Common Contract]
-    end
+package "Payment Provider Interface" {
+  [IPaymentProvider\nCommon Contract] as Interface
+}
 
-    subgraph Country Adapters
-        MX[Mexico Adapter<br/>Conekta + SPEI]
-        CO[Colombia Adapter<br/>PayU + PSE]
-        AR[Argentina Adapter<br/>MercadoPago]
-        CL[Chile Adapter<br/>Khipu]
-    end
+package "Country Adapters" {
+  [Mexico Adapter\nConekta + SPEI] as MX
+  [Colombia Adapter\nPayU + PSE] as CO
+  [Argentina Adapter\nMercadoPago] as AR
+  [Chile Adapter\nKhipu] as CL
+}
 
-    subgraph External Gateways
-        Conekta[Conekta API]
-        PayU[PayU API]
-        MP[MercadoPago API]
-        Khipu[Khipu API]
-    end
+package "External Gateways" {
+  [Conekta API] as Conekta
+  [PayU API] as PayU
+  [MercadoPago API] as MP
+  [Khipu API] as Khipu
+}
 
-    Service --> Factory
-    Factory --> Interface
-    Interface --> MX
-    Interface --> CO
-    Interface --> AR
-    Interface --> CL
+Service --> Factory
+Factory --> Interface
+Interface --> MX
+Interface --> CO
+Interface --> AR
+Interface --> CL
 
-    MX --> Conekta
-    CO --> PayU
-    AR --> MP
-    CL --> Khipu
+MX --> Conekta
+CO --> PayU
+AR --> MP
+CL --> Khipu
+@enduml
 ```
 
 ### Provider Interface
@@ -441,71 +479,115 @@ src/modules/payments/
 
 ### Core Entities
 
-```mermaid
-erDiagram
-    User ||--o{ Business : owns
-    Business ||--|{ Branch : has
-    Business ||--o{ Product : manages
-    Business ||--o{ PaymentMethod : has
-    Branch ||--o{ CashRegister : operates
-    Branch ||--o{ Transaction : processes
-    Transaction ||--o| Invoice : generates
-    Sale ||--|{ SaleItem : contains
-    Sale ||--o| Transaction : paid_via
-    Product ||--o{ SaleItem : sold_in
+```plantuml
+@startuml
+!theme plain
+hide circle
+skinparam linetype ortho
 
-    User {
-        uuid id PK
-        string email UK
-        string phone UK
-        string passwordHash
-        enum role
-        int kycLevel
-        jsonb kycData
-        boolean isActive
-        timestamp createdAt
-        timestamp updatedAt
-    }
+entity "User" as user {
+  *id : UUID <<PK>>
+  --
+  email : VARCHAR
+  phone : VARCHAR
+  passwordHash : VARCHAR
+  role : ENUM
+  kycLevel : INT
+  kycData : JSONB
+  isActive : BOOLEAN
+  createdAt : TIMESTAMP
+  updatedAt : TIMESTAMP
+}
 
-    Business {
-        uuid id PK
-        uuid ownerId FK
-        string legalName
-        string taxId UK
-        string country
-        string industry
-        jsonb settings
-        boolean isActive
-        timestamp createdAt
-    }
+entity "Business" as business {
+  *id : UUID <<PK>>
+  --
+  *ownerId : UUID <<FK>>
+  legalName : VARCHAR
+  taxId : VARCHAR
+  country : VARCHAR
+  industry : VARCHAR
+  settings : JSONB
+  isActive : BOOLEAN
+  createdAt : TIMESTAMP
+}
 
-    Transaction {
-        uuid id PK
-        uuid businessId FK
-        uuid branchId FK
-        decimal amount
-        string currency
-        enum status
-        enum paymentMethod
-        string country
-        string providerAdapter
-        jsonb providerData
-        timestamp createdAt
-        timestamp confirmedAt
-    }
+entity "Branch" as branch {
+  *id : UUID <<PK>>
+  --
+  *businessId : UUID <<FK>>
+}
 
-    Invoice {
-        uuid id PK
-        uuid transactionId FK
-        string invoiceNumber UK
-        enum type
-        string uuid
-        string country
-        jsonb fiscalData
-        string pdfUrl
-        enum status
-        timestamp issuedAt
-    }
+entity "Product" as product {
+  *id : UUID <<PK>>
+  --
+  *businessId : UUID <<FK>>
+}
+
+entity "PaymentMethod" as pay_method {
+  *id : UUID <<PK>>
+  --
+  *businessId : UUID <<FK>>
+}
+
+entity "CashRegister" as register {
+  *id : UUID <<PK>>
+  --
+  *branchId : UUID <<FK>>
+}
+
+entity "Transaction" as txn {
+  *id : UUID <<PK>>
+  --
+  *businessId : UUID <<FK>>
+  *branchId : UUID <<FK>>
+  amount : DECIMAL
+  currency : VARCHAR
+  status : ENUM
+  paymentMethod : ENUM
+  country : VARCHAR
+  providerAdapter : VARCHAR
+  providerData : JSONB
+  createdAt : TIMESTAMP
+  confirmedAt : TIMESTAMP
+}
+
+entity "Invoice" as invoice {
+  *id : UUID <<PK>>
+  --
+  *transactionId : UUID <<FK>>
+  invoiceNumber : VARCHAR
+  type : ENUM
+  uuid : VARCHAR
+  country : VARCHAR
+  fiscalData : JSONB
+  pdfUrl : VARCHAR
+  status : ENUM
+  issuedAt : TIMESTAMP
+}
+
+entity "Sale" as sale {
+  *id : UUID <<PK>>
+}
+
+entity "SaleItem" as sale_item {
+  *id : UUID <<PK>>
+  --
+  *saleId : UUID <<FK>>
+  *productId : UUID <<FK>>
+}
+
+user ||..o{ business : owns
+business ||..|{ branch : has
+business ||..o{ product : manages
+business ||..o{ pay_method : has
+branch ||..o{ register : operates
+branch ||..o{ txn : processes
+txn ||..o| invoice : generates
+sale ||..|{ sale_item : contains
+sale ||..o| txn : paid_via
+product ||..o{ sale_item : sold_in
+@enduml
 ```
 
 ### Key Design Decisions
@@ -541,65 +623,67 @@ erDiagram
 
 **Critical Design: Customer uses their existing banking app (BBVA, Santander, Banorte, etc.). No customer onboarding needed.**
 
-```mermaid
-sequenceDiagram
-    actor Merchant
-    participant MerchantApp as Merchant App<br/>(Our App)
-    participant API as Our Backend
-    participant PaymentService
-    participant Factory
-    participant Adapter as Country Adapter<br/>(Conekta/PayU/etc)
-    participant Gateway as Payment Gateway
-    participant DB
-    participant WebSocket
-    actor Customer
-    participant CustomerBank as Customer's Bank App<br/>(Already Installed)
+```plantuml
+@startuml
+!theme plain
+actor Merchant
+participant "Merchant App\n(Our App)" as MerchantApp
+participant "Our Backend" as API
+participant PaymentService
+participant Factory
+participant "Country Adapter\n(Conekta/PayU/etc)" as Adapter
+participant "Payment Gateway" as Gateway
+participant DB
+participant WebSocket
+actor Customer
+participant "Customer's Bank App\n(Already Installed)" as CustomerBank
 
-    Merchant->>MerchantApp: Click "Charge"
-    MerchantApp->>Merchant: Show amount form
-    Merchant->>MerchantApp: Enter $500
+Merchant -> MerchantApp: Click "Charge"
+MerchantApp -> Merchant: Show amount form
+Merchant -> MerchantApp: Enter $500
 
-    MerchantApp->>API: POST /payments/create-intent
-    API->>PaymentService: createPaymentIntent(dto)
-    PaymentService->>Factory: getProvider('MX')
-    Factory-->>PaymentService: ConektaProvider
+MerchantApp -> API: POST /payments/create-intent
+API -> PaymentService: createPaymentIntent(dto)
+PaymentService -> Factory: getProvider('MX')
+Factory --> PaymentService: ConektaProvider
 
-    PaymentService->>Adapter: createPaymentIntent()
-    Adapter->>Gateway: POST /orders (bank_transfer type)
-    Note over Gateway: Generate SPEI QR<br/>(standard format)
-    Gateway-->>Adapter: Order + QR data + SPEI reference
+PaymentService -> Adapter: createPaymentIntent()
+Adapter -> Gateway: POST /orders (bank_transfer type)
+note over Gateway: Generate SPEI QR\n(standard format)
+Gateway --> Adapter: Order + QR data + SPEI reference
 
-    Adapter-->>PaymentService: PaymentIntent
-    PaymentService->>DB: INSERT transaction (PENDING)
-    PaymentService-->>API: Intent + QR + Link
-    API-->>MerchantApp: 201 Created
-    MerchantApp->>Merchant: Display QR code
+Adapter --> PaymentService: PaymentIntent
+PaymentService -> DB: INSERT transaction (PENDING)
+PaymentService --> API: Intent + QR + Link
+API --> MerchantApp: 201 Created
+MerchantApp -> Merchant: Display QR code
 
-    Note over Merchant,Customer: Merchant shows QR to customer<br/>Customer uses THEIR OWN bank app
+note over Merchant, Customer: Merchant shows QR to customer\nCustomer uses THEIR OWN bank app
 
-    Customer->>CustomerBank: Open bank app<br/>(BBVA, Santander, etc.)
-    Customer->>CustomerBank: Scan QR
-    Note over CustomerBank: Parse SPEI reference,<br/>amount, merchant info
-    CustomerBank->>Customer: Show payment confirmation
-    Customer->>CustomerBank: Confirm (biometric/PIN)
+Customer -> CustomerBank: Open bank app\n(BBVA, Santander, etc.)
+Customer -> CustomerBank: Scan QR
+note over CustomerBank: Parse SPEI reference,\namount, merchant info
+CustomerBank -> Customer: Show payment confirmation
+Customer -> CustomerBank: Confirm (biometric/PIN)
 
-    CustomerBank->>Gateway: Execute SPEI transfer
-    Gateway->>Gateway: Process payment
+CustomerBank -> Gateway: Execute SPEI transfer
+Gateway -> Gateway: Process payment
 
-    Gateway->>API: POST /webhooks/conekta<br/>(payment.confirmed)
-    API->>PaymentService: handleWebhook(event)
-    PaymentService->>Adapter: validateSignature()
-    PaymentService->>DB: UPDATE transaction (CONFIRMED)
-    PaymentService->>DB: UPDATE inventory (if linked)
-    PaymentService->>WebSocket: Emit payment.confirmed
-    WebSocket->>MerchantApp: Real-time notification
-    MerchantApp->>Merchant: Show success + receipt
+Gateway -> API: POST /webhooks/conekta\n(payment.confirmed)
+API -> PaymentService: handleWebhook(event)
+PaymentService -> Adapter: validateSignature()
+PaymentService -> DB: UPDATE transaction (CONFIRMED)
+PaymentService -> DB: UPDATE inventory (if linked)
+PaymentService -> WebSocket: Emit payment.confirmed
+WebSocket -> MerchantApp: Real-time notification
+MerchantApp -> Merchant: Show success + receipt
 
-    Gateway->>CustomerBank: Confirmation
-    CustomerBank->>Customer: Show success in bank app
+Gateway -> CustomerBank: Confirmation
+CustomerBank -> Customer: Show success in bank app
 
-    Note over Customer: Customer never downloaded our app<br/>Used trusted banking app they already have
-    Note over Merchant: Merchant got payment + inventory update<br/>+ analytics + customer data (if shared)
+note over Customer: Customer never downloaded our app\nUsed trusted banking app they already have
+note over Merchant: Merchant got payment + inventory update\n+ analytics + customer data (if shared)
+@enduml
 ```
 
 **Why This Works:**
@@ -614,23 +698,25 @@ sequenceDiagram
 
 ### Flow 2: Merchant Onboarding
 
-```mermaid
-stateDiagram-v2
-    [*] --> PhoneRegistration
-    PhoneRegistration --> OTPVerification: Send OTP
-    OTPVerification --> PhoneRegistration: Invalid code
-    OTPVerification --> BusinessInfo: Valid code
+```plantuml
+@startuml
+!theme plain
+[*] --> PhoneRegistration
+PhoneRegistration --> OTPVerification: Send OTP
+OTPVerification --> PhoneRegistration: Invalid code
+OTPVerification --> BusinessInfo: Valid code
 
-    BusinessInfo --> PaymentMethodSetup: Submit data
-    PaymentMethodSetup --> Tutorial: QR generated
-    Tutorial --> FirstTestPayment: Start tutorial
-    FirstTestPayment --> Dashboard: Payment confirmed
-    Dashboard --> [*]
+BusinessInfo --> PaymentMethodSetup: Submit data
+PaymentMethodSetup --> Tutorial: QR generated
+Tutorial --> FirstTestPayment: Start tutorial
+FirstTestPayment --> Dashboard: Payment confirmed
+Dashboard --> [*]
 
-    note right of BusinessInfo
-        KYC Level 0
-        Limit: $500/day
-    end note
+note right of BusinessInfo
+    KYC Level 0
+    Limit: $500/day
+end note
+@enduml
 ```
 
 **Steps:**
@@ -647,23 +733,25 @@ stateDiagram-v2
 
 ### Flow 3: Cash Register Closure
 
-```mermaid
-flowchart TD
-    Start([Open Closure]) --> Select[Select Period/Shift]
-    Select --> Calculate[Calculate Totals]
-    Calculate --> Display[Display Summary]
+```plantuml
+@startuml
+!theme plain
+start
+:Open Closure;
+:Select Period/Shift;
+:Calculate Totals;
+:Display Summary;
 
-    Display --> Decision{Adjustment Needed?}
-    Decision -->|Yes| Manual[Manual Adjustment with Note]
-    Decision -->|No| Generate[Generate PDF Report]
-    Manual --> Generate
+if (Adjustment Needed?) then (Yes)
+  :Manual Adjustment with Note;
+else (No)
+endif
+:Generate PDF Report;
 
-    Generate --> Send[Send to Email/Cloud]
-    Send --> Close[Mark Register as CLOSED]
-    Close --> End([End])
-
-    style Calculate fill:#e1f5fe
-    style Generate fill:#e1f5fe
+:Send to Email/Cloud;
+:Mark Register as CLOSED;
+stop
+@enduml
 ```
 
 **Calculation includes:**
@@ -681,31 +769,33 @@ flowchart TD
 
 ### Authentication Flow
 
-```mermaid
-sequenceDiagram
-    participant Client
-    participant API
-    participant AuthService
-    participant DB
-    participant Redis
+```plantuml
+@startuml
+!theme plain
+participant Client
+participant API
+participant AuthService
+participant DB
+participant Redis
 
-    Client->>API: POST /auth/login
-    API->>AuthService: validateCredentials()
-    AuthService->>DB: Find user
-    DB-->>AuthService: User data
-    AuthService->>AuthService: Verify password hash
+Client -> API: POST /auth/login
+API -> AuthService: validateCredentials()
+AuthService -> DB: Find user
+DB --> AuthService: User data
+AuthService -> AuthService: Verify password hash
 
-    AuthService->>AuthService: Generate JWT + Refresh
-    AuthService->>Redis: Store refresh token
-    AuthService-->>API: Tokens + User
-    API-->>Client: 200 OK
+AuthService -> AuthService: Generate JWT + Refresh
+AuthService -> Redis: Store refresh token
+AuthService --> API: Tokens + User
+API --> Client: 200 OK
 
-    Note over Client: Store tokens securely
+note over Client: Store tokens securely
 
-    Client->>API: GET /protected (with JWT)
-    API->>AuthService: Validate JWT
-    AuthService-->>API: Valid + User context
-    API-->>Client: Protected resource
+Client -> API: GET /protected (with JWT)
+API -> AuthService: Validate JWT
+AuthService --> API: Valid + User context
+API --> Client: Protected resource
+@enduml
 ```
 
 ### Security Requirements

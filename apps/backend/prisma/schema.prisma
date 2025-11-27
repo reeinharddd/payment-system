@@ -15,7 +15,23 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   email     String?  @unique
+  emailVerified DateTime?
   phone     String?  @unique
+  phoneVerified DateTime?
+
+  // Profile Info
+  firstName String?
+  lastName  String?
+  displayName String?
+  avatarUrl String?
+  locale    String?
+
+  // Identity & Compliance
+  kycLevel  Int      @default(0) // 0=Basic, 1=ID, 2=Fiscal
+  kycData   Json?    // Encrypted ID data, document URLs
+
+  // System
+  preferences Json?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -29,13 +45,17 @@ model User {
 }
 
 model UserIdentity {
-  id         String   @id @default(uuid())
-  userId     String
-  provider   AuthProvider
-  providerId String   // email, google_sub, phone_number
-  credential String?  // password_hash, null
-  metadata   Json?
-  lastLogin  DateTime?
+  id           String   @id @default(uuid())
+  userId       String
+  provider     AuthProvider
+  providerId   String   // Google: profile.id
+  credential   String?  // Local: password_hash
+  accessToken  String?  // OAuth: access_token
+  refreshToken String?  // OAuth: refresh_token
+  metadata     Json?    // OAuth: profile._json
+  lastLogin    DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -47,6 +67,12 @@ enum AuthProvider {
   LOCAL
   GOOGLE
   PHONE
+}
+
+enum BusinessType {
+  RETAIL
+  RESTAURANT
+  SERVICE
 }
 
 model Employee {
@@ -145,8 +171,10 @@ model Business {
   legalName  String
   taxId      String   @unique
   country    String   // MX, CO, AR, CL
+  type       BusinessType @default(RETAIL)
   industry   String?
   settings   Json?    // Business-wide settings
+  features   Json?    // Feature flags (e.g. { "kitchen": true })
   fiscalData Json?    // Tax Data
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())

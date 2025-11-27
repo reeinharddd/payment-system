@@ -103,7 +103,7 @@ A consistent project structure is vital for maintainability in a monorepo. By st
 │   │   ├── nest-cli.json
 │   │   └── .env.example
 │   │
-│   └── merchant-web/         # Angular 19+ merchant dashboard
+│   └── merchant-web/         # Angular 21+ merchant dashboard
 │       ├── src/
 │       │   ├── app/
 │       │   │   ├── core/     # Singleton services

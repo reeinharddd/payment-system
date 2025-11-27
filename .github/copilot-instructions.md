@@ -29,7 +29,7 @@ This project uses a **Model Context Protocol (MCP)** server to enforce standards
 Since the AI cannot "draw" in Figma, we use **Strict Code Modeling** as our design phase.
 
 - **Step 0: Documentation & Design (MANDATORY):**
-  - **Diagrams:** Use Mermaid.js to visualize flows and architecture.
+  - **Diagrams:** Use PlantUML to visualize flows and architecture.
   - **Database:** Create Entity-Relationship (ER) diagrams before writing schema.
   - **UI:** Define Atomic Design components (Atoms -> Molecules -> Organisms).
 - **Step 1: Data Layer:** Define `schema.prisma` (The Truth).

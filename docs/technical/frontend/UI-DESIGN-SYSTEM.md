@@ -1,6 +1,47 @@
-# UI Design System (Atomic Design)
+<!-- AI-INSTRUCTION: START -->
+<!--
+  This document defines the UI DESIGN SYSTEM.
+  1. Preserve the Header Table and Metadata block.
+  2. Fill in the "Agent Directives" to guide future AI interactions.
+  3. Keep the structure strict for RAG (Retrieval Augmented Generation) efficiency.
+-->
+<!-- AI-INSTRUCTION: END -->
 
-This project follows the **Atomic Design** methodology for UI componentization. This ensures consistency, reusability, and scalability across the application.
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="120" align="center" valign="middle">
+      <img src="../../../libs/assets/src/images/logo.png" width="80" alt="Project Logo" />
+    </td>
+    <td align="left" valign="middle">
+      <h1 style="margin: 0; border-bottom: none;">UI Design System (Atomic Design)</h1>
+      <p style="margin: 0; color: #6e7681; font-size: 1.1em;">Component library and design tokens</p>
+    </td>
+  </tr>
+</table>
+
+<div align="center">
+
+  <!-- METADATA BADGES -->
+  <img src="https://img.shields.io/badge/Status-Active-success?style=flat-square" alt="Status" />
+  <img src="https://img.shields.io/badge/Audience-Frontend-blue?style=flat-square" alt="Audience" />
+  <img src="https://img.shields.io/badge/Last%20Updated-2025--11--25-lightgrey?style=flat-square" alt="Date" />
+
+</div>
+
+---
+
+## 🤖 Agent Directives (System Prompt)
+
+_This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
+
+| Directive      | Instruction                                                           |
+| :------------- | :-------------------------------------------------------------------- |
+| **Context**    | This document defines the Atomic Design system for the UI.            |
+| **Constraint** | All new components MUST be classified as Atom, Molecule, or Organism. |
+| **Pattern**    | Use Tailwind CSS for styling and Angular Signals for state.           |
+| **Related**    | `docs/technical/frontend/ANGULAR-ZONELESS.md`                         |
+
+---
 
 ## Methodology
 

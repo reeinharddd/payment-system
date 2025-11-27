@@ -1,5 +1,5 @@
 <!-- AI-INSTRUCTION: START -->
-<!-- 
+<!--
   This document defines the ANGULAR ZONELESS ARCHITECTURE GUIDE.
   1. Preserve the Header Table and Metadata block.
   2. Fill in the "Agent Directives" to guide future AI interactions.
@@ -20,7 +20,7 @@
 </table>
 
 <div align="center">
-  
+
   <!-- METADATA BADGES -->
   <img src="https://img.shields.io/badge/Status-Active-success?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-Frontend-blue?style=flat-square" alt="Audience" />
@@ -32,20 +32,20 @@
 
 ## 🤖 Agent Directives (System Prompt)
 
-*This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document.*
+_This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
-| Directive | Instruction |
-| :--- | :--- |
-| **Context** | This project uses Angular 19+ in **Zoneless Mode**. |
+| Directive      | Instruction                                                      |
+| :------------- | :--------------------------------------------------------------- |
+| **Context**    | This project uses Angular 21+ in **Zoneless Mode**.              |
 | **Constraint** | Do NOT import `zone.js`. Use `Signals` for all state management. |
-| **Pattern** | Use `ChangeDetectionStrategy.OnPush` for all components. |
-| **Related** | `docs/technical/foundations/TECHNICAL-FOUNDATIONS.md` |
+| **Pattern**    | Use `ChangeDetectionStrategy.OnPush` for all components.         |
+| **Related**    | `docs/technical/foundations/TECHNICAL-FOUNDATIONS.md`            |
 
 ---
 
 ## 1. Overview
 
-Zone.js has been the default change detection mechanism since Angular 2. However, with Signals and the new reactivity model, Angular 19+ can operate without it.
+Zone.js has been the default change detection mechanism since Angular 2. However, with Signals and the new reactivity model, Angular 21+ can operate without it.
 
 ### 1.1. Benefits of Zoneless
 
@@ -72,20 +72,20 @@ Zone.js has been the default change detection mechanism since Angular 2. However
 **main.ts:**
 
 ```typescript
-import { bootstrapApplication } from '@angular/platform-browser';
-import { provideExperimentalZonelessChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { AppComponent } from './app/app.component';
-import { routes } from './app/app.routes';
+import { bootstrapApplication } from "@angular/platform-browser";
+import { provideExperimentalZonelessChangeDetection } from "@angular/core";
+import { provideRouter } from "@angular/router";
+import { provideHttpClient, withInterceptors } from "@angular/common/http";
+import { AppComponent } from "./app/app.component";
+import { routes } from "./app/app.routes";
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideExperimentalZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor])),
-  ]
-}).catch(err => console.error(err));
+  ],
+}).catch((err) => console.error(err));
 ```
 
 ### 2.2. Step 2: Remove Zone.js Import
@@ -108,7 +108,7 @@ Replace RxJS BehaviorSubject and manual change detection with Signals:
 export class PaymentComponent {
   loading$ = new BehaviorSubject<boolean>(false);
   payments$ = new BehaviorSubject<Payment[]>([]);
-  
+
   async loadPayments() {
     this.loading$.next(true);
     const data = await this.api.getPayments();
@@ -124,12 +124,10 @@ export class PaymentComponent {
 export class PaymentComponent {
   loading = signal(false);
   payments = signal<Payment[]>([]);
-  
+
   // Computed values
-  total = computed(() => 
-    this.payments().reduce((sum, p) => sum + p.amount, 0)
-  );
-  
+  total = computed(() => this.payments().reduce((sum, p) => sum + p.amount, 0));
+
   async loadPayments() {
     this.loading.set(true);
     const data = await this.api.getPayments();
@@ -146,23 +144,23 @@ export class PaymentComponent {
 ### 3.1. Basic Signal Usage
 
 ```typescript
-import { signal, computed, effect } from '@angular/core';
+import { signal, computed, effect } from "@angular/core";
 
 export class CounterComponent {
   // Writable signal
   count = signal(0);
-  
+
   // Computed (read-only, auto-updates)
   doubled = computed(() => this.count() * 2);
-  
+
   increment() {
-    this.count.update(n => n + 1);
+    this.count.update((n) => n + 1);
   }
-  
+
   constructor() {
     // Effect runs when dependencies change
     effect(() => {
-      console.log('Count changed:', this.count());
+      console.log("Count changed:", this.count());
     });
   }
 }
@@ -179,16 +177,16 @@ interface User {
 
 export class UserComponent {
   user = signal<User | null>(null);
-  
+
   // Computed from nested properties
   displayName = computed(() => {
     const u = this.user();
-    return u ? `${u.name} (${u.email})` : 'Guest';
+    return u ? `${u.name} (${u.email})` : "Guest";
   });
-  
+
   updateUser(updates: Partial<User>) {
-    this.user.update(current => 
-      current ? { ...current, ...updates } : null
+    this.user.update((current) =>
+      current ? { ...current, ...updates } : null,
     );
   }
 }
@@ -199,27 +197,23 @@ export class UserComponent {
 ```typescript
 export class TodoListComponent {
   todos = signal<Todo[]>([]);
-  
+
   // Computed filtering
-  completedTodos = computed(() => 
-    this.todos().filter(t => t.completed)
-  );
-  
-  incompleteTodos = computed(() =>
-    this.todos().filter(t => !t.completed)
-  );
-  
+  completedTodos = computed(() => this.todos().filter((t) => t.completed));
+
+  incompleteTodos = computed(() => this.todos().filter((t) => !t.completed));
+
   addTodo(todo: Todo) {
-    this.todos.update(list => [...list, todo]);
+    this.todos.update((list) => [...list, todo]);
   }
-  
+
   removeTodo(id: string) {
-    this.todos.update(list => list.filter(t => t.id !== id));
+    this.todos.update((list) => list.filter((t) => t.id !== id));
   }
-  
+
   toggleTodo(id: string) {
-    this.todos.update(list =>
-      list.map(t => t.id === id ? { ...t, completed: !t.completed } : t)
+    this.todos.update((list) =>
+      list.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)),
     );
   }
 }
@@ -232,21 +226,19 @@ export class TodoListComponent {
 Use `toSignal()` to convert Observables:
 
 ```typescript
-import { toSignal } from '@angular/core/rxjs-interop';
-import { inject } from '@angular/core';
+import { toSignal } from "@angular/core/rxjs-interop";
+import { inject } from "@angular/core";
 
 export class MessagesComponent {
   private websocket = inject(WebSocketService);
-  
+
   // Convert observable to signal
-  messages = toSignal(this.websocket.messages$, { 
-    initialValue: [] as Message[]
+  messages = toSignal(this.websocket.messages$, {
+    initialValue: [] as Message[],
   });
-  
+
   // Use in computed
-  unreadCount = computed(() => 
-    this.messages().filter(m => !m.read).length
-  );
+  unreadCount = computed(() => this.messages().filter((m) => !m.read).length);
 }
 ```
 
@@ -255,20 +247,18 @@ export class MessagesComponent {
 ```typescript
 export class DataService {
   private http = inject(HttpClient);
-  
+
   // Signal for state
   data = signal<Data[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
-  
+
   async fetchData() {
     this.loading.set(true);
     this.error.set(null);
-    
+
     try {
-      const result = await firstValueFrom(
-        this.http.get<Data[]>('/api/data')
-      );
+      const result = await firstValueFrom(this.http.get<Data[]>("/api/data"));
       this.data.set(result);
     } catch (err) {
       this.error.set(err.message);
@@ -276,12 +266,11 @@ export class DataService {
       this.loading.set(false);
     }
   }
-  
+
   // Or use toSignal for reactive queries
-  dataStream = toSignal(
-    this.http.get<Data[]>('/api/data'),
-    { initialValue: [] }
-  );
+  dataStream = toSignal(this.http.get<Data[]>("/api/data"), {
+    initialValue: [],
+  });
 }
 ```
 
@@ -301,36 +290,37 @@ Use new `@if`, `@for`, `@switch` syntax (Angular 17+):
     } @else {
       <div class="payment-list">
         @for (payment of payments(); track payment.id) {
-          <app-payment-card 
+          <app-payment-card
             [payment]="payment"
-            (click)="selectPayment(payment)" />
+            (click)="selectPayment(payment)"
+          />
         } @empty {
           <p>No payments found</p>
         }
       </div>
     }
-    
+
     @switch (status()) {
-      @case ('pending') {
+      @case ("pending") {
         <app-pending-badge />
       }
-      @case ('confirmed') {
+      @case ("confirmed") {
         <app-success-badge />
       }
-      @case ('failed') {
+      @case ("failed") {
         <app-error-badge />
       }
       @default {
         <app-unknown-badge />
       }
     }
-  `
+  `,
 })
 export class PaymentListComponent {
   loading = signal(false);
   error = signal<string | null>(null);
   payments = signal<Payment[]>([]);
-  status = signal<PaymentStatus>('pending');
+  status = signal<PaymentStatus>("pending");
 }
 ```
 
@@ -352,20 +342,20 @@ These operations automatically trigger change detection in zoneless mode:
 For operations outside Angular's control:
 
 ```typescript
-import { ChangeDetectorRef, inject } from '@angular/core';
+import { ChangeDetectorRef, inject } from "@angular/core";
 
 export class ManualComponent {
   private cdr = inject(ChangeDetectorRef);
-  
+
   onExternalLibraryCallback(data: any) {
     this.processData(data);
-    
+
     // Manually trigger change detection
     this.cdr.markForCheck();
   }
-  
+
   setupExternalListener() {
-    externalLibrary.on('event', (data) => {
+    externalLibrary.on("event", (data) => {
       this.handleEvent(data);
       this.cdr.markForCheck();
     });
@@ -378,17 +368,17 @@ export class ManualComponent {
 Always use `OnPush` for better performance:
 
 ```typescript
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from "@angular/core";
 
 @Component({
-  selector: 'app-payment-card',
+  selector: "app-payment-card",
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="card">
       <h3>{{ payment().customer }}</h3>
       <p>{{ payment().amount | currency }}</p>
     </div>
-  `
+  `,
 })
 export class PaymentCardComponent {
   payment = input.required<Payment>();
@@ -402,47 +392,52 @@ export class PaymentCardComponent {
 ### 7.1. Reactive Forms with Signals
 
 ```typescript
-import { Component, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, signal } from "@angular/core";
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from "@angular/forms";
 
 @Component({
-  selector: 'app-payment-form',
+  selector: "app-payment-form",
   standalone: true,
   imports: [ReactiveFormsModule],
   template: `
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <input formControlName="amount" type="number" />
-      @if (form.controls.amount.errors?.['required']) {
+      @if (form.controls.amount.errors?.["required"]) {
         <span class="error">Amount is required</span>
       }
-      @if (form.controls.amount.errors?.['min']) {
+      @if (form.controls.amount.errors?.["min"]) {
         <span class="error">Minimum amount is $1</span>
       }
-      
+
       <select formControlName="currency">
         @for (curr of currencies(); track curr) {
           <option [value]="curr">{{ curr }}</option>
         }
       </select>
-      
+
       <button type="submit" [disabled]="form.invalid || submitting()">
         Submit
       </button>
     </form>
-  `
+  `,
 })
 export class PaymentFormComponent {
-  currencies = signal(['MXN', 'COP', 'ARS', 'CLP']);
+  currencies = signal(["MXN", "COP", "ARS", "CLP"]);
   submitting = signal(false);
-  
+
   form = new FormGroup({
     amount: new FormControl(0, [Validators.required, Validators.min(1)]),
-    currency: new FormControl('MXN', [Validators.required])
+    currency: new FormControl("MXN", [Validators.required]),
   });
-  
+
   async onSubmit() {
     if (this.form.invalid) return;
-    
+
     this.submitting.set(true);
     try {
       await this.paymentService.create(this.form.value);
@@ -457,19 +452,19 @@ export class PaymentFormComponent {
 ### 7.2. Form Value as Signal
 
 ```typescript
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from "@angular/core/rxjs-interop";
 
 export class FormComponent {
   form = new FormGroup({
-    email: new FormControl(''),
-    password: new FormControl('')
+    email: new FormControl(""),
+    password: new FormControl(""),
   });
-  
+
   // Convert form value stream to signal
   formValue = toSignal(this.form.valueChanges, {
-    initialValue: this.form.value
+    initialValue: this.form.value,
   });
-  
+
   // Computed validation
   isValid = computed(() => {
     const value = this.formValue();
@@ -485,17 +480,17 @@ export class FormComponent {
 ### 8.1. Handling Non-Angular Code
 
 ```typescript
-import { NgZone, inject } from '@angular/core';
+import { NgZone, inject } from "@angular/core";
 
 export class MapComponent {
   private zone = inject(NgZone);
-  
+
   initializeMap() {
     // Run outside Angular for better performance
     this.zone.runOutsideAngular(() => {
-      const map = new ExternalMapLibrary('#map');
-      
-      map.on('click', (event) => {
+      const map = new ExternalMapLibrary("#map");
+
+      map.on("click", (event) => {
         // Re-enter Angular zone for state updates
         this.zone.run(() => {
           this.handleMapClick(event);
@@ -512,13 +507,13 @@ export class MapComponent {
 export class ChartComponent {
   chartData = signal<ChartData>({ labels: [], values: [] });
   private chartInstance: Chart;
-  
+
   ngAfterViewInit() {
     this.chartInstance = new Chart(this.canvas.nativeElement, {
-      type: 'bar',
-      data: this.chartData()
+      type: "bar",
+      data: this.chartData(),
     });
-    
+
     // Update chart when signal changes
     effect(() => {
       this.chartInstance.data = this.chartData();
@@ -535,41 +530,41 @@ export class ChartComponent {
 ### 9.1. Unit Tests
 
 ```typescript
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { provideExperimentalZonelessChangeDetection } from "@angular/core";
 
-describe('PaymentComponent', () => {
+describe("PaymentComponent", () => {
   let component: PaymentComponent;
   let fixture: ComponentFixture<PaymentComponent>;
-  
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PaymentComponent],
       providers: [
         provideExperimentalZonelessChangeDetection(),
-        { provide: PaymentService, useValue: mockPaymentService }
-      ]
+        { provide: PaymentService, useValue: mockPaymentService },
+      ],
     }).compileComponents();
-    
+
     fixture = TestBed.createComponent(PaymentComponent);
     component = fixture.componentInstance;
   });
-  
-  it('should update total when payment added', () => {
+
+  it("should update total when payment added", () => {
     component.payments.set([
-      { id: '1', amount: 100 },
-      { id: '2', amount: 200 }
+      { id: "1", amount: 100 },
+      { id: "2", amount: 200 },
     ]);
-    
+
     expect(component.total()).toBe(300);
   });
-  
-  it('should handle async loading', async () => {
-    const payments = [{ id: '1', amount: 100 }];
+
+  it("should handle async loading", async () => {
+    const payments = [{ id: "1", amount: 100 }];
     mockPaymentService.getPayments.mockResolvedValue(payments);
-    
+
     await component.loadPayments();
-    
+
     expect(component.loading()).toBe(false);
     expect(component.payments()).toEqual(payments);
   });
@@ -589,7 +584,7 @@ get filteredPayments() {
 }
 
 // Good: Computed signal (memoized)
-filteredPayments = computed(() => 
+filteredPayments = computed(() =>
   this.payments().filter(p => p.amount > 100)
 );
 ```
@@ -602,7 +597,7 @@ filteredPayments = computed(() =>
     @for (item of items(); track item.id) {
       <app-item [data]="item" />
     }
-  `
+  `,
 })
 export class ListComponent {
   items = signal<Item[]>([]);
@@ -614,13 +609,13 @@ export class ListComponent {
 ```typescript
 export class ReportComponent {
   rawData = signal<Data[]>([]);
-  
+
   // Only computed when accessed
   expensiveCalculation = computed(() => {
-    console.log('Computing...');
+    console.log("Computing...");
     return complexAnalysis(this.rawData());
   });
-  
+
   // Won't compute until used in template
   displayReport() {
     return this.expensiveCalculation();
@@ -672,7 +667,7 @@ async fetchData() {
 **Problem:**
 
 ```typescript
-externalLib.on('event', (data) => {
+externalLib.on("event", (data) => {
   this.state = data; // Doesn't trigger change detection
 });
 ```
@@ -680,7 +675,7 @@ externalLib.on('event', (data) => {
 **Solution:**
 
 ```typescript
-externalLib.on('event', (data) => {
+externalLib.on("event", (data) => {
   this.stateSignal.set(data); // Triggers change detection
 });
 ```
@@ -699,13 +694,13 @@ setTimeout(() => {
 
 ```typescript
 setTimeout(() => {
-  this.counterSignal.update(n => n + 1); // Updates UI
+  this.counterSignal.update((n) => n + 1); // Updates UI
 }, 1000);
 ```
 
 ---
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-10-22  
-**Author:** Frontend Team  
+**Version:** 1.0.0
+**Last Updated:** 2025-10-22
+**Author:** Frontend Team
 **Status:** Active

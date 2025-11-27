@@ -29,6 +29,18 @@ Complete preliminary architecture design defining core patterns, module structur
 
 ---
 
+## 🤖 Agent Directives (System Prompt)
+
+_This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
+
+| Directive      | Instruction                                                         |
+| :------------- | :------------------------------------------------------------------ |
+| **Context**    | This document defines the preliminary design and base architecture. |
+| **Constraint** | Use this design as the blueprint for system implementation.         |
+| **Pattern**    | Adhere to the defined module structure and naming conventions.      |
+
+---
+
 ## Table of Contents
 
 - [System Architecture](#system-architecture)
@@ -45,73 +57,78 @@ Complete preliminary architecture design defining core patterns, module structur
 
 ### High-Level Architecture
 
-```mermaid
-graph TB
-    subgraph "Client Layer"
-        WEB[Merchant Web App<br/>Angular 19]
-        MOBILE[Mobile App<br/>Future]
-    end
-    
-    subgraph "API Gateway Layer"
-        NGINX[Nginx<br/>Reverse Proxy]
-        RATELIMIT[Rate Limiter<br/>Redis]
-    end
-    
-    subgraph "Application Layer"
-        API[NestJS API<br/>Bun Runtime]
-        MCP[MCP Server<br/>AI Agent]
-        WORKER[Bull Workers<br/>Background Jobs]
-    end
-    
-    subgraph "Data Layer"
-        POSTGRES[(PostgreSQL<br/>Main DB)]
-        REDIS[(Redis<br/>Cache + Queue)]
-    end
-    
-    subgraph "External Services"
-        PAYMENT[Payment Providers<br/>Conekta, PayU, etc]
-        SMS[SMS Provider<br/>Twilio]
-        EMAIL[Email Provider<br/>SendGrid]
-        STORAGE[File Storage<br/>S3/GCS]
-    end
-    
-    WEB --> NGINX
-    MOBILE --> NGINX
-    NGINX --> API
-    NGINX --> RATELIMIT
-    RATELIMIT --> REDIS
-    
-    API --> POSTGRES
-    API --> REDIS
-    API --> PAYMENT
-    API --> SMS
-    API --> EMAIL
-    API --> STORAGE
-    
-    API --> WORKER
-    WORKER --> REDIS
-    WORKER --> SMS
-    WORKER --> EMAIL
-    
-    MCP --> POSTGRES
-    MCP --> API
+```plantuml
+@startuml
+!theme plain
+top to bottom direction
+skinparam componentStyle rectangle
+
+package "Client Layer" {
+    [Merchant Web App\nAngular 19] as WEB
+    [Mobile App\nFuture] as MOBILE
+}
+
+package "API Gateway Layer" {
+    [Nginx\nReverse Proxy] as NGINX
+    [Rate Limiter\nRedis] as RATELIMIT
+}
+
+package "Application Layer" {
+    [NestJS API\nBun Runtime] as API
+    [MCP Server\nAI Agent] as MCP
+    [Bull Workers\nBackground Jobs] as WORKER
+}
+
+package "Data Layer" {
+    database "PostgreSQL\nMain DB" as POSTGRES
+    database "Redis\nCache + Queue" as REDIS
+}
+
+package "External Services" {
+    [Payment Providers\nConekta, PayU, etc] as PAYMENT
+    [SMS Provider\nTwilio] as SMS
+    [Email Provider\nSendGrid] as EMAIL
+    [File Storage\nS3/GCS] as STORAGE
+}
+
+WEB --> NGINX
+MOBILE --> NGINX
+NGINX --> API
+NGINX --> RATELIMIT
+RATELIMIT --> REDIS
+
+API --> POSTGRES
+API --> REDIS
+API --> PAYMENT
+API --> SMS
+API --> EMAIL
+API --> STORAGE
+
+API --> WORKER
+WORKER --> REDIS
+WORKER --> SMS
+WORKER --> EMAIL
+
+MCP --> POSTGRES
+MCP --> API
+@enduml
 ```
 
 ### Technology Decisions
 
-| Layer | Technology | Rationale |
-|-------|-----------|-----------|
-| **Frontend** | Angular 19 Standalone | Zoneless signals, modern reactive patterns, enterprise-ready |
-| **Backend** | NestJS 10+ (Bun Runtime) | TypeScript, modular architecture, built-in DI, extensive ecosystem, fast startup |
-| **Runtime** | Bun 1.0+ | High performance, built-in bundler/test runner, TypeScript support |
-| **Database** | PostgreSQL 16+ | JSONB for flexibility, full-text search, ACID compliance, proven at scale |
-| **Cache** | Redis 7+ | In-memory speed, pub/sub for real-time, job queue support |
-| **ORM** | Prisma 5+ | Type-safe, migration system, introspection, excellent DX |
-| **Queue** | Bull MQ | Redis-based, reliable, retry logic, job scheduling |
-| **Auth** | JWT + Refresh | Stateless, scalable, industry standard |
-| **API Docs** | Swagger/OpenAPI | Auto-generated from decorators, interactive testing |
-| **Testing** | Bun Test + Playwright | Unit/integration (Bun), E2E (Playwright) |
-| **Monitoring** | Grafana + Prometheus | Metrics visualization, alerting, open source |
+| Layer          | Technology               | Rationale                                                                        |
+| -------------- | ------------------------ | -------------------------------------------------------------------------------- |
+| **Frontend**   | Angular 19 Standalone    | Zoneless signals, modern reactive patterns, enterprise-ready                     |
+| **Backend**    | NestJS 10+ (Bun Runtime) | TypeScript, modular architecture, built-in DI, extensive ecosystem, fast startup |
+| **Runtime**    | Bun 1.0+                 | High performance, built-in bundler/test runner, TypeScript support               |
+| **Database**   | PostgreSQL 16+           | JSONB for flexibility, full-text search, ACID compliance, proven at scale        |
+| **Cache**      | Redis 7+                 | In-memory speed, pub/sub for real-time, job queue support                        |
+| **ORM**        | Prisma 5+                | Type-safe, migration system, introspection, excellent DX                         |
+| **Queue**      | Bull MQ                  | Redis-based, reliable, retry logic, job scheduling                               |
+| **Auth**       | JWT + Refresh            | Stateless, scalable, industry standard                                           |
+| **API Docs**   | Swagger/OpenAPI          | Auto-generated from decorators, interactive testing                              |
+| **Testing**    | Bun Test + Playwright    | Unit/integration (Bun), E2E (Playwright)                                         |
+| **Monitoring** | Grafana + Prometheus     | Metrics visualization, alerting, open source                                     |
 
 ---
 
@@ -119,7 +136,7 @@ graph TB
 
 ### Core Modules
 
-```
+```text
 apps/backend/src/
 ├── main.ts                          # Bootstrap application
 ├── app.module.ts                    # Root module
@@ -161,7 +178,7 @@ apps/backend/src/
 
 Every feature module follows this exact structure:
 
-```
+```text
 modules/feature-name/
 ├── feature-name.module.ts           # Module definition
 ├── feature-name.controller.ts       # REST endpoints
@@ -189,9 +206,9 @@ modules/feature-name/
 
 ### Payments Module (Reference Implementation)
 
-**Most critical module - sets pattern for all others**
+> **Most critical module - sets pattern for all others**
 
-```
+```text
 modules/payments/
 ├── payments.module.ts
 ├── payments.controller.ts           # Public endpoints
@@ -297,22 +314,22 @@ model User {
   passwordHash  String
   role          UserRole  @default(MERCHANT)
   kycLevel      KYCLevel  @default(LEVEL_0)
-  
+
   firstName     String?
   lastName      String?
-  
+
   isActive      Boolean   @default(true)
   emailVerified Boolean   @default(false)
   phoneVerified Boolean   @default(false)
-  
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?
-  
+
   // Relations
   businesses    Business[]
   refreshTokens RefreshToken[]
-  
+
   @@index([phone])
   @@index([email])
   @@map("users")
@@ -323,11 +340,11 @@ model RefreshToken {
   userId       String
   token        String   @unique
   expiresAt    DateTime
-  
+
   createdAt    DateTime @default(now())
-  
+
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
   @@index([token])
   @@map("refresh_tokens")
@@ -336,28 +353,28 @@ model RefreshToken {
 model Business {
   id              String   @id @default(uuid())
   ownerId         String
-  
+
   name            String
   legalName       String?
   taxId           String?  @unique  // RFC (MX), NIT (CO), CUIT (AR), RUT (CL)
   country         String   // MX, CO, AR, CL
   industry        String?
-  
+
   address         String?
   city            String?
   state           String?
   postalCode      String?
-  
+
   phone           String?
   email           String?
   website         String?
-  
+
   isActive        Boolean  @default(true)
-  
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   deletedAt       DateTime?
-  
+
   // Relations
   owner           User         @relation(fields: [ownerId], references: [id])
   branches        Branch[]
@@ -365,7 +382,7 @@ model Business {
   sales           Sale[]
   products        Product[]
   paymentMethods  PaymentMethod[]
-  
+
   @@index([ownerId])
   @@index([country])
   @@index([taxId])
@@ -375,26 +392,26 @@ model Business {
 model Branch {
   id          String   @id @default(uuid())
   businessId  String
-  
+
   name        String
   address     String
   city        String
   state       String?
   postalCode  String?
-  
+
   phone       String?
-  
+
   isActive    Boolean  @default(true)
-  
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   deletedAt   DateTime?
-  
+
   // Relations
   business    Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
   sales       Sale[]
   cashRegisters CashRegister[]
-  
+
   @@index([businessId])
   @@map("branches")
 }
@@ -402,32 +419,32 @@ model Branch {
 model Product {
   id          String   @id @default(uuid())
   businessId  String
-  
+
   name        String
   sku         String?
   barcode     String?
-  
+
   description String?
   category    String?
-  
+
   price       Decimal  @db.Decimal(10, 2)
   cost        Decimal? @db.Decimal(10, 2)
-  
+
   stock       Int      @default(0)
   minStock    Int      @default(0)
-  
+
   imageUrl    String?
-  
+
   isActive    Boolean  @default(true)
-  
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   deletedAt   DateTime?
-  
+
   // Relations
   business    Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
   saleItems   SaleItem[]
-  
+
   @@unique([businessId, sku])
   @@unique([businessId, barcode])
   @@index([businessId])
@@ -438,41 +455,41 @@ model Product {
 model Transaction {
   id              String            @id @default(uuid())
   businessId      String
-  
+
   amount          Decimal           @db.Decimal(10, 2)
   currency        String            // MXN, COP, ARS, CLP
-  
+
   status          TransactionStatus @default(PENDING)
-  
+
   paymentMethod   String            // QR, LINK, TRANSFER
   country         String            // MX, CO, AR, CL
-  
+
   // Provider-specific data
   providerAdapter String            // ConektaPaymentProvider, etc
   providerData    Json              // External provider response
   providerRef     String?           // External transaction ID
-  
+
   // Metadata
   description     String?
   metadata        Json?             // Additional custom data
-  
+
   // QR/Link specific
   qrCodeUrl       String?
   paymentLink     String?
-  
+
   // Timestamps
   confirmedAt     DateTime?
   failedAt        DateTime?
   refundedAt      DateTime?
-  
+
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
-  
+
   // Relations
   business        Business          @relation(fields: [businessId], references: [id])
   sale            Sale?
   webhookEvents   WebhookEvent[]
-  
+
   @@index([businessId])
   @@index([status])
   @@index([providerRef])
@@ -485,28 +502,28 @@ model Sale {
   businessId     String
   branchId       String?
   transactionId  String?  @unique
-  
+
   subtotal       Decimal  @db.Decimal(10, 2)
   tax            Decimal  @db.Decimal(10, 2) @default(0)
   discount       Decimal  @db.Decimal(10, 2) @default(0)
   total          Decimal  @db.Decimal(10, 2)
-  
+
   customerName   String?
   customerPhone  String?
   customerEmail  String?
-  
+
   notes          String?
-  
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
-  
+
   // Relations
   business       Business     @relation(fields: [businessId], references: [id])
   branch         Branch?      @relation(fields: [branchId], references: [id])
   transaction    Transaction? @relation(fields: [transactionId], references: [id])
   items          SaleItem[]
   invoice        Invoice?
-  
+
   @@index([businessId])
   @@index([branchId])
   @@index([createdAt])
@@ -517,15 +534,15 @@ model SaleItem {
   id         String  @id @default(uuid())
   saleId     String
   productId  String
-  
+
   quantity   Int
   unitPrice  Decimal @db.Decimal(10, 2)
   total      Decimal @db.Decimal(10, 2)
-  
+
   // Relations
   sale       Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
   product    Product @relation(fields: [productId], references: [id])
-  
+
   @@index([saleId])
   @@index([productId])
   @@map("sale_items")
@@ -534,23 +551,23 @@ model SaleItem {
 model Invoice {
   id              String   @id @default(uuid())
   saleId          String   @unique
-  
+
   invoiceNumber   String   @unique
-  
+
   // Country-specific fiscal data
   fiscalData      Json     // SAT (MX), DIAN (CO), AFIP (AR) response
-  
+
   pdfUrl          String?
   xmlUrl          String?  // Mexico CFDi, etc
-  
+
   status          String   // ISSUED, CANCELED
-  
+
   createdAt       DateTime @default(now())
   canceledAt      DateTime?
-  
+
   // Relations
   sale            Sale     @relation(fields: [saleId], references: [id])
-  
+
   @@index([invoiceNumber])
   @@index([saleId])
   @@map("invoices")
@@ -559,27 +576,27 @@ model Invoice {
 model PaymentMethod {
   id              String            @id @default(uuid())
   businessId      String
-  
+
   type            PaymentMethodType
-  
+
   name            String            // "QR Tienda Principal", "Link WhatsApp"
   description     String?
-  
+
   // For static QR
   qrCodeUrl       String?
   qrImageUrl      String?
-  
+
   // For payment links
   linkTemplate    String?           // Base URL template
-  
+
   isActive        Boolean           @default(true)
-  
+
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
-  
+
   // Relations
   business        Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  
+
   @@index([businessId])
   @@map("payment_methods")
 }
@@ -587,26 +604,26 @@ model PaymentMethod {
 model CashRegister {
   id          String    @id @default(uuid())
   branchId    String
-  
+
   name        String
-  
+
   openedAt    DateTime?
   closedAt    DateTime?
-  
+
   openingCash Decimal   @db.Decimal(10, 2) @default(0)
   closingCash Decimal?  @db.Decimal(10, 2)
-  
+
   expectedCash Decimal? @db.Decimal(10, 2)
   difference   Decimal? @db.Decimal(10, 2)
-  
+
   notes       String?
-  
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  
+
   // Relations
   branch      Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  
+
   @@index([branchId])
   @@index([openedAt])
   @@map("cash_registers")
@@ -615,21 +632,21 @@ model CashRegister {
 model WebhookEvent {
   id             String   @id @default(uuid())
   transactionId  String?
-  
+
   provider       String   // conekta, payu, mercadopago
   eventType      String   // payment.confirmed, payment.failed, etc
-  
+
   payload        Json     // Raw webhook payload
   signature      String?  // Webhook signature for verification
-  
+
   processed      Boolean  @default(false)
   processedAt    DateTime?
-  
+
   createdAt      DateTime @default(now())
-  
+
   // Relations
   transaction    Transaction? @relation(fields: [transactionId], references: [id])
-  
+
   @@index([transactionId])
   @@index([provider])
   @@index([processed])
@@ -641,11 +658,13 @@ model WebhookEvent {
 ### Database Indexes Strategy
 
 **Primary Indexes (created above):**
+
 - Foreign keys: All relations indexed
 - Query patterns: `businessId`, `status`, `createdAt`
 - Unique constraints: `phone`, `email`, `taxId`, `invoiceNumber`
 
 **Additional Indexes (create after data analysis):**
+
 - Composite indexes for common queries
 - Full-text search indexes for product search
 - Partial indexes for active records only
@@ -662,7 +681,7 @@ model WebhookEvent {
 
 **Standard Endpoints Pattern:**
 
-```
+```text
 Resource: /api/v1/resource
 
 GET    /resource           # List (paginated)
@@ -726,7 +745,7 @@ GET    /resource/:id/nested/:nid   # Get nested by ID
 
 ### Payment API Endpoints (Core)
 
-```
+```text
 POST   /payments/intent                # Create payment intent (QR/Link)
 GET    /payments/:id                   # Get payment status
 POST   /payments/:id/confirm           # Manual confirmation (testing)
@@ -745,44 +764,47 @@ POST   /webhooks/khipu                 # Khipu webhook
 
 ### Authentication Flow
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant API as NestJS API
-    participant DB as PostgreSQL
-    participant R as Redis
+```plantuml
+@startuml
+!theme plain
+participant "Client" as C
+participant "NestJS API" as API
+participant "PostgreSQL" as DB
+participant "Redis" as R
 
-    C->>API: POST /auth/login {phone, password}
-    API->>DB: Find user by phone
-    DB-->>API: User data
-    API->>API: Verify password (bcrypt)
-    API->>API: Generate access token (15min)
-    API->>API: Generate refresh token (7 days)
-    API->>DB: Save refresh token
-    API->>R: Cache user session
-    API-->>C: {accessToken, refreshToken}
-    
-    Note over C: Access token expires
-    
-    C->>API: POST /auth/refresh {refreshToken}
-    API->>DB: Verify refresh token
-    DB-->>API: Token valid
-    API->>API: Generate new access token
-    API-->>C: {accessToken}
+C -> API: POST /auth/login {phone, password}
+API -> DB: Find user by phone
+DB --> API: User data
+API -> API: Verify password (bcrypt)
+API -> API: Generate access token (15min)
+API -> API: Generate refresh token (7 days)
+API -> DB: Save refresh token
+API -> R: Cache user session
+API --> C: {accessToken, refreshToken}
+
+note over C: Access token expires
+
+C -> API: POST /auth/refresh {refreshToken}
+API -> DB: Verify refresh token
+DB --> API: Token valid
+API -> API: Generate new access token
+API --> C: {accessToken}
+@enduml
 ```
 
 ### Authorization Levels
 
 **Role-Based Access Control (RBAC):**
 
-| Role | Access |
-|------|--------|
-| **ADMIN** | Full system access, user management, system config |
-| **MERCHANT** | Own business data, create sales, manage inventory |
-| **EMPLOYEE** | Branch-level access, create sales, view reports |
-| **CUSTOMER** | Future use (if customer portal added) |
+| Role         | Access                                             |
+| ------------ | -------------------------------------------------- |
+| **ADMIN**    | Full system access, user management, system config |
+| **MERCHANT** | Own business data, create sales, manage inventory  |
+| **EMPLOYEE** | Branch-level access, create sales, view reports    |
+| **CUSTOMER** | Future use (if customer portal added)              |
 
 **Resource Ownership:**
+
 - Users can only access their own businesses
 - Employees can only access assigned branches
 - Cross-business access blocked at guard level
@@ -799,6 +821,7 @@ sequenceDiagram
 ### Secrets Management
 
 **Environment Variables (never commit):**
+
 - `JWT_SECRET` - Random 256-bit key
 - `JWT_REFRESH_SECRET` - Different random key
 - `DATABASE_URL` - PostgreSQL connection string
@@ -807,6 +830,7 @@ sequenceDiagram
 - SMS/Email API keys
 
 **Encryption at Rest:**
+
 - Password hashing: bcrypt (cost factor 12)
 - Sensitive PII: AES-256-GCM encryption
 - Database encryption: PostgreSQL native encryption
@@ -823,7 +847,7 @@ sequenceDiagram
 export interface IPaymentProvider {
   readonly country: string;
   readonly currency: string;
-  
+
   createPaymentIntent(dto: CreatePaymentDto): Promise<PaymentIntent>;
   generateQRCode(intentId: string): Promise<QRCodeData>;
   confirmPayment(intentId: string): Promise<PaymentConfirmation>;
@@ -842,14 +866,14 @@ export interface PaymentIntent {
 }
 
 export interface QRCodeData {
-  format: 'SPEI' | 'PSE' | 'PIX' | 'QR';
+  format: "SPEI" | "PSE" | "PIX" | "QR";
   content: string;
   imageUrl: string;
 }
 
 export interface PaymentConfirmation {
   transactionId: string;
-  status: 'CONFIRMED' | 'FAILED';
+  status: "CONFIRMED" | "FAILED";
   confirmedAt: Date;
   providerRef: string;
 }
@@ -857,7 +881,7 @@ export interface PaymentConfirmation {
 export interface RefundResult {
   refundId: string;
   amount: number;
-  status: 'PROCESSED' | 'PENDING' | 'FAILED';
+  status: "PROCESSED" | "PENDING" | "FAILED";
   providerRef: string;
 }
 ```
@@ -867,36 +891,36 @@ export interface RefundResult {
 **Generic Webhook Handler:**
 
 ```typescript
-@Controller('webhooks')
+@Controller("webhooks")
 export class WebhooksController {
   constructor(
     private factory: PaymentProviderFactory,
     private webhookService: WebhookService,
   ) {}
-  
-  @Post(':provider')
+
+  @Post(":provider")
   async handleWebhook(
-    @Param('provider') provider: string,
+    @Param("provider") provider: string,
     @Body() payload: any,
-    @Headers('signature') signature: string,
+    @Headers("signature") signature: string,
   ): Promise<void> {
     // 1. Log webhook receipt
     await this.webhookService.logWebhook(provider, payload);
-    
+
     // 2. Verify signature
     const providerInstance = this.factory.getProviderByName(provider);
     const isValid = providerInstance.verifyWebhookSignature(
       JSON.stringify(payload),
       signature,
     );
-    
+
     if (!isValid) {
-      throw new UnauthorizedException('Invalid webhook signature');
+      throw new UnauthorizedException("Invalid webhook signature");
     }
-    
+
     // 3. Process webhook (idempotent)
     await this.webhookService.process(provider, payload);
-    
+
     // 4. Return success (providers expect 200)
     return;
   }
@@ -917,6 +941,7 @@ export class WebhooksController {
 4. **Analytics Queries:** 1 hour TTL (not real-time critical)
 
 **Cache Invalidation:**
+
 - Write-through: Update cache when database updated
 - Event-based: Clear cache on specific events
 - TTL-based: Expire automatically
@@ -924,18 +949,20 @@ export class WebhooksController {
 ### Database Optimization
 
 **Query Optimization:**
+
 - Use Prisma's `select` and `include` to fetch only needed fields
 - Paginate all list endpoints (default 20, max 100)
 - Use database indexes for filter fields
 - Avoid N+1 queries with `include` relations
 
 **Connection Pooling:**
+
 ```typescript
 // Prisma client configuration
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  
+
   // Connection pool settings
   connection_limit = 10
   pool_timeout = 10
@@ -953,12 +980,13 @@ datasource db {
 5. **Webhook Retry:** Exponential backoff
 
 **Job Priorities:**
+
 - Critical: Payment confirmations (priority 10)
 - High: User notifications (priority 5)
 - Normal: Reports generation (priority 1)
 
 ---
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-11-01  
+**Version:** 1.0.0
+**Last Updated:** 2025-11-01
 **Status:** Preliminary - Foundation for Implementation

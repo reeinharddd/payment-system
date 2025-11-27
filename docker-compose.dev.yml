@@ -103,9 +103,10 @@ services:
       - postgres
     volumes:
       - ./services/mcp-server:/app/services/mcp-server
+      - ./docs:/app/docs
       - /app/node_modules
       - /app/services/mcp-server/node_modules
-    command: bun run --filter mcp-server dev
+    command: sh -c "bun install && bun run --filter mcp-server dev"
     networks:
       - payment-network
 

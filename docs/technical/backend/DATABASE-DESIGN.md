@@ -34,346 +34,345 @@
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
-| Directive      | Instruction                                                  |
-| :------------- | :----------------------------------------------------------- |
-| **Context**    | This document defines the database schema and ER diagrams.   |
-| **Constraint** | All schema changes MUST be modeled here first using Mermaid. |
-| **Pattern**    | Use the 'Code-First' approach but document here first.       |
-| **Related**    | `apps/backend/prisma/schema.prisma`                          |
+| Directive      | Instruction                                                   |
+| :------------- | :------------------------------------------------------------ |
+| **Context**    | This document defines the database schema and ER diagrams.    |
+| **Constraint** | All schema changes MUST be modeled here first using PlantUML. |
+| **Pattern**    | Use the 'Code-First' approach but document here first.        |
+| **Related**    | `apps/backend/prisma/schema.prisma`                           |
 
 ---
 
 ## Core Data Model
 
-```mermaid
-erDiagram
-    %% --- AUTH MODULE ---
-    User ||--o{ UserIdentity : has
-    User ||--o{ Employee : is_linked_to
-    Business ||--o{ Employee : employs
-    Branch ||--o{ Employee : assigned_to
-    Role ||--o{ Employee : assigned_role
-    Role ||--o{ RolePermission : has
-    Permission ||--o{ RolePermission : grants
-    Business ||--o{ ApiKey : owns
-    Business ||--o{ Role : defines_custom
+```plantuml
+@startuml
 
-    %% --- BUSINESS CORE ---
-    User ||--o{ Business : owns
-    Business ||--|{ Branch : has
-    Business ||--o{ PaymentMethod : has
+' CONFIGURACIÓN VISUAL (Clean & Modern)
+!theme plain
+hide circle
+skinparam linetype ortho
+skinparam class {
+    BackgroundColor White
+    ArrowColor #333
+    BorderColor #333
+}
 
-    %% --- INVENTORY MODULE ---
-    Business ||--o{ Category : manages
-    Category ||--o{ Category : parent_of
-    Category ||--o{ Product : contains
-    Business ||--o{ Product : owns
-    Product ||--o{ Variant : has
-    Product ||--o{ ProductModifierGroup : has
-    ProductModifierGroup ||--o{ ProductModifier : contains
-    Product ||--o{ ProductComponent : "composed_of (Recipe/Pack)"
-    Branch ||--o{ Stock : stores
-    Product ||--o{ Stock : tracked_in
-    Variant ||--o{ Stock : tracked_in
-    Business ||--o{ InventoryAlert : receives
+' --- CLUSTER: IDENTIDAD Y ACCESO ---
 
-    %% --- SALES MODULE ---
-    Branch ||--o{ CashRegister : has
-    CashRegister ||--o{ Shift : records
-    Employee ||--o{ Shift : opens
-    Shift ||--o{ Sale : includes
-    Sale ||--|{ SaleItem : contains
-    Product ||--o{ SaleItem : sold_as
-    Variant ||--o{ SaleItem : sold_as
-    Sale ||--o| Transaction : paid_via
+entity "User" as user {
+  *id : UUID <<PK>>
+  --
+  email : VARCHAR <<UK>>
+  emailVerified : TIMESTAMP
+  phone : VARCHAR <<UK>>
+  phoneVerified : TIMESTAMP
+  firstName : VARCHAR
+  lastName : VARCHAR
+  displayName : VARCHAR
+  avatarUrl : VARCHAR
+  locale : VARCHAR
+  kycLevel : INT
+  kycData : JSONB
+  preferences : JSONB
+  isActive : BOOLEAN
+  createdAt : TIMESTAMP
+  updatedAt : TIMESTAMP
+}
 
-    %% --- BILLING MODULE ---
-    Sale ||--o| Invoice : generates
-    Transaction ||--o| Invoice : related_to
+entity "UserIdentity" as identity {
+  *id : UUID <<PK>>
+  --
+  *userId : UUID <<FK>>
+  provider : ENUM (LOCAL, GOOGLE, PHONE)
+  providerId : VARCHAR
+  credential : VARCHAR
+  accessToken : VARCHAR
+  refreshToken : VARCHAR
+  metadata : JSONB
+  lastLogin : TIMESTAMP
+}
 
-    %% --- NOTIFICATIONS MODULE ---
-    Business ||--o{ NotificationLog : receives
-    User ||--o{ NotificationLog : receives
+entity "ApiKey" as apikey {
+  *id : UUID <<PK>>
+  --
+  *businessId : UUID <<FK>>
+  keyHash : VARCHAR
+  scopes : JSONB
+  expiresAt : TIMESTAMP
+}
 
-    %% --- ENTITY DEFINITIONS ---
+' --- CLUSTER: ORGANIZACIÓN Y ROLES ---
 
-    User {
-        uuid id PK
-        string email UK
-        string phone UK
-        boolean isActive
-        timestamp createdAt
-        timestamp updatedAt
-    }
+entity "Business" as business {
+  *id : UUID <<PK>>
+  --
+  *ownerId : UUID <<FK>>
+  legalName : VARCHAR
+  taxId : VARCHAR <<UK>>
+  country : VARCHAR
+  type : ENUM (RETAIL, RESTAURANT, SERVICE)
+  features : JSONB
+  isActive : BOOLEAN
+}
 
-    UserIdentity {
-        uuid id PK
-        uuid userId FK
-        enum provider "LOCAL, GOOGLE, PHONE"
-        string providerId "email, google_sub, phone_number"
-        string credential "password_hash, null"
-        jsonb metadata
-        timestamp lastLogin
-    }
+entity "Employee" as employee {
+  *id : UUID <<PK>>
+  --
+  userId : UUID <<FK>>
+  *businessId : UUID <<FK>>
+  branchId : UUID <<FK>>
+  *roleId : UUID <<FK>>
+  alias : VARCHAR
+  pinCode : VARCHAR
+  status : ENUM (ACTIVE, INVITED)
+}
 
-    Employee {
-        uuid id PK
-        uuid userId FK "Nullable (if invite pending)"
-        uuid businessId FK
-        uuid branchId FK "Nullable (if multi-branch)"
-        uuid roleId FK
-        string alias "e.g. Juan - Waiter"
-        string pinCode "Hashed 4-6 digit PIN"
-        string inviteToken
-        enum status "ACTIVE, INVITED, SUSPENDED"
-        timestamp joinedAt
-    }
+entity "Role" as role {
+  *id : UUID <<PK>>
+  --
+  businessId : UUID <<FK>>
+  name : VARCHAR
+  type : ENUM (SYSTEM, CUSTOM)
+}
 
-    Role {
-        uuid id PK
-        uuid businessId FK "Nullable (System roles)"
-        string name
-        string description
-        enum type "SYSTEM, CUSTOM"
-    }
+entity "RolePermission" as role_perm {
+  *roleId : UUID <<FK>>
+  *permissionId : UUID <<FK>>
+}
 
-    Permission {
-        uuid id PK
-        string action
-        string resource
-        string description
-    }
+entity "Permission" as perm {
+  *id : UUID <<PK>>
+  --
+  action : VARCHAR
+  resource : VARCHAR
+}
 
-    RolePermission {
-        uuid roleId FK
-        uuid permissionId FK
-    }
+' --- CLUSTER: COMUNICACIÓN ---
 
-    ApiKey {
-        uuid id PK
-        uuid businessId FK
-        string keyHash
-        string name
-        jsonb scopes
-        timestamp expiresAt
-        timestamp lastUsedAt
-    }
+entity "NotificationLog" as notif {
+  *id : UUID <<PK>>
+  --
+  userId : UUID <<FK>>
+  businessId : UUID <<FK>>
+  channel : ENUM
+  recipient : VARCHAR
+  status : ENUM
+}
 
-    Business {
-        uuid id PK
-        uuid ownerId FK
-        string legalName
-        string taxId UK
-        string country
-        string industry
-        jsonb settings
-        jsonb fiscalData "Tax Data"
-        boolean isActive
-        timestamp createdAt
-    }
+' --- CLUSTER: INVENTORY ---
 
-    PaymentMethod {
-        uuid id PK
-        uuid businessId FK
-        string name
-        enum type "CASH, CARD, QR, TRANSFER"
-        jsonb config
-        boolean isActive
-    }
+entity "Category" as category {
+  *id : UUID <<PK>>
+  --
+  *businessId : UUID <<FK>>
+  parentId : UUID <<FK>>
+  name : VARCHAR
+}
 
-    Branch {
-        uuid id PK
-        uuid businessId FK
-        string name
-        string address
-        string phone
-        string timezone
-        boolean isActive
-    }
+entity "Product" as product {
+  *id : UUID <<PK>>
+  --
+  *businessId : UUID <<FK>>
+  categoryId : UUID <<FK>>
+  name : VARCHAR
+  sku : VARCHAR
+  barcode : VARCHAR
+  price : DECIMAL
+  cost : DECIMAL
+  type : ENUM
+  trackInventory : BOOLEAN
+}
 
-    Category {
-        uuid id PK
-        uuid businessId FK
-        uuid parentId FK
-        string name
-        string description
-    }
+entity "Variant" as variant {
+  *id : UUID <<PK>>
+  --
+  *productId : UUID <<FK>>
+  name : VARCHAR
+  sku : VARCHAR
+  price : DECIMAL
+}
 
-    Product {
-        uuid id PK
-        uuid businessId FK
-        uuid categoryId FK
-        string name
-        string description
-        string sku
-        string barcode "Unique per Business"
-        decimal price
-        decimal cost
-        decimal taxRate
-        enum type "ITEM, SERVICE, COMPOSITE"
-        boolean trackInventory "If false, stock is not checked"
-        boolean isActive
-    }
+entity "Stock" as stock {
+  *id : UUID <<PK>>
+  --
+  *branchId : UUID <<FK>>
+  *productId : UUID <<FK>>
+  variantId : UUID <<FK>>
+  quantity : DECIMAL
+  minStock : DECIMAL
+}
 
-    ProductComponent {
-        uuid id PK
-        uuid parentProductId FK "The Pack or Recipe"
-        uuid childProductId FK "The Item inside"
-        decimal quantity "How many items per pack/recipe"
-        enum type "RECIPE, PACK"
-    }
+entity "InventoryAlert" as alert {
+  *id : UUID <<PK>>
+  --
+  *businessId : UUID <<FK>>
+  *branchId : UUID <<FK>>
+  *productId : UUID <<FK>>
+  type : ENUM
+  status : ENUM
+}
 
-    ProductModifierGroup {
-        uuid id PK
-        uuid productId FK
-        string name "e.g. Salsa, Termino"
-        int minSelection
-        int maxSelection
-        boolean isRequired
-    }
+' --- CLUSTER: SALES ---
 
-    ProductModifier {
-        uuid id PK
-        uuid groupId FK
-        string name "e.g. Verde, Roja, 3/4"
-        decimal priceAdjustment
-        decimal costAdjustment
-    }
+entity "Branch" as branch {
+  *id : UUID <<PK>>
+  --
+  *businessId : UUID <<FK>>
+  name : VARCHAR
+  address : VARCHAR
+}
 
-    Variant {
-        uuid id PK
-        uuid productId FK
-        string name
-        string sku
-        string barcode
-        decimal price
-        decimal cost
-    }
+entity "CashRegister" as register {
+  *id : UUID <<PK>>
+  --
+  *branchId : UUID <<FK>>
+  name : VARCHAR
+  status : ENUM
+}
 
-    Stock {
-        uuid id PK
-        uuid branchId FK
-        uuid productId FK
-        uuid variantId FK
-        decimal quantity
-        decimal minStock
-        string location
-    }
+entity "Shift" as shift {
+  *id : UUID <<PK>>
+  --
+  *cashRegisterId : UUID <<FK>>
+  *employeeId : UUID <<FK>>
+  startTime : TIMESTAMP
+  endTime : TIMESTAMP
+}
 
-    InventoryAlert {
-        uuid id PK
-        uuid businessId FK
-        uuid branchId FK
-        uuid productId FK
-        enum type "OVERSELLING, LOW_STOCK"
-        decimal expectedStock
-        decimal actualStock
-        enum status "PENDING, RESOLVED"
-        timestamp createdAt
-    }
+entity "Sale" as sale {
+  *id : UUID <<PK>>
+  --
+  *shiftId : UUID <<FK>>
+  customerId : UUID <<FK>>
+  total : DECIMAL
+  status : ENUM
+  paymentMethod : ENUM
+}
 
-    CashRegister {
-        uuid id PK
-        uuid branchId FK
-        string name
-        enum status "OPEN, CLOSED"
-    }
+entity "SaleItem" as sale_item {
+  *id : UUID <<PK>>
+  --
+  *saleId : UUID <<FK>>
+  *productId : UUID <<FK>>
+  variantId : UUID <<FK>>
+  quantity : DECIMAL
+  unitPrice : DECIMAL
+}
 
-    Shift {
-        uuid id PK
-        uuid cashRegisterId FK
-        uuid employeeId FK
-        timestamp startTime
-        timestamp endTime
-        decimal startAmount
-        decimal endAmount
-        decimal expectedAmount
-        decimal difference
-        string notes
-    }
+entity "Transaction" as txn {
+  *id : UUID <<PK>>
+  --
+  *businessId : UUID <<FK>>
+  branchId : UUID <<FK>>
+  saleId : UUID <<FK>>
+  amount : DECIMAL
+  status : ENUM
+  providerAdapter : VARCHAR
+}
 
-    Sale {
-        uuid id PK
-        uuid shiftId FK
-        uuid customerId FK
-        string label "Table 5, Tab Name"
-        decimal total
-        decimal subtotal
-        decimal tax
-        decimal discount
-        enum status "OPEN, COMPLETED, CANCELLED"
-        enum channel "POS, DELIVERY"
-        enum paymentMethod
-        timestamp createdAt
-        timestamp updatedAt
-    }
+entity "Invoice" as invoice {
+  *id : UUID <<PK>>
+  --
+  *saleId : UUID <<FK>>
+  transactionId : UUID <<FK>>
+  invoiceNumber : VARCHAR
+  uuid : VARCHAR
+  status : ENUM
+}
 
-    SaleItem {
-        uuid id PK
-        uuid saleId FK
-        uuid productId FK
-        uuid variantId FK
-        decimal quantity
-        decimal unitPrice
-        decimal total
-        decimal tax
-        decimal discount
-        jsonb modifiers "Selected modifiers snapshot"
-        string notes "Kitchen notes"
-        enum status "PENDING, PREPARING, READY, DELIVERED"
-        timestamp deliveredAt
-    }
+entity "PaymentMethod" as pay_method {
+  *id : UUID <<PK>>
+  --
+  *businessId : UUID <<FK>>
+  name : VARCHAR
+  type : ENUM
+}
 
-    Transaction {
-        uuid id PK
-        uuid businessId FK
-        uuid branchId FK
-        decimal amount
-        string currency
-        enum status
-        enum paymentMethod
-        string country
-        string providerAdapter
-        jsonb providerData
-        timestamp createdAt
-        timestamp confirmedAt
-    }
+' --- RELACIONES (Notación Pata de Gallo) ---
 
-    Invoice {
-        uuid id PK
-        uuid saleId FK
-        uuid transactionId FK
-        string invoiceNumber UK
-        enum type
-        string uuid "Fiscal UUID"
-        string country
-        jsonb fiscalData
-        string pdfUrl
-        enum status
-        timestamp issuedAt
-    }
+' Identity
+user ||..o{ identity : "tiene"
+user ||..o{ business : "posee"
+user ||..o{ employee : "trabaja como"
+user ||..o{ notif : "recibe"
 
-    NotificationTemplate {
-        uuid id PK
-        string name
-        enum channel "SMS, EMAIL, PUSH, WHATSAPP"
-        string subject
-        string content
-        jsonb variables
-        boolean isActive
-    }
+' Business Core
+business ||..o{ employee : "emplea"
+business ||..o{ branch : "tiene"
+business ||..o{ pay_method : "configura"
+business ||..o{ apikey : "tiene"
+business ||..o{ notif : "genera"
 
-    NotificationLog {
-        uuid id PK
-        uuid businessId FK
-        uuid userId FK
-        enum channel
-        string recipient
-        enum status "SENT, FAILED, PENDING"
-        string error
-        timestamp sentAt
-    }
+' Roles
+role ||..o{ employee : "asignado a"
+role ||..|{ role_perm : "tiene"
+perm ||..|{ role_perm : "pertenece a"
+business ||..o{ role : "define"
+
+' Inventory
+business ||..o{ category : "gestiona"
+category ||..o{ category : "padre de"
+category ||..o{ product : "contiene"
+business ||..o{ product : "vende"
+product ||..o{ variant : "tiene"
+branch ||..o{ stock : "almacena"
+product ||..o{ stock : "inventariado en"
+variant ||..o{ stock : "inventariado en"
+business ||..o{ alert : "recibe"
+branch ||..o{ alert : "genera"
+product ||..o{ alert : "genera"
+
+' Sales
+branch ||..o{ register : "tiene"
+register ||..o{ shift : "registra"
+employee ||..o{ shift : "abre"
+shift ||..o{ sale : "incluye"
+sale ||..|{ sale_item : "contiene"
+product ||..o{ sale_item : "vendido como"
+variant ||..o{ sale_item : "vendido como"
+sale ||..o| txn : "pagado con"
+business ||..o{ txn : "procesa"
+branch ||..o{ txn : "procesa"
+
+' Billing
+sale ||..o| invoice : "factura"
+txn ||..o| invoice : "relacionado con"
+
+@enduml
 ```
+
+## Platform vs Product Architecture
+
+This database design supports a **"Platform with Multiple Products"** strategy. This allows a single user to have a unified identity while accessing different business tools (Restaurant, Retail, Service) based on their context.
+
+### 1. Global Identity (The "Who")
+
+The `User` entity represents the human being. This data is **immutable** across products.
+
+- **Single Sign-On:** A user logs in once via `UserIdentity` (Google, Phone, Password).
+- **Global Profile:** Name, email, phone are stored here.
+
+### 2. Contextual Profile (The "Where")
+
+The `Employee` entity represents the user's role within a specific `Business`.
+
+- **Context Switching:** A user can be an "Owner" in Business A (Restaurant) and a "Cashier" in Business B (Retail).
+- **Separation of Concerns:** Permissions and roles are linked to the `Employee` record, not the `User`.
+
+### 3. Business Types (The "What")
+
+The `Business` entity determines the product experience via the `type` and `features` fields.
+
+| Field      | Description                            | Example                                      |
+| :--------- | :------------------------------------- | :------------------------------------------- |
+| `type`     | Defines the primary vertical.          | `RESTAURANT`, `RETAIL`, `SERVICE`            |
+| `features` | JSON flags to toggle specific modules. | `{ "kitchenDisplay": true, "tables": true }` |
+
+**Frontend Behavior:**
+
+- If `type === 'RESTAURANT'`, the app loads the Table Management and Kitchen modules.
+- If `type === 'RETAIL'`, the app loads the Barcode Scanner and Quick POS modules.
 
 ## Proposed Changes
 

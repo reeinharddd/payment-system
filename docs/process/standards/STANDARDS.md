@@ -1,5 +1,5 @@
 <!-- AI-INSTRUCTION: START -->
-<!-- 
+<!--
   This document defines the DOCUMENTATION STANDARDS. When creating new files:
   1. Preserve the Header Table and Metadata block.
   2. Fill in the "Agent Directives" to guide future AI interactions.
@@ -20,7 +20,7 @@
 </table>
 
 <div align="center">
-  
+
   <!-- METADATA BADGES -->
   <img src="https://img.shields.io/badge/Status-Approved-green?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-Developers-blue?style=flat-square" alt="Audience" />
@@ -32,14 +32,14 @@
 
 ## 🤖 Agent Directives (System Prompt)
 
-*This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document.*
+_This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
-| Directive | Instruction |
-| :--- | :--- |
-| **Context** | This document defines how to write documentation for this project. |
-| **Constraint** | Use Markdown (`.md`) only. No external diagram tools (use Mermaid). |
-| **Pattern** | Follow the `00-GENERAL-DOC-TEMPLATE.md` structure for all new files. |
-| **Related** | `docs/templates/00-GENERAL-DOC-TEMPLATE.md` |
+| Directive      | Instruction                                                          |
+| :------------- | :------------------------------------------------------------------- |
+| **Context**    | This document defines how to write documentation for this project.   |
+| **Constraint** | Use Markdown (`.md`) only. No external diagram tools (use PlantUML). |
+| **Pattern**    | Follow the `00-GENERAL-DOC-TEMPLATE.md` structure for all new files. |
+| **Related**    | `docs/templates/00-GENERAL-DOC-TEMPLATE.md`                          |
 
 ---
 
@@ -58,15 +58,15 @@ Consistent documentation reduces cognitive load and ensures that information is 
 #### Clarity Over Style
 
 - Use plain language
-- No emojis or decorative elements
+- **NO EMOJIS** or decorative elements in documentation or code comments
 - Focus on information density
 - Structure over aesthetics
 
 #### Native Formats Only
 
 - Markdown (.md) for all documentation
-- Mermaid for diagrams (renders in GitHub/VSCode)
-- No external diagram formats (no PlantUML, draw.io, etc.)
+- PlantUML for diagrams (renders in GitHub/VSCode with extension)
+- No external diagram formats (no Mermaid, draw.io, etc.)
 - Code examples in fenced blocks with language tags
 
 #### Self-Contained Documents
@@ -81,7 +81,7 @@ Each document must be complete and understandable on its own:
 
 Structure information from high-level to detailed:
 
-```
+```text
 1. Overview (what/why)
 2. Quick Start (immediate action)
 3. Details (how it works)
@@ -96,7 +96,9 @@ All documents must follow the Master Template (`docs/templates/00-GENERAL-DOC-TE
 
 ```markdown
 <!-- AI-INSTRUCTION: START -->
+
 ...
+
 <!-- AI-INSTRUCTION: END -->
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -110,11 +112,13 @@ All documents must follow the Master Template (`docs/templates/00-GENERAL-DOC-TE
 ---
 
 ## 🤖 Agent Directives (System Prompt)
+
 ...
 
 ---
 
 ## 1. Executive Summary
+
 ...
 ```
 
@@ -128,92 +132,127 @@ GETTING-STARTED.md        # General docs
 SYSTEM-ARCHITECTURE.md    # Architecture docs
 ```
 
-### 3.3. Diagram Standards (Mermaid)
+### 3.3. Diagram Standards (PlantUML)
 
 #### Supported Types
 
-Use Mermaid for all diagrams. Renders natively in GitHub, GitLab, VSCode (with extension).
+Use PlantUML for all diagrams. Renders natively in VSCode (with extension) and is the industry standard for UML.
 
 **Architecture Diagrams:**
 
-```mermaid
-graph TB
-    Client[Client App]
-    API[API Gateway]
-    Auth[Auth Service]
-    Payment[Payment Service]
-    DB[(Database)]
-    
-    Client -->|HTTPS| API
-    API --> Auth
-    API --> Payment
-    Payment --> DB
+```plantuml
+@startuml
+!theme plain
+node "Client App" as Client
+node "API Gateway" as API
+node "Auth Service" as Auth
+node "Payment Service" as Payment
+database "Database" as DB
+
+Client --> API : HTTPS
+API --> Auth
+API --> Payment
+Payment --> DB
+@enduml
 ```
 
 **Sequence Diagrams:**
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant A as App
-    participant S as Server
-    participant D as Database
-    
-    U->>A: Click "Pay"
-    A->>S: POST /payments
-    S->>D: Save transaction
-    D-->>S: Saved
-    S-->>A: Payment ID
-    A-->>U: Show QR
+```plantuml
+@startuml
+!theme plain
+actor User as U
+participant "App" as A
+participant "Server" as S
+database "Database" as D
+
+U -> A: Click "Pay"
+A -> S: POST /payments
+S -> D: Save transaction
+D --> S: Saved
+S --> A: Payment ID
+A --> U: Show QR
+@enduml
 ```
 
 **Entity Relationships:**
 
-```mermaid
-erDiagram
-    User ||--o{ Business : owns
-    Business ||--|{ Branch : has
-    Branch ||--o{ Transaction : processes
-    Transaction ||--o| Invoice : generates
-    
-    User {
-        uuid id PK
-        string email
-        string role
-    }
-    
-    Business {
-        uuid id PK
-        uuid ownerId FK
-        string country
-        string taxId
-    }
+```plantuml
+@startuml
+!theme plain
+hide circle
+skinparam linetype ortho
+
+entity "User" as user {
+  *id : UUID <<PK>>
+  --
+  email : VARCHAR
+  role : VARCHAR
+}
+
+entity "Business" as business {
+  *id : UUID <<PK>>
+  --
+  *ownerId : UUID <<FK>>
+  country : VARCHAR
+  taxId : VARCHAR
+}
+
+entity "Branch" as branch {
+  *id : UUID <<PK>>
+  --
+  *businessId : UUID <<FK>>
+}
+
+entity "Transaction" as txn {
+  *id : UUID <<PK>>
+  --
+  *branchId : UUID <<FK>>
+}
+
+entity "Invoice" as inv {
+  *id : UUID <<PK>>
+  --
+  *txnId : UUID <<FK>>
+}
+
+user ||..o{ business : owns
+business ||..|{ branch : has
+branch ||..o{ txn : processes
+txn ||..o| inv : generates
+@enduml
 ```
 
 **State Machines:**
 
-```mermaid
-stateDiagram-v2
-    [*] --> Pending
-    Pending --> Confirmed: Payment received
-    Pending --> Cancelled: Timeout/User cancel
-    Confirmed --> Refunded: Refund requested
-    Refunded --> [*]
-    Cancelled --> [*]
+```plantuml
+@startuml
+!theme plain
+[*] --> Pending
+Pending --> Confirmed: Payment received
+Pending --> Cancelled: Timeout/User cancel
+Confirmed --> Refunded: Refund requested
+Refunded --> [*]
+Cancelled --> [*]
+@enduml
 ```
 
 **Flow Charts:**
 
-```mermaid
-flowchart TD
-    Start([Start]) --> Check{Country?}
-    Check -->|MX| Conekta[Conekta Provider]
-    Check -->|CO| PayU[PayU Provider]
-    Check -->|AR| MP[MercadoPago Provider]
-    Conekta --> Process[Process Payment]
-    PayU --> Process
-    MP --> Process
-    Process --> End([End])
+```plantuml
+@startuml
+!theme plain
+start
+if (Country?) then (MX)
+  :Conekta Provider;
+elseif (CO)
+  :PayU Provider;
+else (AR)
+  :MercadoPago Provider;
+endif
+:Process Payment;
+stop
+@enduml
 ```
 
 #### Diagram Guidelines
@@ -222,37 +261,42 @@ flowchart TD
 2. **Meaningful labels**: Use clear, concise names
 3. **Consistent naming**: Same entity = same name across diagrams
 4. **Direction**: Top-to-bottom or left-to-right only
-5. **Grouping**: Use subgraphs for logical grouping
+5. **Grouping**: Use packages or rectangles for logical grouping
 
-```mermaid
-graph TB
-    subgraph Frontend
-        Web[Web App]
-        Mobile[Mobile App]
-    end
-    
-    subgraph Backend
-        API[API Gateway]
-        Services[Services Layer]
-    end
-    
-    subgraph Data
-        DB[(PostgreSQL)]
-        Cache[(Redis)]
-    end
-    
-    Web --> API
-    Mobile --> API
-    API --> Services
-    Services --> DB
-    Services --> Cache
+```plantuml
+@startuml
+!theme plain
+package "Frontend" {
+  [Web App] as Web
+  [Mobile App] as Mobile
+}
+
+package "Backend" {
+  [API Gateway] as API
+  [Services Layer] as Services
+}
+
+package "Data" {
+  database "PostgreSQL" as DB
+  database "Redis" as Cache
+}
+
+Web --> API
+Mobile --> API
+API --> Services
+Services --> DB
+Services --> Cache
+@enduml
 ```
 
 ### 3.4. Code Documentation
 
 #### Inline Comments
 
-Only when code intent is not obvious:
+**RULE:** Avoid comments unless absolutely necessary. Code should be self-documenting.
+
+- **Forbidden:** Redundant comments that explain what the code is doing.
+- **Allowed:** Comments that explain _why_ a complex decision was made.
 
 ```typescript
 // Bad: Redundant
@@ -269,7 +313,7 @@ Use JSDoc format:
 ```typescript
 /**
  * Creates a payment intent for the specified country.
- * 
+ *
  * @param country - ISO country code (MX, CO, AR)
  * @param amount - Payment amount in local currency
  * @returns Payment intent with QR code data
@@ -318,7 +362,7 @@ Handles payment processing across multiple countries using provider abstraction.
 
 ## Architecture
 
-[Mermaid diagram]
+[PlantUML diagram]
 
 ## Configuration
 
@@ -332,14 +376,17 @@ Handles payment processing across multiple countries using provider abstraction.
 Generate API docs automatically from decorators:
 
 ```typescript
-@ApiTags('payments')
-@Controller('payments')
+@ApiTags("payments")
+@Controller("payments")
 export class PaymentsController {
-  
-  @Post('create-intent')
-  @ApiOperation({ summary: 'Create payment intent' })
-  @ApiResponse({ status: 201, description: 'Intent created', type: PaymentIntentDto })
-  @ApiResponse({ status: 400, description: 'Invalid input' })
+  @Post("create-intent")
+  @ApiOperation({ summary: "Create payment intent" })
+  @ApiResponse({
+    status: 201,
+    description: "Intent created",
+    type: PaymentIntentDto,
+  })
+  @ApiResponse({ status: 400, description: "Invalid input" })
   async createIntent(@Body() dto: CreatePaymentDto): Promise<PaymentIntentDto> {
     // Implementation
   }
@@ -350,7 +397,7 @@ export class PaymentsController {
 
 In markdown docs, use consistent format:
 
-```markdown
+````markdown
 ### POST /api/payments/create-intent
 
 Creates a new payment intent.
@@ -359,7 +406,7 @@ Creates a new payment intent.
 
 ```json
 {
-  "amount": 500.00,
+  "amount": 500.0,
   "currency": "MXN",
   "customerId": "uuid-here"
 }
@@ -380,7 +427,7 @@ Creates a new payment intent.
 - 400: Invalid amount or currency
 - 404: Business not found
 - 500: Provider unavailable
-```
+````
 
 ### 3.6. Architecture Decision Records (ADR)
 
@@ -434,9 +481,9 @@ Include at bottom of documents:
 ```markdown
 ---
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-10-22  
-**Author:** Architecture Team  
+**Version:** 1.0.0
+**Last Updated:** 2025-10-22
+**Author:** Architecture Team
 **Status:** Active | Draft | Deprecated
 ```
 
@@ -460,7 +507,7 @@ Example deprecation notice:
 ```json
 {
   "recommendations": [
-    "bierner.markdown-mermaid",
+    "jebbs.plantuml",
     "yzhang.markdown-all-in-one",
     "davidanson.vscode-markdownlint",
     "shd101wyy.markdown-preview-enhanced"
@@ -500,7 +547,7 @@ npx markdown-link-check docs/**/*.md
 
 ### Good Documentation Example
 
-```markdown
+````markdown
 # Payment Provider Interface
 
 All payment providers must implement this interface.
@@ -518,12 +565,12 @@ interface IPaymentProvider {
 
 ```typescript
 class ConektaProvider implements IPaymentProvider {
-  readonly country = 'MX';
-  
+  readonly country = "MX";
+
   async createIntent(amount: number): Promise<PaymentIntent> {
     const order = await this.conekta.orders.create({
       amount,
-      currency: 'MXN'
+      currency: "MXN",
     });
     return this.mapToIntent(order);
   }
@@ -534,22 +581,29 @@ class ConektaProvider implements IPaymentProvider {
 
 ```typescript
 const factory = new PaymentProviderFactory();
-const provider = factory.getProvider('MX');
+const provider = factory.getProvider("MX");
 const intent = await provider.createIntent(500);
 ```
 
 ## Flow
 
-```mermaid
-sequenceDiagram
-    Service->>Factory: getProvider('MX')
-    Factory->>Service: ConektaProvider
-    Service->>Provider: createIntent(500)
-    Provider->>Conekta: API call
-    Conekta-->>Provider: Order
-    Provider-->>Service: PaymentIntent
+```plantuml
+@startuml
+!theme plain
+participant Service
+participant Factory
+participant Provider
+participant Conekta
+
+Service -> Factory: getProvider('MX')
+Factory --> Service: ConektaProvider
+Service -> Provider: createIntent(500)
+Provider -> Conekta: API call
+Conekta --> Provider: Order
+Provider --> Service: PaymentIntent
+@enduml
 ```
-```
+````
 
 ### Bad Documentation Example
 
@@ -579,11 +633,13 @@ Before committing documentation:
 
 - [ ] Title is clear and descriptive
 - [ ] No emojis or decorative elements
-- [ ] All diagrams use Mermaid (no external formats)
+- [ ] All diagrams use PlantUML (no external formats)
 - [ ] Code examples are tested and work
 - [ ] Links are valid and relative
 - [ ] Metadata footer included
 - [ ] Passes markdownlint validation
 - [ ] Renders correctly in GitHub preview
+
 ```
-````
+
+```

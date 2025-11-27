@@ -127,6 +127,14 @@ _This section contains mandatory instructions for AI Agents (Copilot, Cursor, et
 
 ## 2. Code Construction Rules
 
+### 2.0. General Style Rules
+
+1. **No Emojis:** Never use emojis in code, comments, or commit messages.
+2. **Minimal Comments:**
+   - Do not state the obvious.
+   - Focus on naming variables and functions clearly so comments are unnecessary.
+   - Use comments only to explain complex business logic or "magic" numbers/strings.
+
 ### 2.1. Backend (NestJS)
 
 #### Rule 1: Feature Module Structure
@@ -554,7 +562,7 @@ Brief description of what this endpoint does.
 
 ### Headers
 
-```
+```text
 Authorization: Bearer {jwt_token}
 Content-Type: application/json
 ```
@@ -578,7 +586,7 @@ Content-Type: application/json
 
 ### Error Responses
 
-**400 Bad Request**
+#### 400 Bad Request
 
 ```json
 {
@@ -593,7 +601,7 @@ Content-Type: application/json
 }
 ```
 
-**401 Unauthorized**
+#### 401 Unauthorized
 
 ```json
 {
@@ -602,7 +610,7 @@ Content-Type: application/json
 }
 ```
 
-**404 Not Found**
+#### 404 Not Found
 
 ```json
 {

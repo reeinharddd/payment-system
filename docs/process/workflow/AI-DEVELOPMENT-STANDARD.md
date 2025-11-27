@@ -60,7 +60,7 @@ To ensure the AI operates effectively, the human developer must adhere to the fo
 **Flow:**
 
 1. **Documentation & Design (Step 0):**
-   - **Diagrams:** Create Mermaid.js diagrams for all new flows.
+   - **Diagrams:** Create PlantUML diagrams for all new flows.
    - **Database:** Define Entity-Relationship (ER) models.
    - **UI:** Plan using Atomic Design (Atoms, Molecules, Organisms).
 2. **Data Modeling:** Define `schema.prisma` first.
@@ -153,5 +153,8 @@ feat(payments): create TransactionHistory standalone component
 
 - **Language:** English (Code, Comments, Commits, Documentation).
 - **Code Style:** Strict TypeScript, Functional patterns where possible.
+- **Communication Style:**
+  - **NO EMOJIS** in any output.
+  - **Minimal Comments:** Code must be self-explanatory. Avoid redundant comments.
 - **Testing:** All new features must include unit tests.
 - **Documentation:** All public methods must have JSDoc/TSDoc.

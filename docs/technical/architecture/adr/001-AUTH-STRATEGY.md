@@ -115,17 +115,27 @@ To support multiple login methods without "column bloat" in the `User` table, we
 1.  **`User` Table:** Represents the _Profile_ and _Identity_ of the person.
 2.  **`UserIdentity` Table:** Represents the _Credentials_ (Password, Google ID, Phone Number).
 
-```mermaid
-erDiagram
-    User ||--o{ UserIdentity : has
+```plantuml
+@startuml
+!theme plain
+hide circle
+skinparam linetype ortho
 
-    UserIdentity {
-        uuid id PK
-        uuid userId FK
-        enum provider "LOCAL, GOOGLE, PHONE"
-        string providerId "email, google_sub, phone_number"
-        string credential "password_hash, null"
-        jsonb metadata
-        timestamp lastLogin
-    }
+entity "User" as user {
+  *id : UUID <<PK>>
+}
+
+entity "UserIdentity" as identity {
+  *id : UUID <<PK>>
+  --
+  *userId : UUID <<FK>>
+  provider : ENUM (LOCAL, GOOGLE, PHONE)
+  providerId : VARCHAR
+  credential : VARCHAR
+  metadata : JSONB
+  lastLogin : TIMESTAMP
+}
+
+user ||..o{ identity : has
+@enduml
 ```
