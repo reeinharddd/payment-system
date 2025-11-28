@@ -22,10 +22,10 @@ keywords:
 
 # Related documentation
 related_docs:
-  api_design: ""  # To be created: docs/technical/backend/api/INVENTORY-API.md
-  ux_flow: ""  # To be created: docs/technical/frontend/ux-flows/INVENTORY-BARCODE-SCANNING.md
+  api_design: "" # To be created: docs/technical/backend/api/INVENTORY-API.md
+  ux_flow: "docs/technical/frontend/ux-flows/INVENTORY-BARCODE-SCANNING.md" # ✓ Created
   feature_design: "docs/technical/backend/features/INVENTORY-MANAGEMENT.md"
-  sync_strategy: ""  # To be created: docs/technical/architecture/INVENTORY-SYNC-STRATEGY.md
+  sync_strategy: "" # To be created: docs/technical/architecture/INVENTORY-SYNC-STRATEGY.md
 
 # Database metadata
 database:
@@ -38,7 +38,7 @@ schema_stats:
   total_tables: 12
   total_indexes: 24
   total_constraints: 18
-  estimated_rows: "10K-100K"  # Per business
+  estimated_rows: "10K-100K" # Per business
 ---
 
 <!-- AI-INSTRUCTION: START -->
@@ -73,7 +73,7 @@ schema_stats:
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
@@ -457,9 +457,9 @@ Stores multiple barcodes per product with package quantity information for smart
 **Business Rules:**
 
 - **Multiple Barcodes:** A product can have multiple barcodes:
-  - Individual unit barcode: `7501234567890` → 1 piece
-  - Box barcode: `17501234567897` → 12 pieces
-  - Case barcode: `27501234567894` → 144 pieces (12 boxes)
+  - Individual unit barcode: `7501234567890` > 1 piece
+  - Box barcode: `17501234567897` > 12 pieces
+  - Case barcode: `27501234567894` > 144 pieces (12 boxes)
 - **Smart Receiving:** When scanning a box barcode, system auto-detects `packageQuantity` and updates stock accordingly.
 - **GS1 Standard:** If `isGS1 = true`, system parses:
   - **GTIN** (Global Trade Item Number)
@@ -530,11 +530,11 @@ Defines flexible pricing strategies: bulk discounts, time-based pricing, VIP pri
 ```sql
 -- Coca-Cola base price: $15 MXN
 
-PriceRule 1: Buy 1-5 → $15 each (no rule, base price)
-PriceRule 2: Buy 6-11 → $14 each (7% discount)
+PriceRule 1: Buy 1-5 > $15 each (no rule, base price)
+PriceRule 2: Buy 6-11 > $14 each (7% discount)
   minQuantity=6, maxQuantity=11, discountPercent=6.67, priority=10
 
-PriceRule 3: Buy 12+ → $12 each (20% discount)
+PriceRule 3: Buy 12+ > $12 each (20% discount)
   minQuantity=12, maxQuantity=NULL, discountPercent=20, priority=5
 ```
 
@@ -683,7 +683,7 @@ Defines how to convert between different units of measure for the same product.
 | `productId`        | UUID          | Product reference.  | Foreign Key to `Product`.             |
 | `fromUnit`         | VARCHAR(20)   | Source unit.        | e.g., `box`, `case`, `pallet`.        |
 | `toUnit`           | VARCHAR(20)   | Target unit.        | e.g., `pcs` (pieces), `kg`, `L`.      |
-| `conversionFactor` | DECIMAL(10,4) | Multiplier.         | e.g., `1 box = 24 pcs` → factor = 24. |
+| `conversionFactor` | DECIMAL(10,4) | Multiplier.         | e.g., `1 box = 24 pcs` > factor = 24. |
 | `isDefault`        | BOOLEAN       | Primary conversion. | Used in POS when scanning.            |
 | `createdAt`        | TIMESTAMP     | Creation time.      | UTC.                                  |
 
@@ -691,8 +691,8 @@ Defines how to convert between different units of measure for the same product.
 
 - **Use Case:** A store receives "Coca-Cola in boxes of 24", but sells individual bottles.
 - **Example:** `fromUnit = 'box'`, `toUnit = 'pcs'`, `conversionFactor = 24`.
-- **Bidirectional:** If `box → pcs = 24`, then `pcs → box = 1/24 = 0.0417`.
-- **Multiple Conversions:** A product can have multiple conversions (e.g., box→pcs, case→box, pallet→case).
+- **Bidirectional:** If `box > pcs = 24`, then `pcs > box = 1/24 = 0.0417`.
+- **Multiple Conversions:** A product can have multiple conversions (e.g., box>pcs, case>box, pallet>case).
 
 **Implementation Example:**
 
@@ -999,537 +999,27 @@ FOR EACH ROW EXECUTE FUNCTION check_stock_after_movement();
 
 ## 6. Performance & Indexing Strategy
 
-When a user scans a barcode, the system must handle 3 possible outcomes:
+**NOTE:** User interface flows for barcode scanning scenarios have been moved to:
+**→ [Inventory Barcode Scanning UX Flow](../../frontend/ux-flows/INVENTORY-BARCODE-SCANNING.md)**
 
-#### **Scenario A: ✅ Known Product, Known Barcode**
+This section focuses on **database performance** and **indexing strategy**.
 
-```
-User scans: 7501234567890
-
-→ System finds: Barcode record
-  ├─ Product: "Sabritas Adobadas 45g"
-  ├─ Package Qty: 1 pieza
-  └─ Current Stock: 24 pcs
-
-→ UI Shows: Quick Confirmation Screen
-  ┌─────────────────────────────────────┐
-  │ ✓ Producto Identificado             │
-  │                                     │
-  │ 📦 Sabritas Adobadas 45g           │
-  │ 🏷️  SKU: SAB-ADO-45                │
-  │                                     │
-  │ Cantidad a recibir:                 │
-  │ [  5  ] piezas    🔄 Cambiar unidad│
-  │                                     │
-  │ Stock actual: 24 pcs                │
-  │ Nuevo stock: 29 pcs                 │
-  │                                     │
-  │ [ Cancelar ]     [ ✓ Confirmar ]   │
-  └─────────────────────────────────────┘
-
-→ User confirms → Stock updated immediately
-```
-
-**Validation Rules:**
-
-- ✅ Auto-fills product info
-- ✅ Shows current stock for context
-- ✅ User can adjust quantity before confirming
-- ✅ Fast path: Scan → Quantity → Confirm (3 taps)
-
----
-
-#### **Scenario B: ⚠️ Known Product, Unknown Barcode (New Package Type)**
-
-```
-User scans: 17501234567897 (Box barcode)
-
-→ System searches: No barcode record found
-→ System detects: GS1 format (starts with '1')
-→ System extracts: GTIN = 7501234567890
-→ System searches: Product with primary barcode = 7501234567890
-→ System finds: "Sabritas Adobadas 45g"
-
-→ UI Shows: Barcode Registration Screen
-  ┌─────────────────────────────────────┐
-  │ ⚠️  Nuevo Código Detectado          │
-  │                                     │
-  │ Código escaneado:                   │
-  │ 17501234567897                      │
-  │                                     │
-  │ ¿Es este producto?                  │
-  │ ┌─────────────────────────────────┐ │
-  │ │ ✓ Sabritas Adobadas 45g         │ │
-  │ │   SKU: SAB-ADO-45               │ │
-  │ │   Stock: 24 pcs                 │ │
-  │ └─────────────────────────────────┘ │
-  │                                     │
-  │ Este código representa:             │
-  │ Cantidad: [ 12 ] [v Piezas]        │
-  │                                     │
-  │ Opciones:                           │
-  │ ○ Caja (12 piezas)                 │
-  │ ○ Paquete (6 piezas)               │
-  │ ○ Otro: [____]                     │
-  │                                     │
-  │ ☑️ Guardar este código para futuro │
-  │                                     │
-  │ [ Buscar Otro ] [ ✓ Confirmar ]    │
-  └─────────────────────────────────────┘
-
-→ User confirms → System creates:
-  1. New Barcode record (17501234567897 → 12 pcs)
-  2. UnitConversion record (box → pcs, factor 12)
-  3. Updates stock: +12 pcs
-```
-
-**Validation Rules:**
-
-- ✅ Suggests most likely product (from GS1 GTIN)
-- ✅ Shows product image for visual confirmation
-- ✅ User defines package quantity
-- ✅ Option to save barcode for future (or skip if one-time)
-- ✅ Creates both `Barcode` and `UnitConversion` records
-
----
-
-#### **Scenario C: ❌ Unknown Product (First Time)**
-
-```
-User scans: 9876543210987
-
-→ System searches: No barcode found
-→ System searches: No GTIN match
-→ System searches: External API (optional: OpenFoodFacts, UPC Database)
-
-→ UI Shows: Product Creation Wizard
-  ┌─────────────────────────────────────┐
-  │ 🆕 Producto No Encontrado           │
-  │                                     │
-  │ Código: 9876543210987               │
-  │                                     │
-  │ ¿Deseas buscarlo en línea?         │
-  │ [ 🔍 Buscar ]  [ ✏️ Crear Manual ]  │
-  └─────────────────────────────────────┘
-
-→ If "Buscar" → Calls external API:
-  ┌─────────────────────────────────────┐
-  │ 🔍 Resultados de Búsqueda           │
-  │                                     │
-  │ 1. [📦] Doritos Nacho 170g          │
-  │    Marca: Sabritas                  │
-  │    Categoría: Botanas               │
-  │                                     │
-  │ 2. [📦] Doritos Nacho 100g          │
-  │    Marca: Sabritas                  │
-  │    Categoría: Botanas               │
-  │                                     │
-  │ [ Ninguno Coincide ]                │
-  └─────────────────────────────────────┘
-
-→ If "Crear Manual" or "Ninguno Coincide":
-  ┌─────────────────────────────────────┐
-  │ ✏️ Nuevo Producto                   │
-  │                                     │
-  │ Nombre *                            │
-  │ [Sabritas Amarillas 45g         ]  │
-  │                                     │
-  │ Categoría *                         │
-  │ [v Botanas                      ]  │
-  │                                     │
-  │ Código de Barras                    │
-  │ [7501234567890                  ]  │
-  │ ☑️ Este código es el principal      │
-  │                                     │
-  │ Marca                               │
-  │ [Sabritas                       ]  │
-  │                                     │
-  │ 📸 [Tomar Foto] o [Elegir Imagen]  │
-  │                                     │
-  │ ─────── Inventario ────────         │
-  │                                     │
-  │ Cantidad Recibida *                 │
-  │ [  12  ] [v Piezas]                │
-  │                                     │
-  │ ─────── Precios ───────────         │
-  │                                     │
-  │ Precio de Venta                     │
-  │ $ [  15.00  ]                       │
-  │                                     │
-  │ Costo (Opcional) 🔒                 │
-  │ $ [  8.00   ]                       │
-  │                                     │
-  │ ─────────────────────────           │
-  │                                     │
-  │ [ Cancelar ]     [ 💾 Guardar ]    │
-  └─────────────────────────────────────┘
-
-→ System creates:
-  1. Product record
-  2. Barcode record
-  3. InventoryLevel record (qty = 12)
-  4. StockMovement (RESTOCK, +12 pcs)
-```
-
-**Validation Rules:**
-
-- ✅ Required fields: Name, Category, Quantity
-- ✅ Optional: Cost, Selling Price (can set later)
-- ✅ Image capture via camera or gallery
-- ✅ Auto-suggests category based on barcode prefix (if available)
-- ✅ Creates complete product + initial stock in one flow
-
----
-
-### 5.2. Visual Product Selection (No Scanner)
-
-**Use Case:** Merchant doesn't have barcode scanner or product has no barcode.
-
-```
-User taps: "Recibir Inventario" → "Buscar Producto"
-
-→ UI Shows: Smart Search with Visual Grid
-  ┌─────────────────────────────────────┐
-  │ 🔍 Buscar Producto                  │
-  │ [Sabritas            ] 🔍 ⚙️        │
-  │                                     │
-  │ Filtros Rápidos:                    │
-  │ [ Todos ] [Botanas] [Bebidas] [+]  │
-  │                                     │
-  │ ┌──────┐ ┌──────┐ ┌──────┐         │
-  │ │ 📦   │ │ 📦   │ │ 📦   │         │
-  │ │Sabri-│ │Sabri-│ │Doritos│        │
-  │ │tas   │ │tas   │ │Nacho │         │
-  │ │Adoba-│ │Amari-│ │170g  │         │
-  │ │das   │ │llas  │ │24pcs │         │
-  │ │45g   │ │45g   │ │      │         │
-  │ │24pcs │ │18pcs │ │      │         │
-  │ └──────┘ └──────┘ └──────┘         │
-  │                                     │
-  │ [ + Crear Nuevo Producto ]          │
-  └─────────────────────────────────────┘
-
-→ User taps product → Same confirmation screen as Scenario A
-```
-
-**Key Features:**
-
-- ✅ **Search:** Type product name
-- ✅ **Visual:** Grid with product images
-- ✅ **Stock Indicator:** Shows current stock below name
-- ✅ **Category Filters:** Quick filtering by category
-- ✅ **Sorting:** Recent, A-Z, Low Stock First
-
----
-
-### 5.3. Duplicate Detection & Variant Disambiguation
-
-**Problem:** User tries to create "Sabritas Amarillas" but similar products exist.
-
-```
-User enters name: "Sabritas Amarillas"
-
-→ System searches: Products with similar names
-→ System finds: 3 matches
-
-→ UI Shows: Duplicate Warning
-  ┌─────────────────────────────────────┐
-  │ ⚠️  Productos Similares Encontrados │
-  │                                     │
-  │ ¿Es alguno de estos?                │
-  │                                     │
-  │ ┌─────────────────────────────────┐ │
-  │ │ 📦 Sabritas Adobadas 45g        │ │
-  │ │    SKU: SAB-ADO-45              │ │
-  │ │    Stock: 24 pcs                │ │
-  │ └─────────────────────────────────┘ │
-  │                                     │
-  │ ┌─────────────────────────────────┐ │
-  │ │ 📦 Sabritas Limon 45g           │ │
-  │ │    SKU: SAB-LIM-45              │ │
-  │ │    Stock: 18 pcs                │ │
-  │ └─────────────────────────────────┘ │
-  │                                     │
-  │ ┌─────────────────────────────────┐ │
-  │ │ 📦 Sabritas Amarillas 170g      │ │
-  │ │    SKU: SAB-AMA-170             │ │
-  │ │    Stock: 0 pcs                 │ │
-  │ └─────────────────────────────────┘ │
-  │                                     │
-  │ [ ✓ Es Uno de Estos ]               │
-  │ [ ✗ No, Es Diferente ]              │
-  └─────────────────────────────────────┘
-
-→ If "Es Uno de Estos" → Add stock to existing
-→ If "No, Es Diferente" → Continue creation
-  → System suggests: "¿Agregar tamaño al nombre?"
-  → Auto-fills: "Sabritas Amarillas 45g"
-```
-
-**Disambiguation Strategy:**
-
-- ✅ **Fuzzy Search:** Detects similar names (Levenshtein distance)
-- ✅ **Show Visual:** Product images for quick identification
-- ✅ **Suggest Specificity:** Prompt user to add size/variant info
-- ✅ **Learn from Barcodes:** If barcode GTIN matches, auto-link
-
----
-
-### 5.4. Size/Variant Management
-
-**Use Case:** Same product, multiple sizes (Sabritas 45g, 170g, 340g)
-
-**Option 1: Separate Simple Products (Recommended for Small Shops)**
-
-```
-Products (type: SIMPLE):
-├─ Sabritas Amarillas 45g   (SKU: SAB-AMA-45)
-├─ Sabritas Amarillas 170g  (SKU: SAB-AMA-170)
-└─ Sabritas Amarillas 340g  (SKU: SAB-AMA-340)
-
-Advantages:
-✅ Simple to understand
-✅ Each has own barcode(s)
-✅ Each can have different pricing
-✅ Easy visual selection in POS
-```
-
-**Option 2: Variable Product (Advanced - For Fashion/Complex SKUs)**
-
-```
-Product: "Sabritas Amarillas" (type: VARIABLE)
-├─ Variant 1: {"Size": "45g"}   → SKU: SAB-AMA-45
-├─ Variant 2: {"Size": "170g"}  → SKU: SAB-AMA-170
-└─ Variant 3: {"Size": "340g"}  → SKU: SAB-AMA-340
-
-Advantages:
-✅ Grouped in UI
-✅ Shared description/brand
-✅ Easier reporting (total Sabritas sales)
-```
-
-**UI Selection:**
-
-```
-During product creation:
-┌─────────────────────────────────────┐
-│ ¿Este producto tiene variantes?     │
-│ (tallas, colores, tamaños)          │
-│                                     │
-│ ○ No, es un solo producto           │
-│   (Recomendado para mayoría)        │
-│                                     │
-│ ○ Sí, tiene variantes               │
-│   (Ej: Playeras S/M/L)              │
-└─────────────────────────────────────┘
-```
-
----
-
-### 5.5. Stock Adjustment Validation
-
-**Use Case:** User notices physical stock doesn't match system.
-
-```
-User: "Ajustar Inventario"
-
-→ System requires: Reason + Approval (if large difference)
-
-  ┌─────────────────────────────────────┐
-  │ ⚙️ Ajuste de Inventario             │
-  │                                     │
-  │ Producto: Sabritas Amarillas 45g    │
-  │                                     │
-  │ Stock en Sistema: 24 pcs            │
-  │ Stock Físico:     [ 20 ] pcs       │
-  │                                     │
-  │ Diferencia: -4 pcs ⚠️               │
-  │                                     │
-  │ Razón *                             │
-  │ [v Merma/Daño              ]       │
-  │                                     │
-  │ Opciones:                           │
-  │ • Merma/Daño                        │
-  │ • Robo                              │
-  │ • Error de conteo anterior          │
-  │ • Otro                              │
-  │                                     │
-  │ Notas (Opcional)                    │
-  │ [4 bolsas rotas durante transporte] │
-  │                                     │
-  │ ⚠️ Ajustes >10% requieren           │
-  │    aprobación de gerente            │
-  │                                     │
-  │ [ Cancelar ]     [ 💾 Guardar ]    │
-  └─────────────────────────────────────┘
-
-→ If difference > 10%:
-  → Send notification to manager
-  → Require PIN/approval before saving
-
-→ System creates:
-  → StockMovement (type: ADJUSTMENT, qty: -4)
-  → Audit log with reason
-```
-
-**Validation Rules:**
-
-- ✅ Reason is mandatory
-- ✅ Large discrepancies (>10%) require supervisor approval
-- ✅ Capture who made adjustment (employee ID)
-- ✅ Optional photo evidence
-- ✅ Cannot adjust during active shift (prevents hiding theft)
-
----
-
-### 5.6. Analytics Preservation During Corrections
-
-**Problem:** If we allow editing historical data, analytics break.
-
-**Solution:** Never edit, only append corrections.
-
-**Example:**
-
-```
-❌ BAD: Edit existing product
-Product "Sabritas Amarillas" (ID: abc-123)
-└─ Change name to "Sabritas Limón"
-  └─ Problem: Historical sales reports now show wrong product
-
-✅ GOOD: Create new product, mark old as archived
-Product "Sabritas Amarillas" (ID: abc-123)
-├─ Status: ARCHIVED
-├─ ArchivedReason: "Descontinuado"
-└─ ReplacedBy: def-456
-
-Product "Sabritas Limón" (ID: def-456)
-└─ Status: ACTIVE
-
-→ Historical sales still show "Sabritas Amarillas"
-→ New sales use "Sabritas Limón"
-→ Analytics remain accurate
-```
-
-**Product Correction Flow:**
-
-```
-1. Small fixes (typos): Allowed
-   "Sabrtias" → "Sabritas" ✅
-
-2. Price changes: Create PriceRule or update basePrice
-   → Historical sales keep old price (immutable)
-   → New sales use new price
-
-3. Fundamental changes (wrong product): Archive + Create New
-   → Mark old: status = ARCHIVED
-   → Create new product
-   → Link: metadata.replacedBy = new_id
-
-4. Merge duplicates:
-   → Transfer all stock to primary product
-   → Transfer all barcodes to primary
-   → Archive duplicate
-   → Historical sales preserved
-```
-
----
-
-### 5.7. Database Constraints for Data Integrity
+**Query Optimization:**
 
 ```sql
--- Prevent duplicate barcodes across products
-CREATE UNIQUE INDEX idx_barcode_value
-ON inventory.Barcode(barcodeValue)
-WHERE deletedAt IS NULL;
+-- Barcode lookup (most common query)
+CREATE INDEX idx_barcode_value ON inventory.Barcode(barcodeValue) WHERE deletedAt IS NULL;
 
--- Prevent duplicate SKUs per business
-CREATE UNIQUE INDEX idx_product_sku
-ON inventory.Product(businessId, sku)
-WHERE deletedAt IS NULL;
+-- Product search by name (fuzzy)
+CREATE INDEX idx_product_name_trgm ON inventory.Product USING gin(name gin_trgm_ops);
 
--- Ensure package quantity is positive
-ALTER TABLE inventory.Barcode
-ADD CONSTRAINT chk_package_qty_positive
-CHECK (packageQuantity > 0);
-
--- Prevent negative final stock after movement
-CREATE FUNCTION check_stock_after_movement()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.quantityAfter < 0 AND NOT allow_negative_stock THEN
-    RAISE EXCEPTION 'Stock cannot go negative';
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_check_stock
-BEFORE INSERT ON inventory.StockMovement
-FOR EACH ROW EXECUTE FUNCTION check_stock_after_movement();
+-- Stock level per branch
+CREATE INDEX idx_inventory_level_branch ON inventory.InventoryLevel(productId, branchId) WHERE deletedAt IS NULL;
 ```
 
 ---
 
-To ensure high performance for catalog searches and stock lookups:
-
-| Table            | Index Columns                                  | Type            | Purpose                                  |
-| :--------------- | :--------------------------------------------- | :-------------- | :--------------------------------------- |
-| `Category`       | `(businessId, parentId)`                       | B-Tree          | Fast hierarchy traversal.                |
-| `Category`       | `(businessId, isActive)`                       | B-Tree          | Filter active categories in POS.         |
-| `Product`        | `(businessId, categoryId)`                     | B-Tree          | List products by category.               |
-| `Product`        | `(businessId, sku)`                            | Unique          | Enforce uniqueness and fast SKU lookups. |
-| `Product`        | `(businessId, barcode)`                        | B-Tree          | Barcode scanning in POS.                 |
-| `Product`        | `name`                                         | GIN (Full-Text) | Product search by name.                  |
-| `ProductVariant` | `(productId, status)`                          | B-Tree          | List active variants.                    |
-| `InventoryLevel` | `(businessId, branchId, productId, variantId)` | Unique          | Prevent duplicate stock records.         |
-| `InventoryLevel` | `(branchId, quantity)`                         | B-Tree          | Low stock alerts.                        |
-| `StockMovement`  | `(inventoryLevelId, createdAt DESC)`           | B-Tree          | Audit trail history queries.             |
-| `StockMovement`  | `(businessId, createdAt DESC)`                 | B-Tree          | Recent activity dashboard.               |
-| `StockMovement`  | `(referenceType, referenceId)`                 | B-Tree          | Trace movements from sales/purchases.    |
-
-**Query Patterns:**
-
-- **POS Product Search:** `WHERE businessId = ? AND name ILIKE ? AND status = 'ACTIVE'` (Uses full-text index).
-- **Barcode Scan:** `WHERE businessId = ? AND barcode = ?` (Direct index hit).
-- **Low Stock Report:** `WHERE branchId = ? AND quantity <= reorderPoint` (Index on quantity).
-- **Movement History:** `WHERE inventoryLevelId = ? ORDER BY createdAt DESC LIMIT 50` (Index on createdAt).
-
----
-
-## 6. Offline Sync Strategy
-
-### 6.1. Catalog Sync (Read-Heavy)
-
-- **Strategy:** "Pull" model with versioning.
-- **Mechanism:** Device requests `GET /products?since={lastVersion}`.
-- **Optimization:**
-  - Soft deletes (`deletedAt`) ensure devices remove items locally.
-  - Only changed records are transmitted (delta sync).
-- **Initial Sync:** On first login, download full catalog for the branch.
-
-### 6.2. Stock Sync (Write-Heavy)
-
-- **Challenge:** Race conditions (Two devices selling the last item).
-- **Strategy:** Delta-based writes with optimistic locking.
-  - Device does **not** send "New Quantity = 5".
-  - Device sends "Movement: SALE, Quantity = -1, Version = 42".
-- **Server Logic:**
-  1. Receive Movement request.
-  2. Check `InventoryLevel.version` matches request version.
-  3. If match: Apply delta, create `StockMovement`, increment version.
-  4. If mismatch: Reject with `409 Conflict`. Client must refresh and retry.
-  5. Broadcast new `InventoryLevel` to all connected devices via WebSocket.
-
-### 6.3. Conflict Resolution
-
-**Scenario:** Two cashiers sell the last item simultaneously while offline.
-
-- **Device A:** `quantity = 1 -> 0` (version 10 -> 11)
-- **Device B:** `quantity = 1 -> 0` (version 10 -> 11)
-- **Server receives A first:**
-  - Applies: `quantity = 0, version = 11`
-- **Server receives B:**
-  - Rejects: "Version mismatch. Expected 11, got 10."
+- Rejects: "Version mismatch. Expected 11, got 10."
 - **Device B:** Receives rejection, shows "Item sold out. Stock refreshed."
 
 ---
@@ -1644,7 +1134,7 @@ Taco de Asada:
   Cost: $2.99
   Profit per Unit: $5.01
   Total Profit: $15.03
-  Margin: 62.6% 🎯
+  Margin: 62.6% TARGET
 ```
 
 ### 8.3. Recipe Cost Auto-Calculation with Live Updates
@@ -1691,7 +1181,7 @@ async function calculateRecipeCostLive(recipeId: string) {
 **Dashboard Display:**
 
 ```
-🍔 Hamburguesa Clásica - Cost Breakdown
+ Hamburguesa Clásica - Cost Breakdown
 
 ├─ Carne molida (150g @ $12/kg) ......... $1.80
 ├─ Pan hamburguesa (1 @ $3.00) .......... $3.00
@@ -1705,7 +1195,7 @@ TOTAL COST ................................ $5.99
 
 Selling Price ............................. $15.00
 Gross Profit .............................. $9.01
-Profit Margin ............................. 60.1% ✅
+Profit Margin ............................. 60.1% PASS
 ```
 
 ### 8.4. Price Increase Alert
@@ -1719,8 +1209,8 @@ if (
 ) {
   await createNotification({
     type: "COST_INCREASE",
-    title: `⚠️ ${product.name} cost increased ${percentIncrease}%`,
-    message: `Old: $${product.lastCostPrice} → New: $${product.currentCostPrice}`,
+    title: `WARNING ${product.name} cost increased ${percentIncrease}%`,
+    message: `Old: $${product.lastCostPrice} > New: $${product.currentCostPrice}`,
     action: "Consider updating selling price to maintain margin",
   });
 }
@@ -1745,7 +1235,7 @@ function suggestSellingPrice(
 // Example:
 const taco = await getProduct("taco-asada");
 console.log(suggestSellingPrice(taco.currentCostPrice, 65));
-// Cost: $2.99 → Suggested Price: $8.99 (65.6% margin)
+// Cost: $2.99 > Suggested Price: $8.99 (65.6% margin)
 ```
 
 ---
