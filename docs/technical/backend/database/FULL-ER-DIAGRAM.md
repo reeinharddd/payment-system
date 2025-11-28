@@ -232,6 +232,7 @@ package "inventory" {
     *businessId : UUID <<FK>>
     parentId : UUID <<FK>>
     name : VARCHAR
+    isActive : BOOLEAN
     createdAt : TIMESTAMP
     updatedAt : TIMESTAMP
     deletedAt : TIMESTAMP
@@ -246,44 +247,51 @@ package "inventory" {
     sku : VARCHAR
     barcode : VARCHAR
     price : DECIMAL
-    cost : DECIMAL
+    costPrice : DECIMAL
     type : ENUM
-    trackInventory : BOOLEAN
+    trackStock : BOOLEAN
+    status : ENUM
     createdAt : TIMESTAMP
     updatedAt : TIMESTAMP
     deletedAt : TIMESTAMP
   }
 
-  entity "Variant" as variant {
+  entity "ProductVariant" as variant {
     *id : UUID <<PK>>
     --
     *productId : UUID <<FK>>
     name : VARCHAR
     sku : VARCHAR
     price : DECIMAL
+    attributes : JSONB
+    status : ENUM
+    createdAt : TIMESTAMP
+    updatedAt : TIMESTAMP
     deletedAt : TIMESTAMP
   }
 
-  entity "Stock" as stock {
-    *id : UUID <<PK>>
-    --
-    *branchId : UUID <<FK>>
-    *productId : UUID <<FK>>
-    variantId : UUID <<FK>>
-    quantity : DECIMAL
-    minStock : DECIMAL
-    version : INT
-    updatedAt : TIMESTAMP
-  }
-
-  entity "InventoryAlert" as alert {
+  entity "InventoryLevel" as stock {
     *id : UUID <<PK>>
     --
     *businessId : UUID <<FK>>
     *branchId : UUID <<FK>>
     *productId : UUID <<FK>>
+    variantId : UUID <<FK>>
+    quantity : INT
+    reorderPoint : INT
+    version : BIGINT
+    updatedAt : TIMESTAMP
+  }
+
+  entity "StockMovement" as movement {
+    *id : UUID <<PK>>
+    --
+    *businessId : UUID <<FK>>
+    *inventoryLevelId : UUID <<FK>>
     type : ENUM
-    status : ENUM
+    quantityChange : INT
+    reason : VARCHAR
+    referenceId : UUID
     createdAt : TIMESTAMP
   }
 }
@@ -411,9 +419,7 @@ product ||..o{ variant : "has"
 branch ||..o{ stock : "stores"
 product ||..o{ stock : "stocked in"
 variant ||..o{ stock : "stocked in"
-business ||..o{ alert : "receives"
-branch ||..o{ alert : "generates"
-product ||..o{ alert : "generates"
+stock ||..o{ movement : "history"
 
 ' Sales
 branch ||..o{ register : "has"

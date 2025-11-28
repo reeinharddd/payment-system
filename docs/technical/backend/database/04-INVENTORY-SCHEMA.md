@@ -22,7 +22,7 @@
 <div align="center">
 
   <!-- METADATA BADGES -->
-  <img src="https://img.shields.io/badge/Status-Draft-lightgrey?style=flat-square" alt="Status" />
+  <img src="https://img.shields.io/badge/Status-Draft-warning?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-Backend-blue?style=flat-square" alt="Audience" />
   <img src="https://img.shields.io/badge/Last%20Updated-2025--11--27-lightgrey?style=flat-square" alt="Date" />
 
@@ -34,25 +34,26 @@
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
-| Directive      | Instruction                                                                                                |
-| :------------- | :--------------------------------------------------------------------------------------------------------- |
-| **Context**    | Manages the catalog, stock levels, and movements of goods.                                                 |
-| **Constraint** | **Negative Stock:** Configurable per Business. Default is `false`.                                         |
-| **Pattern**    | **Event Sourcing:** Stock is calculated by summing `StockMovement`. `Product.stock` is a cache.            |
-| **Rule**       | **Variants:** Products can have variants (Size/Color). If variants exist, parent stock is sum of variants. |
-| **Related**    | `apps/backend/src/modules/inventory/`                                                                      |
+| Directive      | Instruction                                                                                        |
+| :------------- | :------------------------------------------------------------------------------------------------- |
+| **Context**    | Manages the catalog, stock levels, and movements of goods.                                         |
+| **Constraint** | **Offline-First:** All entities must support version-based syncing.                                |
+| **Pattern**    | **Optimistic UI:** Stock changes are applied locally first, then synced as `StockMovement` deltas. |
+| **Rule**       | **Variants:** Use `JSONB` for flexible attributes (e.g., Size, Color) instead of EAV tables.       |
+| **Related**    | `apps/backend/src/modules/inventory/`                                                              |
 
 ---
 
 ## 1. Executive Summary
 
-The **Inventory Schema** is designed for retail and hospitality. It supports complex product structures (variants, bundles) and multi-location stock tracking.
+The **Inventory Schema** manages the core catalog and stock tracking. It is designed to handle both **Simple Products** and **Variable Products** (e.g., Apparel) with a flexible attribute system. It supports **Multi-Location** inventory tracking, allowing a merchant to manage stock across multiple stores or warehouses.
 
 Key capabilities:
 
-1.  **Variants:** T-Shirt (Red/L, Red/M).
-2.  **Stock History:** Full audit trail of every item entering or leaving via `StockMovement`.
-3.  **Low Stock Alerts:** Automated notifications when threshold is breached.
+1.  **Flexible Variants:** JSONB-based attributes allow for unlimited variation types without schema migration.
+2.  **Multi-Location:** Stock is tracked per `Location` (Store/Warehouse).
+3.  **Audit Trail:** Immutable `StockMovement` log for every inventory change (Sale, Restock, Loss).
+4.  **Offline Sync:** Designed to handle conflict resolution via delta-based updates.
 
 ---
 
@@ -60,48 +61,108 @@ Key capabilities:
 
 ```plantuml
 @startuml
+
 !theme plain
 hide circle
 skinparam linetype ortho
 
-package "inventory" {
-  entity "Product" as product {
-    *id : UUID <<PK>>
-    --
-    *businessId : UUID <<FK>>
-    name : VARCHAR(255)
-    sku : VARCHAR(50)
-    price : DECIMAL(19,4)
-    stock : INT
-    hasVariants : BOOLEAN
-  }
-
-  entity "Variant" as variant {
-    *id : UUID <<PK>>
-    --
-    *productId : UUID <<FK>>
-    name : VARCHAR(100)
-    sku : VARCHAR(50)
-    price : DECIMAL(19,4)
-    stock : INT
-  }
-
-  entity "StockMovement" as movement {
-    *id : UUID <<PK>>
-    --
-    *productId : UUID <<FK>>
-    variantId : UUID <<FK>>
-    branchId : UUID <<FK>>
-    quantity : INT
-    type : ENUM (IN, OUT, ADJUSTMENT)
-    reason : VARCHAR(255)
-    createdAt : TIMESTAMP
-  }
+entity "Category" as Category {
+  *id : UUID
+  *merchantId : UUID
+  parentId : UUID
+  --
+  *name : VARCHAR
+  description : TEXT
+  *isActive : BOOLEAN
+  --
+  *createdAt : TIMESTAMP
+  *updatedAt : TIMESTAMP
+  deletedAt : TIMESTAMP
+  version : BIGINT
 }
 
-product ||..o{ variant : "has"
-product ||..o{ movement : "tracks"
-variant ||..o{ movement : "tracks"
+entity "Product" as Product {
+  *id : UUID
+  *merchantId : UUID
+  categoryId : UUID
+  taxRateId : UUID
+  --
+  *name : VARCHAR
+  description : TEXT
+  *sku : VARCHAR
+  barcode : VARCHAR
+  image : VARCHAR
+  --
+  *price : DECIMAL(10,2)
+  costPrice : DECIMAL(10,2)
+  --
+  *type : ENUM (SIMPLE, VARIABLE)
+  *trackStock : BOOLEAN
+  *status : ENUM (ACTIVE, DRAFT, ARCHIVED)
+  --
+  *createdAt : TIMESTAMP
+  *updatedAt : TIMESTAMP
+  deletedAt : TIMESTAMP
+  version : BIGINT
+}
+
+entity "ProductVariant" as Variant {
+  *id : UUID
+  *productId : UUID
+  --
+  *name : VARCHAR
+  sku : VARCHAR
+  barcode : VARCHAR
+  image : VARCHAR
+  --
+  price : DECIMAL(10,2)
+  costPrice : DECIMAL(10,2)
+  --
+  *attributes : JSONB
+  *status : ENUM (ACTIVE, ARCHIVED)
+  --
+  *createdAt : TIMESTAMP
+  *updatedAt : TIMESTAMP
+  deletedAt : TIMESTAMP
+  version : BIGINT
+}
+
+entity "InventoryLevel" as Stock {
+  *id : UUID
+  *merchantId : UUID
+  *locationId : UUID
+  *productId : UUID
+  variantId : UUID
+  --
+  *quantity : INTEGER
+  reorderPoint : INTEGER
+  --
+  *createdAt : TIMESTAMP
+  *updatedAt : TIMESTAMP
+  version : BIGINT
+}
+
+entity "StockMovement" as Movement {
+  *id : UUID
+  *merchantId : UUID
+  *inventoryLevelId : UUID
+  --
+  *type : ENUM (SALE, RESTOCK, ADJUSTMENT, RETURN, LOSS)
+  *quantityChange : INTEGER
+  reason : VARCHAR
+  referenceId : UUID
+  --
+  *createdAt : TIMESTAMP
+  createdBy : UUID
+}
+
+Category ||..o{ Category : "children"
+Category ||..o{ Product : "products"
+Product ||..o{ Variant : "variants"
+Product ||..o{ Stock : "stock"
+Variant ||..o{ Stock : "stock"
+Stock ||..o{ Movement : "history"
+
 @enduml
 ```
 
@@ -109,20 +170,69 @@ variant ||..o{ movement : "tracks"
 
 ## 3. Detailed Entity Definitions
 
-### 3.1. Product
+### 3.1. Category
 
-The main catalog item.
+Organizes products into a hierarchy.
 
-| Attribute | Type    | Description         | Rules & Constraints             |
-| :-------- | :------ | :------------------ | :------------------------------ |
-| `sku`     | VARCHAR | Stock Keeping Unit. | Unique per Business.            |
-| `price`   | DECIMAL | Base selling price. | 4 decimal places for precision. |
+- **Self-Referential:** `parentId` allows for infinite nesting (e.g., Men > Shirts > Casual).
+- **Sync:** Full sync to device.
 
-### 3.2. StockMovement
+### 3.2. Product
 
-The ledger of inventory changes.
+The core catalog item.
 
-| Attribute  | Type | Description        | Rules & Constraints                                       |
-| :--------- | :--- | :----------------- | :-------------------------------------------------------- |
-| `type`     | ENUM | Direction of flow. | `IN` (Purchase), `OUT` (Sale), `ADJUSTMENT` (Loss/Found). |
-| `quantity` | INT  | Amount changed.    | Can be negative for OUT.                                  |
+- **Type:**
+  - `SIMPLE`: No variants. Stock is tracked directly against the Product ID.
+  - `VARIABLE`: Has variants. Stock is tracked against Variant IDs.
+- **Pricing:** Base price. Variants can override this.
+- **Track Stock:** If `false`, the system assumes infinite stock (useful for Services or Digital Goods).
+
+### 3.3. ProductVariant
+
+Specific variations of a product.
+
+- **Attributes (JSONB):** Stores the specific options.
+  - Example: `{"Size": "M", "Color": "Red", "Material": "Cotton"}`
+  - Benefit: No need to create `OptionTypes` and `OptionValues` tables for every new variation type.
+- **Pricing Override:** If `price` is set, it overrides the parent Product price.
+
+### 3.4. InventoryLevel
+
+The "State" of stock.
+
+- **Granularity:** Unique per `Location` + `Product` + `Variant`.
+- **Simple Products:** `variantId` is NULL.
+- **Variable Products:** `variantId` is set.
+
+### 3.5. StockMovement
+
+The "Ledger" of stock.
+
+- **Immutable:** Never update or delete a movement.
+- **Types:**
+  - `SALE`: Decrement (Point of Sale).
+  - `RESTOCK`: Increment (Purchase Order).
+  - `ADJUSTMENT`: Manual correction (Stocktake).
+  - `RETURN`: Increment (Customer Return).
+  - `LOSS`: Decrement (Theft/Damage).
+
+---
+
+## 4. Offline Sync Strategy
+
+### 4.1. Catalog Sync (Read-Heavy)
+
+- **Strategy:** "Pull" model.
+- **Mechanism:** Device requests `GET /products?since={lastVersion}`.
+- **Optimization:** Soft deletes (`deletedAt`) ensure devices remove items locally.
+
+### 4.2. Stock Sync (Write-Heavy)
+
+- **Challenge:** Race conditions (Two devices selling the last item).
+- **Strategy:** Delta-based writes.
+  - Device does **not** send "New Quantity = 5".
+  - Device sends "Movement: SALE, Quantity = -1".
+- **Server Logic:**
+  1. Receive Movement.
+  2. Apply delta to `InventoryLevel`.
+  3. Broadcast new `InventoryLevel` version to all devices.
