@@ -138,32 +138,60 @@ push }o..|| inapp : "notifies"
 
 ### 3.1. NotificationTemplate
 
-Stores the blueprints for messages. Supports global defaults and business-specific overrides.
+Stores the blueprints for messages. Supports global defaults and business-specific overrides. This allows the system to be **agnostic** of the content format until runtime.
 
-| Attribute    | Type    | Description                       | Rules & Constraints                               |
-| :----------- | :------ | :-------------------------------- | :------------------------------------------------ |
-| `businessId` | UUID    | The tenant owning this template.  | If NULL, it is a System Default template.         |
-| `code`       | VARCHAR | Unique slug per Business/Channel. | e.g., `PAYMENT_LINK`, `RECEIPT`, `WELCOME`.       |
-| `content`    | TEXT    | The body template.                | MJML for Email, Plain text for SMS/WhatsApp.      |
-| `variables`  | JSONB   | Expected dynamic fields.          | e.g., `["customerName", "paymentUrl", "amount"]`. |
+| Attribute    | Type    | Description                       | Rules & Constraints                                                         |
+| :----------- | :------ | :-------------------------------- | :-------------------------------------------------------------------------- |
+| `id`         | UUID    | Unique identifier.                | Primary Key.                                                                |
+| `businessId` | UUID    | The tenant owning this template.  | If `NULL`, it is a **System Default** template used as fallback.            |
+| `code`       | VARCHAR | Unique slug per Business/Channel. | e.g., `PAYMENT_LINK`, `RECEIPT`, `WELCOME`. Used by code to trigger events. |
+| `channel`    | ENUM    | The delivery medium.              | `EMAIL`, `SMS`, `PUSH`, `WHATSAPP`.                                         |
+| `subject`    | VARCHAR | Email subject or Push title.      | Supports Handlebars syntax for variables (e.g., `Welcome {{name}}`).        |
+| `content`    | TEXT    | The body template.                | **MJML** for Email (responsive), Plain text for SMS/WhatsApp.               |
+| `variables`  | JSONB   | Expected dynamic fields.          | Schema definition for validation (e.g., `["customerName", "amount"]`).      |
+| `isDefault`  | BOOLEAN | Fallback flag.                    | Only one default per `code` + `channel` allowed globally.                   |
 
 ### 3.2. InAppNotification (The Bell Icon)
 
-Stores persistent alerts shown in the application UI.
+Stores persistent alerts shown in the application UI. These are delivered in **Real-Time** via WebSockets/SSE when the user is online.
 
-| Attribute | Type    | Description     | Rules & Constraints                |
-| :-------- | :------ | :-------------- | :--------------------------------- |
-| `isRead`  | BOOLEAN | Read status.    | Used to show "Unread count" badge. |
-| `data`    | JSONB   | Action payload. | e.g., `{ "link": "/orders/123" }`. |
+| Attribute   | Type      | Description        | Rules & Constraints                                             |
+| :---------- | :-------- | :----------------- | :-------------------------------------------------------------- |
+| `id`        | UUID      | Unique identifier. | Primary Key.                                                    |
+| `userId`    | UUID      | The recipient.     | Foreign Key to `auth.User`.                                     |
+| `title`     | VARCHAR   | Short headline.    | Max 100 chars.                                                  |
+| `body`      | TEXT      | Detailed message.  | Plain text only. No HTML allowed for security (XSS prevention). |
+| `data`      | JSONB     | Action payload.    | e.g., `{ "link": "/orders/123", "action": "APPROVE" }`.         |
+| `isRead`    | BOOLEAN   | Read status.       | Used to calculate the "Unread Badge" count.                     |
+| `createdAt` | TIMESTAMP | Creation time.     | Used for sorting in the notification center.                    |
 
 ### 3.3. NotificationLog
 
-Audit trail for all sent messages. Critical for debugging "I didn't get the link".
+The **Audit Trail** for all sent messages. Critical for debugging delivery issues and proving **Read Confirmation**.
 
-| Attribute    | Type    | Description               | Rules & Constraints                                  |
-| :----------- | :------ | :------------------------ | :--------------------------------------------------- |
-| `priority`   | ENUM    | Queue priority.           | `HIGH` for OTPs/Payments. `LOW` for Marketing.       |
-| `provider`   | VARCHAR | The actual sender.        | e.g., `Twilio`, `SendGrid`, `Meta`.                  |
-| `providerId` | VARCHAR | External ID for tracking. | Used to query the provider's API for status updates. |
-| `metadata`   | JSONB   | Proof of delivery.        | Stores raw webhook payloads (e.g., Read Receipts).   |
-| `status`     | ENUM    | Delivery state.           | Updated via Webhooks (e.g., WhatsApp Read Receipt).  |
+| Attribute    | Type      | Description                 | Rules & Constraints                                                         |
+| :----------- | :-------- | :-------------------------- | :-------------------------------------------------------------------------- |
+| `id`         | UUID      | Unique identifier.          | Primary Key.                                                                |
+| `userId`     | UUID      | The recipient.              | Foreign Key to `auth.User`.                                                 |
+| `businessId` | UUID      | The context of the message. | Foreign Key to `business.Business`.                                         |
+| `templateId` | UUID      | The template used.          | Foreign Key to `NotificationTemplate`.                                      |
+| `channel`    | ENUM      | The channel used.           | `EMAIL`, `SMS`, `PUSH`, `WHATSAPP`.                                         |
+| `priority`   | ENUM      | Queue priority.             | `HIGH` (OTP, Payments) bypasses `LOW` (Marketing) queues.                   |
+| `status`     | ENUM      | Current delivery state.     | `PENDING` -> `SENT` -> `DELIVERED` -> `READ` (if supported).                |
+| `provider`   | VARCHAR   | The actual sender.          | e.g., `Twilio`, `SendGrid`, `Meta`. Makes the system **Provider Agnostic**. |
+| `providerId` | VARCHAR   | External ID for tracking.   | Used to query the provider's API for status updates.                        |
+| `metadata`   | JSONB     | Proof of delivery.          | Stores raw webhook payloads (e.g., WhatsApp Read Receipt signature).        |
+| `error`      | TEXT      | Failure reason.             | Populated if status is `FAILED`.                                            |
+| `createdAt`  | TIMESTAMP | Timestamp of generation.    | Immutable.                                                                  |
+
+### 3.4. PushSubscription
+
+Manages Web Push subscriptions for PWA (Progressive Web App). Enables **Offline** notifications to reach the device.
+
+| Attribute   | Type    | Description                     | Rules & Constraints                                                                |
+| :---------- | :------ | :------------------------------ | :--------------------------------------------------------------------------------- |
+| `id`        | UUID    | Unique identifier.              | Primary Key.                                                                       |
+| `userId`    | UUID    | The subscriber.                 | Foreign Key to `auth.User`.                                                        |
+| `endpoint`  | TEXT    | Browser push service URL.       | Unique per device/browser profile.                                                 |
+| `keys`      | JSONB   | Encryption keys (P256DH, Auth). | **Critical Security:** Used to encrypt the payload so only the device can read it. |
+| `userAgent` | VARCHAR | Device information.             | Used for debugging (e.g., "Chrome on Android").                                    |
