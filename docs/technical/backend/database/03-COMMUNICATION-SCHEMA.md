@@ -21,7 +21,7 @@
 <div align="center">
 
   <!-- METADATA BADGES -->
-  <img src="https://img.shields.io/badge/Status-Ready-success?style=flat-square" alt="Status" />
+  <img src="https://img.shields.io/badge/Status-Draft-warning?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-Backend-blue?style=flat-square" alt="Audience" />
   <img src="https://img.shields.io/badge/Last%20Updated-2025--11--27-lightgrey?style=flat-square" alt="Date" />
 
