@@ -356,7 +356,7 @@ app.post("/mcp", async (req, res) => {
   });
 
   res.on("close", () => {
-    transport.close();
+    void transport.close();
   });
 
   await server.connect(transport);
