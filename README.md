@@ -30,7 +30,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

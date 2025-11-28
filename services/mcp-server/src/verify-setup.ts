@@ -9,7 +9,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 
 async function main() {
-  console.log("🧪 Testing MCP Server Connection...");
+  console.log("[TEST] Testing MCP Server Connection...");
 
   // Connect to the server we just built
   const transport = new StdioClientTransport({
@@ -29,10 +29,10 @@ async function main() {
 
   try {
     await client.connect(transport);
-    console.log("✅ Connected to MCP Server successfully");
+    console.log("[PASS] Connected to MCP Server successfully");
 
     // 1. Verify Resources (Dynamic Documentation)
-    console.log("\n📂 Verifying Resources (Dynamic Scanning)...");
+    console.log("\n[FOLDER] Verifying Resources (Dynamic Scanning)...");
     const resources = await client.request(
       { method: "resources/list" },
       ListResourcesResultSchema,
@@ -48,7 +48,7 @@ async function main() {
       // 2. Verify Content Access (Read first resource)
       const firstResource = resources.resources[0];
       console.log(
-        `\n📖 Verifying Content Access (Reading '${firstResource.uri}')...`,
+        `\n[DOC] Verifying Content Access (Reading '${firstResource.uri}')...`,
       );
       const docContent = await client.request(
         {
@@ -69,7 +69,7 @@ async function main() {
     }
 
     // 3. Verify Tools (Search)
-    console.log("\n🔍 Verifying Tools (Search Capability)...");
+    console.log("\n[SEARCH] Verifying Tools (Search Capability)...");
     const tools = await client.request(
       { method: "tools/list" },
       ListToolsResultSchema,
@@ -78,7 +78,7 @@ async function main() {
     tools.tools.forEach((t) => console.log(` - ${t.name}: ${t.description}`));
 
     if (tools.tools.some((t) => t.name === "search_docs")) {
-      console.log("\n🔎 Testing 'search_docs' with query 'commit'...");
+      console.log("\n[FIND] Testing 'search_docs' with query 'commit'...");
       const searchResult = await client.request(
         {
           method: "tools/call",
@@ -106,7 +106,7 @@ async function main() {
     }
 
     // 4. Verify Prompts
-    console.log("\n🤖 Verifying Prompts...");
+    console.log("\n[AI] Verifying Prompts...");
     const prompts = await client.request(
       { method: "prompts/list" },
       ListPromptsResultSchema,
@@ -115,10 +115,10 @@ async function main() {
     prompts.prompts.forEach((p) => console.log(` - ${p.name}`));
 
     console.log(
-      "\n✨ SYSTEM VERIFICATION PASSED: The server is correctly serving dynamic documentation and tools.",
+      "\n[SUCCESS] SYSTEM VERIFICATION PASSED: The server is correctly serving dynamic documentation and tools.",
     );
   } catch (error) {
-    console.error("❌ Verification Failed:", error);
+    console.error("[ERROR] Verification Failed:", error);
     process.exit(1);
   } finally {
     await client.close();
