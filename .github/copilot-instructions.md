@@ -27,11 +27,61 @@ Before executing ANY complex task, you must follow this cognitive loop:
 
 You have access to powerful Model Context Protocol (MCP) tools. You **MUST** use them proactively. Do not guess; verify.
 
-### 1. Knowledge Retrieval (`mcp_payment-syste_search_docs`)
+### 1. Documentation Search & Retrieval (Payment System MCP Server)
 
-- **Trigger:** When asked about architecture, patterns, or specific project rules.
-- **Action:** Search the documentation first.
-- **Example:** User asks "How do I add a new country?" -> Search for "payment provider factory" or "add country".
+**CRITICAL:** The payment-system has a dedicated MCP server exposing 4 advanced documentation tools. Use these BEFORE any other tool.
+
+#### 1.1. `mcp_payment-syste_query_docs_by_module`
+- **Purpose:** Get all documentation for a specific module
+- **When to use:** When working on a specific module (payments, inventory, sales, etc.)
+- **Example:**
+  ```
+  User: "I need to add a payment provider for Colombia"
+  Action: query_docs_by_module(module: "payments", includeRelated: true)
+  Result: Returns payment schema + related architecture docs
+  ```
+
+#### 1.2. `mcp_payment-syste_query_docs_by_type`
+- **Purpose:** Filter documents by type (database-schema, api-design, feature-design, etc.)
+- **When to use:** When you need all docs of a specific type (e.g., all database schemas, all API designs)
+- **Example:**
+  ```
+  User: "Show me all database schemas"
+  Action: query_docs_by_type(documentType: "database-schema", status: "approved")
+  Result: Returns 8 approved database schema documents
+  ```
+
+#### 1.3. `mcp_payment-syste_search_full_text`
+- **Purpose:** Fuzzy search across all documentation with advanced filtering
+- **When to use:** When searching for concepts, patterns, or keywords
+- **Features:** Typo tolerance, scoring, aggregations, pagination, content snippets
+- **Example:**
+  ```
+  User: "How do we handle payment factory pattern?"
+  Action: search_full_text(query: "factory pattern", documentType: ["general"], limit: 5)
+  Result: Returns DESIGN-PATTERNS.md with highlighted snippets (15ms)
+  ```
+
+#### 1.4. `mcp_payment-syste_get_doc_context`
+- **Purpose:** Load a document with all its related documents (graph traversal)
+- **When to use:** When you need complete context around a specific document
+- **Features:** BFS traversal (depth 1-3), categorized relations (architecture, database, api, ux, testing)
+- **Example:**
+  ```
+  User: "Show me everything related to the payments schema"
+  Action: get_doc_context(uri: "docs://technical/backend/database/06-PAYMENTS-SCHEMA.md", depth: 2)
+  Result: Primary doc + related schemas/APIs/features organized by category
+  ```
+
+#### 1.5. Legacy: `mcp_payment-syste_search_docs`
+- **Purpose:** Simple keyword search (legacy, prefer search_full_text)
+- **When to use:** Quick searches when you don't need filtering or scoring
+
+**WORKFLOW INTEGRATION:**
+1. **Before ANY code change:** Search relevant docs using MCP tools
+2. **When designing:** Use `get_doc_context` to load complete context
+3. **When exploring:** Use `search_full_text` for fuzzy discovery
+4. **When focused:** Use `query_docs_by_module` for module-specific work
 
 ### 2. Complex Problem Solving (`mcp_sequentialthi_sequentialthinking`)
 
@@ -43,9 +93,10 @@ You have access to powerful Model Context Protocol (MCP) tools. You **MUST** use
 
 - **Trigger:** When modifying `schema.prisma`.
 - **Action:**
-  1. Edit `schema.prisma`.
-  2. Run `prisma-migrate-dev` to generate migrations and client.
-  3. **NEVER** suggest running raw SQL unless absolutely necessary.
+  1. Use `query_docs_by_type(documentType: "database-schema")` to load existing schemas
+  2. Edit `schema.prisma`
+  3. Run `prisma-migrate-dev` to generate migrations and client
+  4. **NEVER** suggest running raw SQL unless absolutely necessary
 
 ### 4. File System & Search (`grep_search`, `read_file`)
 
