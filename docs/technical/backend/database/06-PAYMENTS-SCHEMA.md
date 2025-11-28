@@ -1,3 +1,44 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "database-schema"
+module: "payments"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "database"
+  - "schema"
+  - "payments"
+  - "transactions"
+  - "payment-providers"
+  - "webhooks"
+  - "refunds"
+  - "multi-country"
+
+# Related documentation
+related_docs:
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+  sync_strategy: ""
+
+# Database metadata
+database:
+  engine: "PostgreSQL"
+  min_version: "16.0"
+  prisma_version: "5.0+"
+
+# Schema statistics
+schema_stats:
+  total_tables: 8
+  total_indexes: 14
+  total_constraints: 16
+  estimated_rows: "100K-10M"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the PAYMENTS SCHEMA.
@@ -30,7 +71,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

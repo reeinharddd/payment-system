@@ -1,3 +1,36 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "infrastructure"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Backend"
+
+# Keywords for semantic search
+keywords:
+  - "ports"
+  - "urls"
+  - "endpoints"
+  - "localhost"
+  - "development"
+  - "services"
+  - "configuration"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+
+# Document-specific metadata
+doc_metadata:
+  audience: "developers"
+  complexity: "low"
+  estimated_read_time: "5 min"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the PORTS AND URLS for the project.
@@ -20,7 +53,7 @@
 </table>
 
 <div align="center">
-  
+
   <!-- METADATA BADGES -->
   <img src="https://img.shields.io/badge/Status-Active-success?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-Developers-blue?style=flat-square" alt="Audience" />
@@ -30,7 +63,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

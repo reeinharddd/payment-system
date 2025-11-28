@@ -1,3 +1,39 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "adr"
+module: "architecture"
+status: "accepted"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "adr"
+  - "offline-first"
+  - "pwa"
+  - "indexeddb"
+  - "sync-queue"
+  - "eventual-consistency"
+  - "service-worker"
+  - "dexie"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  sync_strategy: "docs/technical/frontend/OFFLINE-SYNC.md"
+  superseded_by: ""
+
+# ADR-specific metadata
+adr_metadata:
+  adr_number: 2
+  decision_date: "2025-11-25"
+  review_date: "2026-11-25"
+  stakeholders: ["@Architect", "@Frontend"]
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document is a TEMPLATE for Architecture Decision Records (ADR).
@@ -30,7 +66,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

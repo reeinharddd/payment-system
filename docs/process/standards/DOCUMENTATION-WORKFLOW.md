@@ -35,7 +35,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with documentation._
 
@@ -105,32 +105,32 @@ What are you documenting?
 
 This matrix defines **what goes where**. Violating this creates confusion and makes documents unmaintainable.
 
-| Concern                          | Database Schema Doc | Feature Design Doc | ADR           | UX Flow Doc   | API Design Doc |
-| :------------------------------- | :------------------ | :----------------- | :------------ | :------------ | :------------- |
-| **Table definitions**            | ✅ PRIMARY          | 📝 Reference       | ❌            | ❌            | ❌             |
-| **Column types & constraints**   | ✅ PRIMARY          | ❌                 | ❌            | ❌            | ❌             |
-| **Indexes & performance**        | ✅ PRIMARY          | 📝 Considerations  | ❌            | ❌            | ❌             |
-| **Foreign keys & relationships** | ✅ PRIMARY          | 📝 Reference       | ❌            | ❌            | ❌             |
-| **Triggers & DB-level logic**    | ✅ PRIMARY          | ❌                 | ❌            | ❌            | ❌             |
-| **User interaction flows**       | ❌                  | 📝 Overview        | ❌            | ✅ PRIMARY    | ❌             |
-| **Validation screens**           | ❌                  | 📝 Overview        | ❌            | ✅ PRIMARY    | ❌             |
-| **UI mockups/wireframes**        | ❌                  | 📝 Overview        | ❌            | ✅ PRIMARY    | ❌             |
-| **Business logic algorithms**    | ❌                  | ✅ PRIMARY         | 📝 Rationale  | ❌            | ❌             |
-| **Service layer implementation** | ❌                  | ✅ PRIMARY         | ❌            | ❌            | ❌             |
-| **API endpoints & DTOs**         | ❌                  | 📝 Reference       | ❌            | ❌            | ✅ PRIMARY     |
-| **Request/response contracts**   | ❌                  | 📝 Reference       | ❌            | ❌            | ✅ PRIMARY     |
-| **Error handling strategies**    | ❌                  | ✅ PRIMARY         | 📝 Rationale  | ❌            | ✅ PRIMARY     |
-| **Offline sync strategy**        | ❌                  | 📝 Overview        | ✅ PRIMARY    | ❌            | 📝 Impact      |
-| **Conflict resolution rules**    | ❌                  | 📝 Overview        | ✅ PRIMARY    | ❌            | ❌             |
-| **Technology choice rationale**  | ❌                  | ❌                 | ✅ PRIMARY    | ❌            | ❌             |
-| **Security considerations**      | 📝 RLS & Access     | ✅ Implementation  | 📝 Decisions  | 📝 Auth Flows | ✅ Contracts   |
-| **Performance benchmarks**       | 📝 Query patterns   | ✅ Optimization    | 📝 Trade-offs | ❌            | 📝 Rate limits |
+| Concern                          | Database Schema Doc | Feature Design Doc | ADR            | UX Flow Doc    | API Design Doc  |
+| :------------------------------- | :------------------ | :----------------- | :------------- | :------------- | :-------------- |
+| **Table definitions**            | YES PRIMARY         | REF Reference      | NO             | NO             | NO              |
+| **Column types & constraints**   | YES PRIMARY         | NO                 | NO             | NO             | NO              |
+| **Indexes & performance**        | YES PRIMARY         | REF Considerations | NO             | NO             | NO              |
+| **Foreign keys & relationships** | YES PRIMARY         | REF Reference      | NO             | NO             | NO              |
+| **Triggers & DB-level logic**    | YES PRIMARY         | NO                 | NO             | NO             | NO              |
+| **User interaction flows**       | NO                  | REF Overview       | NO             | YES PRIMARY    | NO              |
+| **Validation screens**           | NO                  | REF Overview       | NO             | YES PRIMARY    | NO              |
+| **UI mockups/wireframes**        | NO                  | REF Overview       | NO             | YES PRIMARY    | NO              |
+| **Business logic algorithms**    | NO                  | YES PRIMARY        | REF Rationale  | NO             | NO              |
+| **Service layer implementation** | NO                  | YES PRIMARY        | NO             | NO             | NO              |
+| **API endpoints & DTOs**         | NO                  | REF Reference      | NO             | NO             | YES PRIMARY     |
+| **Request/response contracts**   | NO                  | REF Reference      | NO             | NO             | YES PRIMARY     |
+| **Error handling strategies**    | NO                  | YES PRIMARY        | REF Rationale  | NO             | YES PRIMARY     |
+| **Offline sync strategy**        | NO                  | REF Overview       | YES PRIMARY    | NO             | REF Impact      |
+| **Conflict resolution rules**    | NO                  | REF Overview       | YES PRIMARY    | NO             | NO              |
+| **Technology choice rationale**  | NO                  | NO                 | YES PRIMARY    | NO             | NO              |
+| **Security considerations**      | REF RLS & Access    | YES Implementation | REF Decisions  | REF Auth Flows | YES Contracts   |
+| **Performance benchmarks**       | REF Query patterns  | YES Optimization   | REF Trade-offs | NO             | REF Rate limits |
 
 **Legend:**
 
-- ✅ PRIMARY: This is the authoritative source
-- 📝 Reference/Overview: Brief mention with link to primary source
-- ❌ Does NOT belong here
+- YES PRIMARY: This is the authoritative source
+- REF Reference/Overview: Brief mention with link to primary source
+- NO Does NOT belong here
 
 ---
 
@@ -163,11 +163,11 @@ This matrix defines **what goes where**. Violating this creates confusion and ma
 
 **Strictly FORBIDDEN:**
 
-- ❌ UI/UX flows or mockups → Move to `docs/technical/frontend/ux-flows/`
-- ❌ Business logic algorithms → Move to Feature Design docs
-- ❌ API endpoint definitions → Move to API Design docs
-- ❌ Sync strategies → Move to ADRs or Sync Strategy docs
-- ❌ User stories → Move to Feature Design docs
+- NO UI/UX flows or mockups > Move to `docs/technical/frontend/ux-flows/`
+- NO Business logic algorithms > Move to Feature Design docs
+- NO API endpoint definitions > Move to API Design docs
+- NO Sync strategies > Move to ADRs or Sync Strategy docs
+- NO User stories > Move to Feature Design docs
 
 **Example Violation:**
 
@@ -180,9 +180,9 @@ When a user scans a barcode, the system must handle 3 possible outcomes:
 [... detailed UI flow ...]
 ```
 
-**❌ WRONG:** This is UX flow, not database structure.
+**NO WRONG:** This is UX flow, not database structure.
 
-**✅ CORRECT:** Move to `docs/technical/frontend/ux-flows/INVENTORY-BARCODE-SCANNING.md`
+**YES CORRECT:** Move to `docs/technical/frontend/ux-flows/INVENTORY-BARCODE-SCANNING.md`
 
 ---
 
@@ -203,9 +203,9 @@ When a user scans a barcode, the system must handle 3 possible outcomes:
 
 **Cross-References:**
 
-- Database changes → Link to `[XX]-[NAME]-SCHEMA.md#entity-name`
-- API contracts → Link to `API-[FEATURE].md`
-- UX flows → Link to `UX-[FLOW-NAME].md`
+- Database changes > Link to `[XX]-[NAME]-SCHEMA.md#entity-name`
+- API contracts > Link to `API-[FEATURE].md`
+- UX flows > Link to `UX-[FLOW-NAME].md`
 
 ---
 
@@ -258,13 +258,13 @@ Every document MUST have an **Appendix: Change Log** section.
 
 **When to Update:**
 
-- ✅ Adding/removing tables or columns
-- ✅ Changing data types or constraints
-- ✅ Adding/modifying indexes
-- ✅ Updating business logic or algorithms
-- ✅ Adding examples or clarifications
-- ❌ Fixing typos (unless significant)
-- ❌ Formatting changes (unless affecting structure)
+- YES Adding/removing tables or columns
+- YES Changing data types or constraints
+- YES Adding/modifying indexes
+- YES Updating business logic or algorithms
+- YES Adding examples or clarifications
+- NO Fixing typos (unless significant)
+- NO Formatting changes (unless affecting structure)
 
 ---
 
@@ -274,12 +274,12 @@ Every document MUST have an **Appendix: Change Log** section.
 
 Ask yourself: **What am I documenting?**
 
-- Database structure? → Database Schema Template
-- Complete feature? → Feature Design Template
-- Architectural decision? → ADR Template
-- User interaction? → UX Flow Template
-- API contracts? → API Design Template
-- Sync strategy? → Sync Strategy Template
+- Database structure? > Database Schema Template
+- Complete feature? > Feature Design Template
+- Architectural decision? > ADR Template
+- User interaction? > UX Flow Template
+- API contracts? > API Design Template
+- Sync strategy? > Sync Strategy Template
 
 ### Step 2: Check if Document Exists
 
@@ -310,12 +310,12 @@ cp docs/templates/03-DATABASE-SCHEMA-TEMPLATE.md \
 
 ```yaml
 ---
-document_type: "database-schema"  # REQUIRED: Exact type identifier
-module: "billing"                 # REQUIRED: Module/feature name
-status: "draft"                   # REQUIRED: draft | in-review | approved | deprecated
-version: "1.0.0"                  # REQUIRED: Semantic versioning
-last_updated: "2025-11-27"        # REQUIRED: ISO date (YYYY-MM-DD)
-author: "@username"               # REQUIRED: GitHub username or team
+document_type: "database-schema" # REQUIRED: Exact type identifier
+module: "billing" # REQUIRED: Module/feature name
+status: "draft" # REQUIRED: draft | in-review | approved | deprecated
+version: "1.0.0" # REQUIRED: Semantic versioning
+last_updated: "2025-11-27" # REQUIRED: ISO date (YYYY-MM-DD)
+author: "@username" # REQUIRED: GitHub username or team
 
 # Keywords for semantic search (5-10 keywords)
 keywords:
@@ -347,15 +347,15 @@ related_docs:
 
 **Example Document Types:**
 
-| Template                   | `document_type` Value  |
-| :------------------------- | :--------------------- |
-| Database Schema            | `"database-schema"`    |
-| API Design                 | `"api-design"`         |
-| UX Flow                    | `"ux-flow"`            |
-| Feature Design             | `"feature-design"`     |
-| ADR                        | `"adr"`                |
-| Sync Strategy              | `"sync-strategy"`      |
-| General                    | `"general"`            |
+| Template        | `document_type` Value |
+| :-------------- | :-------------------- |
+| Database Schema | `"database-schema"`   |
+| API Design      | `"api-design"`        |
+| UX Flow         | `"ux-flow"`           |
+| Feature Design  | `"feature-design"`    |
+| ADR             | `"adr"`               |
+| Sync Strategy   | `"sync-strategy"`     |
+| General         | `"general"`           |
 
 ### Step 5: Fill Template Sections
 
@@ -460,9 +460,9 @@ Read through the document and note sections that don't belong:
 ```markdown
 # Example: 04-INVENTORY-SCHEMA.md
 
-## 5. Product Identification & Validation Flows ❌ VIOLATION
+## 5. Product Identification & Validation Flows NO VIOLATION
 
-### 5.1. Barcode Scanning - The 3 Scenarios ❌ UX Flow in DB doc
+### 5.1. Barcode Scanning - The 3 Scenarios NO UX Flow in DB doc
 ```
 
 ### Step 2: Extract Content
@@ -569,7 +569,7 @@ Templates themselves should have version numbers in their change logs:
 
 ### Violation 3: Missing or Invalid Metadata
 
-**❌ Wrong:**
+**NO Wrong:**
 
 ```markdown
 <!-- AI-INSTRUCTION comments -->
@@ -581,7 +581,7 @@ Templates themselves should have version numbers in their change logs:
 ## 1. Executive Summary
 ```
 
-**✅ Correct:**
+**YES Correct:**
 
 ```markdown
 ---
@@ -624,7 +624,7 @@ schema_stats:
 
 ### Violation 1: UI Flow in Database Doc
 
-**❌ Wrong:**
+**NO Wrong:**
 
 ```markdown
 ## 5. Product Scanning Flow
@@ -637,7 +637,7 @@ When user scans barcode:
    [... detailed UI flow ...]
 ```
 
-**✅ Correct:**
+**YES Correct:**
 
 ```markdown
 ## 5. Data Integrity Constraints
@@ -655,7 +655,7 @@ When user scans barcode:
 
 ### Violation 2: Database Schema in Feature Doc
 
-**❌ Wrong:**
+**NO Wrong:**
 
 ```markdown
 ## 3. Implementation
@@ -669,7 +669,7 @@ Table: Product
   [... full table definition ...]
 ```
 
-**✅ Correct:**
+**YES Correct:**
 
 ```markdown
 ## 3. Implementation
@@ -690,7 +690,7 @@ See full schema definition in the linked document.
 
 ### Violation 3: Missing Change Log
 
-**❌ Wrong:**
+**NO Wrong:**
 
 ```markdown
 [... document content ...]
@@ -703,7 +703,7 @@ See full schema definition in the linked document.
 <!-- No change log -->
 ```
 
-**✅ Correct:**
+**YES Correct:**
 
 ```markdown
 [... document content ...]
@@ -743,7 +743,7 @@ markdownlint --fix docs/**/*.md
 
 **Common Rules:**
 
-- MD001: Heading levels (H1 → H2 → H3, no skipping)
+- MD001: Heading levels (H1 > H2 > H3, no skipping)
 - MD040: Fenced code must have language tag
 - MD032: Lists must have blank lines before/after
 
@@ -759,7 +759,7 @@ DOCS=$(git diff --cached --name-only --diff-filter=ACM | grep '\.md$')
 if [ -n "$DOCS" ]; then
   markdownlint $DOCS
   if [ $? -ne 0 ]; then
-    echo "❌ Markdown linting failed. Fix issues and try again."
+    echo "NO Markdown linting failed. Fix issues and try again."
     exit 1
   fi
 fi
@@ -777,28 +777,28 @@ exit 0
 ╠══════════════════════════════════════════════════════════════════╣
 ║                                                                  ║
 ║  1. IDENTIFY TYPE                                                ║
-║     → DB Structure?    Use: 03-DATABASE-SCHEMA-TEMPLATE.md       ║
-║     → Feature/Module?  Use: 01-FEATURE-DESIGN-TEMPLATE.md        ║
-║     → Why Decision?    Use: 02-ADR-TEMPLATE.md                   ║
-║     → UX Flow?         Use: 06-UX-FLOW-TEMPLATE.md (TBD)         ║
+║     > DB Structure?    Use: 03-DATABASE-SCHEMA-TEMPLATE.md       ║
+║     > Feature/Module?  Use: 01-FEATURE-DESIGN-TEMPLATE.md        ║
+║     > Why Decision?    Use: 02-ADR-TEMPLATE.md                   ║
+║     > UX Flow?         Use: 06-UX-FLOW-TEMPLATE.md (TBD)         ║
 ║                                                                  ║
 ║  2. CHECK SEPARATION OF CONCERNS                                 ║
-║     ✅ DB Docs:  Tables, columns, indexes, constraints ONLY      ║
-║     ✅ UX Docs:  User flows, screens, validation ONLY            ║
-║     ✅ API Docs: Endpoints, DTOs, contracts ONLY                 ║
-║     ❌ NO MIXING: Keep concerns separated!                       ║
+║     YES DB Docs:  Tables, columns, indexes, constraints ONLY      ║
+║     YES UX Docs:  User flows, screens, validation ONLY            ║
+║     YES API Docs: Endpoints, DTOs, contracts ONLY                 ║
+║     NO NO MIXING: Keep concerns separated!                       ║
 ║                                                                  ║
 ║  3. MANDATORY SECTIONS                                           ║
-║     ✅ Executive Summary                                         ║
-║     ✅ Agent Directives                                          ║
-║     ✅ Change Log (Appendix A)                                   ║
-║     ✅ Cross-references to related docs                          ║
+║     YES Executive Summary                                         ║
+║     YES Agent Directives                                          ║
+║     YES Change Log (Appendix A)                                   ║
+║     YES Cross-references to related docs                          ║
 ║                                                                  ║
 ║  4. BEFORE COMMITTING                                            ║
-║     → Run: markdownlint docs/**/*.md                             ║
-║     → Update: Change Log with version bump                       ║
-║     → Update: Last Updated badge                                 ║
-║     → Verify: All links work                                     ║
+║     > Run: markdownlint docs/**/*.md                             ║
+║     > Update: Change Log with version bump                       ║
+║     > Update: Last Updated badge                                 ║
+║     > Verify: All links work                                     ║
 ║                                                                  ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
@@ -807,11 +807,11 @@ exit 0
 
 ## Appendix A: Change Log
 
-| Date       | Version | Author  | Changes                                                                           |
-| :--------- | :------ | :------ | :-------------------------------------------------------------------------------- |
+| Date       | Version | Author  | Changes                                                                                          |
+| :--------- | :------ | :------ | :----------------------------------------------------------------------------------------------- |
 | 2025-11-27 | 1.2.0   | @Scribe | Added 3 new templates: Testing Strategy, Deployment Runbook, Security Audit (total 10 templates) |
-| 2025-11-27 | 1.1.0   | @Scribe | Added YAML frontmatter requirements for semantic search, MCP, and RAG integration |
-| 2025-11-27 | 1.0.0   | @Scribe | Initial documentation workflow guide with template rules                          |
+| 2025-11-27 | 1.1.0   | @Scribe | Added YAML frontmatter requirements for semantic search, MCP, and RAG integration                |
+| 2025-11-27 | 1.0.0   | @Scribe | Initial documentation workflow guide with template rules                                         |
 
 ---
 

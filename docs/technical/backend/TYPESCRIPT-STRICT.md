@@ -1,3 +1,37 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "backend"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Backend"
+
+# Keywords for semantic search
+keywords:
+  - "typescript"
+  - "strict-mode"
+  - "type-safety"
+  - "eslint"
+  - "no-any"
+  - "zod"
+  - "validation"
+  - "typescript-5"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+
+# Document-specific metadata
+doc_metadata:
+  audience: "developers"
+  complexity: "medium"
+  estimated_read_time: "20 min"
+---
+
 <!--
   ~ TYPESCRIPT STRICT MODE STANDARDS
   ~ ============================================================================
@@ -28,7 +62,7 @@ Comprehensive guide for extreme type safety.
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
@@ -285,8 +319,8 @@ function getUserTransactions(userId: UserId): Transaction[] {
 const userId = UserId("uuid-1");
 const businessId = BusinessId("uuid-2");
 
-getUserTransactions(userId); // ✓ Works
-getUserTransactions(businessId); // ✗ Type error
+getUserTransactions(userId); //  Works
+getUserTransactions(businessId); //  Type error
 ```
 
 ---
@@ -362,7 +396,7 @@ const config: DeepReadonly<AppConfig> = {
   },
 };
 
-config.database.host = "other"; // ✗ Type error
+config.database.host = "other"; //  Type error
 ```
 
 ### 6.2. Exact Type Matching
@@ -380,8 +414,8 @@ function createUser<T extends Exact<T, { name: string; email: string }>>(
   return user;
 }
 
-createUser({ name: "John", email: "john@example.com" }); // ✓
-createUser({ name: "John", email: "john@example.com", extra: "not allowed" }); // ✗
+createUser({ name: "John", email: "john@example.com" }); //
+createUser({ name: "John", email: "john@example.com", extra: "not allowed" }); //
 ```
 
 ### 6.3. Require At Least One
@@ -406,9 +440,9 @@ function searchUsers(filters: RequireAtLeastOne<SearchFilters>): User[] {
   // Implementation
 }
 
-searchUsers({}); // ✗ Type error
-searchUsers({ name: "John" }); // ✓
-searchUsers({ name: "John", email: "john@example.com" }); // ✓
+searchUsers({}); //  Type error
+searchUsers({ name: "John" }); //
+searchUsers({ name: "John", email: "john@example.com" }); //
 ```
 
 ---

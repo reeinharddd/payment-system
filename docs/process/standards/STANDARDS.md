@@ -1,3 +1,36 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "standards"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "standards"
+  - "documentation"
+  - "markdown"
+  - "conventions"
+  - "style-guide"
+  - "plantuml"
+  - "mermaid"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+
+# Document-specific metadata
+doc_metadata:
+  audience: "developers"
+  complexity: "low"
+  estimated_read_time: "25 min"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the DOCUMENTATION STANDARDS. When creating new files:
@@ -30,7 +63,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
@@ -111,7 +144,7 @@ All documents must follow the Master Template (`docs/templates/00-GENERAL-DOC-TE
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 ...
 
@@ -607,22 +640,22 @@ Provider --> Service: PaymentIntent
 
 ### Bad Documentation Example
 
-❌ **Too verbose, decorative, external dependencies:**
+BAD PRACTICE - Too verbose, decorative, external dependencies:\*\*
 
 ```markdown
-# 💰 Payment Provider Interface 🎉
+# Payment Provider Interface
 
-Welcome to the **amazing** payment provider documentation! ✨
+Welcome to the **amazing** payment provider documentation!
 
-## 🚀 What is this?
+## What is this?
 
-This is like, totally the best interface ever! 🔥
+This is like, totally the best interface ever!
 
-## 📸 Architecture
+## Architecture
 
 See `payment-arch.puml` and generate with PlantUML.
 
-## 💡 Pro Tips
+## Pro Tips
 
 Remember to always...
 ```

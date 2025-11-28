@@ -1,3 +1,37 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "foundations"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "technical-foundations"
+  - "why-angular"
+  - "why-nestjs"
+  - "why-postgresql"
+  - "technology-choices"
+  - "rationale"
+  - "bun"
+  - "monorepo"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+
+# Document-specific metadata
+doc_metadata:
+  audience: "developers"
+  complexity: "medium"
+  estimated_read_time: "25 min"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the TECHNICAL FOUNDATIONS.
@@ -20,7 +54,7 @@
 </table>
 
 <div align="center">
-  
+
   <!-- METADATA BADGES -->
   <img src="https://img.shields.io/badge/Status-Active-success?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-Developers-blue?style=flat-square" alt="Audience" />
@@ -30,7 +64,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
@@ -376,17 +410,17 @@ Image: Immutable blueprint (like a class)
 Container: Running instance (like an object)
 
 ┌─────────────────┐
-│   Docker Image  │ ← Built once, never changes
+│   Docker Image  │ < Built once, never changes
 │   (Immutable)   │
 └────────┬────────┘
          │ docker run
          ↓
 ┌─────────────────┐
-│   Container 1   │ ← Running instance
+│   Container 1   │ < Running instance
 │   (Mutable)     │
 └─────────────────┘
 ┌─────────────────┐
-│   Container 2   │ ← Another instance from same image
+│   Container 2   │ < Another instance from same image
 │   (Mutable)     │
 └─────────────────┘
 ```
@@ -398,7 +432,7 @@ Container: Running instance (like an object)
 FROM oven/bun:1               # Layer 1 (base OS + Bun)
 WORKDIR /app                  # Layer 2 (working directory)
 COPY package.json bun.lockb ./ # Layer 3 (dependency files)
-RUN bun install --frozen-lockfile # Layer 4 (install dependencies) ← CACHED
+RUN bun install --frozen-lockfile # Layer 4 (install dependencies) < CACHED
 COPY . .                      # Layer 5 (application code)
 RUN bun run build             # Layer 6 (build application)
 ```
@@ -500,7 +534,7 @@ Docker Bridge: 172.17.0.0/16
     └─ Container 3: 172.17.0.4 (redis)
 
 Containers can talk to each other by name:
-postgres://postgres:5432  ← "postgres" resolves to 172.17.0.3
+postgres://postgres:5432  < "postgres" resolves to 172.17.0.3
 ```
 
 **Custom Networks (Better Isolation):**
@@ -565,7 +599,7 @@ FROM oven/bun:1
 ```dockerfile
 USER bun  # Built-in user in Bun images
 # vs
-USER root  # ← NEVER do this in production
+USER root  # < NEVER do this in production
 ```
 
 **3. Health Checks**
@@ -617,8 +651,8 @@ services:
 ```typescript
 // Without DI (tightly coupled)
 class PaymentService {
-  private db = new Database();  // ← Creates own dependency
-  private gateway = new PaymentGateway();  // ← Hard to test
+  private db = new Database();  // < Creates own dependency
+  private gateway = new PaymentGateway();  // < Hard to test
 
   async processPayment() {
     await this.db.save(...);
@@ -630,8 +664,8 @@ class PaymentService {
 @Injectable()
 class PaymentService {
   constructor(
-    private readonly db: Database,  // ← Injected
-    private readonly gateway: PaymentGateway,  // ← Injected
+    private readonly db: Database,  // < Injected
+    private readonly gateway: PaymentGateway,  // < Injected
   ) {}
 
   async processPayment() {
@@ -661,12 +695,12 @@ Application Startup:
             │ needs
             ↓
 ┌─────────────────────────┐
-│   PaymentService        │ ← Created once (singleton)
+│   PaymentService        │ < Created once (singleton)
 └───────────┬─────────────┘
             │ needs
             ↓
 ┌─────────────────────────┐
-│   PrismaService         │ ← Shared across all services
+│   PrismaService         │ < Shared across all services
 └─────────────────────────┘
 ```
 
@@ -749,7 +783,7 @@ export class PaymentsController {
 **Guard Execution Order:**
 
 ```
-Request → Guard 1 → Guard 2 → Interceptor → Pipe → Controller → Service
+Request > Guard 1 > Guard 2 > Interceptor > Pipe > Controller > Service
           ↓ fail    ↓ fail     ↓           ↓        ↓           ↓
           401       403        Transform   Validate Process    DB
 ```
@@ -792,12 +826,12 @@ export class LoggingInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const startTime = Date.now();
 
-    console.log(`→ ${request.method} ${request.url}`);
+    console.log(`> ${request.method} ${request.url}`);
 
     return next.handle().pipe(
       tap(() => {
         const duration = Date.now() - startTime;
-        console.log(`← ${request.method} ${request.url} [${duration}ms]`);
+        console.log(`< ${request.method} ${request.url} [${duration}ms]`);
       }),
     );
   }
@@ -923,17 +957,17 @@ export class PaymentFormComponent {
 
 ```
 Creation:
-  constructor() → Called when class instantiated
+  constructor() > Called when class instantiated
   ↓
-  ngOnInit() → Called after first change detection
+  ngOnInit() > Called after first change detection
   ↓
 Updates:
-  ngOnChanges() → Called when input properties change
+  ngOnChanges() > Called when input properties change
   ↓
-  ngDoCheck() → Called on every change detection
+  ngDoCheck() > Called on every change detection
   ↓
 Destruction:
-  ngOnDestroy() → Called before component destroyed (cleanup)
+  ngOnDestroy() > Called before component destroyed (cleanup)
 ```
 
 **2. Signals (New Reactivity System - Angular 19+)**
@@ -1211,12 +1245,12 @@ COMMIT;
 ```sql
 -- Without index: Full table scan (slow)
 SELECT * FROM transactions WHERE business_id = '123';
--- Scans 1,000,000 rows → 500ms
+-- Scans 1,000,000 rows > 500ms
 
 -- With index: Index lookup (fast)
 CREATE INDEX idx_transactions_business_id ON transactions(business_id);
 SELECT * FROM transactions WHERE business_id = '123';
--- Scans 100 rows → 5ms
+-- Scans 100 rows > 5ms
 ```
 
 **Index Types:**

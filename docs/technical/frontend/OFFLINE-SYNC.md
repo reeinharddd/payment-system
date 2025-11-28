@@ -1,3 +1,46 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "sync-strategy"
+module: "frontend"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Frontend"
+
+# Keywords for semantic search
+keywords:
+  - "offline"
+  - "sync"
+  - "indexeddb"
+  - "dexie"
+  - "pwa"
+  - "service-worker"
+  - "conflict-resolution"
+  - "eventual-consistency"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  sync_strategy: "docs/technical/architecture/SECURE-OFFLINE-POS.md"
+
+# Sync-specific metadata
+sync_metadata:
+  sync_type: "bidirectional"
+  conflict_strategy: "last-write-wins"
+  storage_engine: "IndexedDB (Dexie.js)"
+  max_offline_duration: "7 days"
+  batch_size: 50
+  consistency_model: "eventual"
+
+# Document-specific metadata
+doc_metadata:
+  audience: "developers"
+  complexity: "high"
+  estimated_read_time: "30 min"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the Offline Synchronization Strategy.
@@ -30,7 +73,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

@@ -1,11 +1,11 @@
 ---
 # YAML Frontmatter - Metadata for Semantic Search & RAG
-document_type: "api-design"  # REQUIRED: Type identifier for MCP/RAG
-module: "[module-name]"  # REQUIRED: e.g., "inventory", "sales", "payments"
-status: "approved"  # REQUIRED: draft | in-review | approved | deprecated
-version: "1.0.0"  # REQUIRED: Semantic versioning (Major.Minor.Patch)
-last_updated: "YYYY-MM-DD"  # REQUIRED: ISO date format
-author: "@username"  # REQUIRED: GitHub username or team
+document_type: "api-design" # REQUIRED: Type identifier for MCP/RAG
+module: "[module-name]" # REQUIRED: e.g., "inventory", "sales", "payments"
+status: "approved" # REQUIRED: draft | in-review | approved | deprecated
+version: "1.0.0" # REQUIRED: Semantic versioning (Major.Minor.Patch)
+last_updated: "YYYY-MM-DD" # REQUIRED: ISO date format
+author: "@username" # REQUIRED: GitHub username or team
 
 # Keywords for semantic search (optimize for MCP tool discovery)
 keywords:
@@ -13,25 +13,25 @@ keywords:
   - "rest"
   - "endpoints"
   - "dto"
-  - "[resource-name]"  # e.g., "product-api", "inventory-api"
-  - "[http-methods]"  # e.g., "get", "post", "patch", "delete"
+  - "[resource-name]" # e.g., "product-api", "inventory-api"
+  - "[http-methods]" # e.g., "get", "post", "patch", "delete"
   - "openapi"
   - "swagger"
 
 # Related documentation for cross-referencing
 related_docs:
-  database_schema: ""  # Path to related DB schema doc
-  ux_flow: ""  # Path to related UX flow doc
-  feature_design: ""  # Path to related feature design doc
-  sync_strategy: ""  # Path to related sync strategy doc
+  database_schema: "" # Path to related DB schema doc
+  ux_flow: "" # Path to related UX flow doc
+  feature_design: "" # Path to related feature design doc
+  sync_strategy: "" # Path to related sync strategy doc
 
 # API-specific metadata
 api_metadata:
-  base_path: "/api/v1/[resource]"  # e.g., "/api/v1/products"
+  base_path: "/api/v1/[resource]" # e.g., "/api/v1/products"
   authentication: "JWT Bearer Token"
   rate_limit: "100 req/min"
-  total_endpoints: 0  # Update after completion
-  openapi_spec: ""  # Path to OpenAPI/Swagger JSON file
+  total_endpoints: 0 # Update after completion
+  openapi_spec: "" # Path to OpenAPI/Swagger JSON file
 ---
 
 <!-- AI-INSTRUCTION: START -->
@@ -47,10 +47,10 @@ api_metadata:
   4. FOCUS ON: Endpoints, HTTP methods, request/response DTOs, status codes, authentication
 
   WHERE TO DOCUMENT OTHER ASPECTS:
-  - Database Structure → docs/technical/backend/database/
-  - Business Logic → docs/technical/backend/features/
-  - UI Flows → docs/technical/frontend/ux-flows/
-  - Architecture Decisions → docs/technical/architecture/adr/
+  - Database Structure > docs/technical/backend/database/
+  - Business Logic > docs/technical/backend/features/
+  - UI Flows > docs/technical/frontend/ux-flows/
+  - Architecture Decisions > docs/technical/architecture/adr/
 -->
 <!-- AI-INSTRUCTION: END -->
 

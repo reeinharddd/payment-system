@@ -1,3 +1,39 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "database-schema"
+module: "database"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "er-diagram"
+  - "database-schema"
+  - "relationships"
+  - "entity-relationship"
+  - "full-schema"
+  - "plantuml"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+
+# Database metadata
+database:
+  engine: "PostgreSQL"
+  prisma_version: "5.0+"
+  schema_stats:
+    tables: 30
+    indexes: 60
+    constraints: 100
+    estimated_rows: 1000000
+---
+
 # Full Entity-Relationship Diagram
 
 This diagram represents the complete database schema for the Payment System.

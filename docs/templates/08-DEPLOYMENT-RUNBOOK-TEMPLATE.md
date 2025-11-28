@@ -1,11 +1,11 @@
 ---
 # YAML Frontmatter - Metadata for Semantic Search & RAG
-document_type: "deployment-runbook"  # REQUIRED: Type identifier for MCP/RAG
-module: "[module-name]"  # REQUIRED: e.g., "backend", "frontend", "infrastructure"
-status: "approved"  # REQUIRED: draft | in-review | approved | deprecated
-version: "1.0.0"  # REQUIRED: Semantic versioning (Major.Minor.Patch)
-last_updated: "YYYY-MM-DD"  # REQUIRED: ISO date format
-author: "@username"  # REQUIRED: GitHub username or team
+document_type: "deployment-runbook" # REQUIRED: Type identifier for MCP/RAG
+module: "[module-name]" # REQUIRED: e.g., "backend", "frontend", "infrastructure"
+status: "approved" # REQUIRED: draft | in-review | approved | deprecated
+version: "1.0.0" # REQUIRED: Semantic versioning (Major.Minor.Patch)
+last_updated: "YYYY-MM-DD" # REQUIRED: ISO date format
+author: "@username" # REQUIRED: GitHub username or team
 
 # Keywords for semantic search (5-10 keywords)
 keywords:
@@ -13,28 +13,28 @@ keywords:
   - "runbook"
   - "operations"
   - "devops"
-  - "[environment]"  # e.g., "production", "staging", "development"
-  - "[strategy]"  # e.g., "blue-green", "canary", "rolling"
+  - "[environment]" # e.g., "production", "staging", "development"
+  - "[strategy]" # e.g., "blue-green", "canary", "rolling"
   - "rollback"
   - "ci-cd"
   - "monitoring"
 
 # Related documentation
 related_docs:
-  database_schema: ""  # Path to DB schema (for migration planning)
-  api_design: ""  # Path to API design
-  feature_design: ""  # Path to feature design
-  testing_strategy: ""  # Path to testing strategy
-  security_audit: ""  # Path to security audit
+  database_schema: "" # Path to DB schema (for migration planning)
+  api_design: "" # Path to API design
+  feature_design: "" # Path to feature design
+  testing_strategy: "" # Path to testing strategy
+  security_audit: "" # Path to security audit
 
 # Deployment-specific metadata
 deployment_metadata:
-  environment: "production"  # "development" | "staging" | "production"
-  deployment_frequency: "weekly"  # e.g., "daily", "weekly", "on-demand"
-  deployment_strategy: "blue-green"  # "rolling" | "blue-green" | "canary" | "recreate"
-  rollback_time: "5 minutes"  # e.g., "5 minutes", "< 1 hour"
-  zero_downtime: true  # Whether deployment causes downtime
-  automation_level: "full"  # "manual" | "semi-automated" | "full"
+  environment: "production" # "development" | "staging" | "production"
+  deployment_frequency: "weekly" # e.g., "daily", "weekly", "on-demand"
+  deployment_strategy: "blue-green" # "rolling" | "blue-green" | "canary" | "recreate"
+  rollback_time: "5 minutes" # e.g., "5 minutes", "< 1 hour"
+  zero_downtime: true # Whether deployment causes downtime
+  automation_level: "full" # "manual" | "semi-automated" | "full"
 ---
 
 <!-- AI-INSTRUCTION: START -->
@@ -50,10 +50,10 @@ deployment_metadata:
   4. FOCUS ON: Deployment steps, rollback procedures, health checks, incident response
 
   WHERE TO DOCUMENT OTHER ASPECTS:
-  - Infrastructure Code → docker/, k8s/, terraform/ directories
-  - Application Code → apps/*/src/ directories
-  - Monitoring Config → observability/ or infra/ directories
-  - Architecture Decisions → docs/technical/architecture/adr/
+  - Infrastructure Code > docker/, k8s/, terraform/ directories
+  - Application Code > apps/*/src/ directories
+  - Monitoring Config > observability/ or infra/ directories
+  - Architecture Decisions > docs/technical/architecture/adr/
 
   Keep this document as the Single Source of Truth for DEPLOYMENT PROCEDURES only.
 -->
@@ -175,7 +175,7 @@ _High-level overview of deployment strategy._
 │ (Current)   │     │ (New)       │
 ├─────────────┤     ├─────────────┤
 │ Version 1.5 │     │ Version 1.6 │
-│ Active ✓    │     │ Idle        │
+│ Active     │     │ Idle        │
 └──────┬──────┘     └──────┬──────┘
        │                   │
        └───────┬───────────┘
@@ -328,7 +328,7 @@ npm run test:smoke -- --target=https://green.api.payment-system.com
 
 ---
 
-#### Step 5: Switch Traffic (Blue → Green)
+#### Step 5: Switch Traffic (Blue > Green)
 
 **Time:** 1 minute
 
@@ -562,7 +562,7 @@ kubectl patch service backend-service \
 **Communication Template:**
 
 ```text
-🚨 INCIDENT: [Brief Description]
+[ALERT] INCIDENT: [Brief Description]
 Severity: P0/P1
 Started: [Time]
 Impact: [User-facing impact]
@@ -576,14 +576,14 @@ Status: Investigating / Mitigating / Resolved
 
 ### 7.1. Key Metrics
 
-| Metric                   | Normal Range | Alert Threshold | Action             |
-| :----------------------- | :----------- | :-------------- | :----------------- |
-| Error Rate               | < 0.1%       | > 1%            | Investigate / Rollback |
-| API Latency (P95)        | < 200ms      | > 500ms         | Investigate performance |
-| Database Connections     | < 50         | > 80            | Scale database pool |
-| CPU Usage                | < 70%        | > 85%           | Scale pods          |
-| Memory Usage             | < 80%        | > 90%           | Investigate memory leak |
-| Payment Success Rate     | > 99%        | < 98%           | CRITICAL - Investigate immediately |
+| Metric               | Normal Range | Alert Threshold | Action                             |
+| :------------------- | :----------- | :-------------- | :--------------------------------- |
+| Error Rate           | < 0.1%       | > 1%            | Investigate / Rollback             |
+| API Latency (P95)    | < 200ms      | > 500ms         | Investigate performance            |
+| Database Connections | < 50         | > 80            | Scale database pool                |
+| CPU Usage            | < 70%        | > 85%           | Scale pods                         |
+| Memory Usage         | < 80%        | > 90%           | Investigate memory leak            |
+| Payment Success Rate | > 99%        | < 98%           | CRITICAL - Investigate immediately |
 
 ---
 
@@ -598,13 +598,13 @@ Status: Investigating / Mitigating / Resolved
 
 ## 8. Emergency Contacts
 
-| Role                      | Name   | Slack         | Phone        |
-| :------------------------ | :----- | :------------ | :----------- |
-| On-Call Engineer          | [Name] | @oncall       | +1-XXX-XXXX  |
-| DevOps Lead               | [Name] | @devops-lead  | +1-XXX-XXXX  |
-| Engineering Manager       | [Name] | @eng-manager  | +1-XXX-XXXX  |
-| Database Administrator    | [Name] | @dba          | +1-XXX-XXXX  |
-| Security Team (Incidents) | [Name] | @security     | +1-XXX-XXXX  |
+| Role                      | Name   | Slack        | Phone       |
+| :------------------------ | :----- | :----------- | :---------- |
+| On-Call Engineer          | [Name] | @oncall      | +1-XXX-XXXX |
+| DevOps Lead               | [Name] | @devops-lead | +1-XXX-XXXX |
+| Engineering Manager       | [Name] | @eng-manager | +1-XXX-XXXX |
+| Database Administrator    | [Name] | @dba         | +1-XXX-XXXX |
+| Security Team (Incidents) | [Name] | @security    | +1-XXX-XXXX |
 
 ---
 
@@ -619,9 +619,9 @@ Status: Investigating / Mitigating / Resolved
 
 ## Appendix A: Change Log
 
-| Date       | Version | Author   | Changes                        |
-| :--------- | :------ | :------- | :----------------------------- |
-| YYYY-MM-DD | 1.0.0   | @DevOps  | Initial deployment runbook     |
+| Date       | Version | Author  | Changes                    |
+| :--------- | :------ | :------ | :------------------------- |
+| YYYY-MM-DD | 1.0.0   | @DevOps | Initial deployment runbook |
 
 ---
 

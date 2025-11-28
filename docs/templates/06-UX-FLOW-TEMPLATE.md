@@ -1,11 +1,11 @@
 ---
 # YAML Frontmatter - Metadata for Semantic Search & RAG
-document_type: "ux-flow"  # REQUIRED: Type identifier for MCP/RAG
-module: "[module-name]"  # REQUIRED: e.g., "inventory-ui", "sales-ui"
-status: "approved"  # REQUIRED: draft | in-review | approved | deprecated
-version: "1.0.0"  # REQUIRED: Semantic versioning
-last_updated: "YYYY-MM-DD"  # REQUIRED: ISO date format
-author: "@username"  # REQUIRED: GitHub username or team
+document_type: "ux-flow" # REQUIRED: Type identifier for MCP/RAG
+module: "[module-name]" # REQUIRED: e.g., "inventory-ui", "sales-ui"
+status: "approved" # REQUIRED: draft | in-review | approved | deprecated
+version: "1.0.0" # REQUIRED: Semantic versioning
+last_updated: "YYYY-MM-DD" # REQUIRED: ISO date format
+author: "@username" # REQUIRED: GitHub username or team
 
 # Keywords for semantic search
 keywords:
@@ -13,7 +13,7 @@ keywords:
   - "user-flow"
   - "screens"
   - "validation"
-  - "[feature-name]"  # e.g., "barcode-scanning", "product-creation"
+  - "[feature-name]" # e.g., "barcode-scanning", "product-creation"
   - "mobile"
   - "accessibility"
   - "user-experience"
@@ -21,19 +21,19 @@ keywords:
 
 # Related documentation
 related_docs:
-  database_schema: ""  # Path to DB schema
-  api_design: ""  # Path to API design
-  feature_design: ""  # Path to feature design
-  sync_strategy: ""  # Path to sync strategy (offline behavior)
+  database_schema: "" # Path to DB schema
+  api_design: "" # Path to API design
+  feature_design: "" # Path to feature design
+  sync_strategy: "" # Path to sync strategy (offline behavior)
 
 # UX-specific metadata
 ux_metadata:
-  platform: "web"  # "web" | "mobile" | "both"
+  platform: "web" # "web" | "mobile" | "both"
   framework: "Angular 21+"
-  total_screens: 0  # Update after completion
-  accessibility_level: "WCAG AA"  # "WCAG A" | "WCAG AA" | "WCAG AAA"
-  user_roles: []  # e.g., ["merchant", "cashier", "admin"]
-  key_interactions: []  # e.g., ["barcode-scan", "product-search", "form-validation"]
+  total_screens: 0 # Update after completion
+  accessibility_level: "WCAG AA" # "WCAG A" | "WCAG AA" | "WCAG AAA"
+  user_roles: [] # e.g., ["merchant", "cashier", "admin"]
+  key_interactions: [] # e.g., ["barcode-scan", "product-search", "form-validation"]
 ---
 
 <!-- AI-INSTRUCTION: START -->
@@ -49,10 +49,10 @@ ux_metadata:
   4. FOCUS ON: User journeys, screen mockups, validation flows, error states
 
   WHERE TO DOCUMENT OTHER ASPECTS:
-  - Database Structure → docs/technical/backend/database/
-  - API Contracts → docs/technical/backend/api/
-  - Business Logic → docs/technical/backend/features/
-  - Architectural Decisions → docs/technical/architecture/adr/
+  - Database Structure > docs/technical/backend/database/
+  - API Contracts > docs/technical/backend/api/
+  - Business Logic > docs/technical/backend/features/
+  - Architectural Decisions > docs/technical/architecture/adr/
 -->
 <!-- AI-INSTRUCTION: END -->
 
@@ -109,8 +109,8 @@ _High-level overview of this user flow._
 
 **Entry Points:**
 
-- [e.g. "Inventory Management → 'Receive Stock' button"]
-- [e.g. "POS → Quick restock during sale"]
+- [e.g. "Inventory Management > 'Receive Stock' button"]
+- [e.g. "POS > Quick restock during sale"]
 
 ---
 
@@ -148,7 +148,7 @@ _High-level overview of this user flow._
 
 ```text
 ┌─────────────────────────────────────┐
-│  ← [Back]      [Screen Title]       │
+│  < [Back]      [Screen Title]       │
 ├─────────────────────────────────────┤
 │                                     │
 │  [Primary Action Button]            │
@@ -162,8 +162,8 @@ _High-level overview of this user flow._
 **Elements:**
 
 - **Header:** [Title text]
-- **Primary CTA:** "[Button Text]" → Goes to [Next Screen]
-- **Secondary CTA:** "[Button Text]" → Goes to [Alt Screen]
+- **Primary CTA:** "[Button Text]" > Goes to [Next Screen]
+- **Secondary CTA:** "[Button Text]" > Goes to [Alt Screen]
 
 **Validation:**
 
@@ -183,7 +183,7 @@ _High-level overview of this user flow._
 
 ```text
 ┌─────────────────────────────────────┐
-│  ✓ Producto Identificado            │
+│   Producto Identificado            │
 ├─────────────────────────────────────┤
 │                                     │
 │  [Product Image]                 │
@@ -199,7 +199,7 @@ _High-level overview of this user flow._
 │  Stock actual: 24 pcs               │
 │  Nuevo stock: 29 pcs                │
 │                                     │
-│  [ Cancelar ]    [ ✓ Confirmar ]   │
+│  [ Cancelar ]    [  Confirmar ]   │
 └─────────────────────────────────────┘
 ```
 
@@ -209,7 +209,7 @@ _High-level overview of this user flow._
 - Current stock shown for context
 - Quantity field editable with unit selector
 - New stock calculated and shown in real-time
-- Fast path: Scan → Adjust → Confirm (3 taps)
+- Fast path: Scan > Adjust > Confirm (3 taps)
 
 **Edge Cases:**
 
@@ -227,7 +227,7 @@ _High-level overview of this user flow._
 
 ```text
 ┌─────────────────────────────────────┐
-│  🔍 Resultados de Búsqueda          │
+│  [SEARCH] Resultados de Búsqueda          │
 ├─────────────────────────────────────┤
 │                                     │
 │  ┌─────────────────────────────┐   │
@@ -251,8 +251,8 @@ _High-level overview of this user flow._
 
 **Interaction:**
 
-- User taps product card → Goes to Validation Screen (3.2 Scenario A)
-- User taps "Crear Nuevo" → Goes to Product Creation Flow
+- User taps product card > Goes to Validation Screen (3.2 Scenario A)
+- User taps "Crear Nuevo" > Goes to Product Creation Flow
 
 ---
 
@@ -271,19 +271,19 @@ _High-level overview of this user flow._
 │                                     │
 │  ¿Deseas buscarlo en línea?        │
 │                                     │
-│  [ 🔍 Buscar en Base de Datos ]    │
+│  [ [SEARCH] Buscar en Base de Datos ]    │
 │                                     │
-│  [ ✏️ Crear Manualmente ]          │
+│  [ [EDIT] Crear Manualmente ]          │
 │                                     │
-│  [ ✕ Cancelar ]                    │
+│  [ [X] Cancelar ]                    │
 └─────────────────────────────────────┘
 ```
 
 **Branching:**
 
 - **Buscar en Base de Datos:** Calls external API (OpenFoodFacts, UPC DB)
-  - If found → Pre-fill creation form
-  - If not found → Show "Sin resultados" → Go to manual creation
+  - If found > Pre-fill creation form
+  - If not found > Show "Sin resultados" > Go to manual creation
 - **Crear Manualmente:** Go to Product Creation Wizard (Section 3.3)
 
 ---
@@ -294,10 +294,10 @@ _High-level overview of this user flow._
 
 ```text
 ┌─────────────────────────────────────┐
-│  ← [Atrás]   Nuevo Producto (1/3)   │
+│  < [Atrás]   Nuevo Producto (1/3)   │
 ├─────────────────────────────────────┤
 │                                     │
-│  📸 [Tomar Foto]  [Elegir Imagen]  │
+│   [Tomar Foto]  [Elegir Imagen]  │
 │                                     │
 │  Nombre *                           │
 │  ┌─────────────────────────────┐   │
@@ -318,9 +318,9 @@ _High-level overview of this user flow._
 │  ┌─────────────────────────────┐   │
 │  │ 7501234567890               │   │
 │  └─────────────────────────────┘   │
-│  ☑️ Este código es el principal     │
+│   Este código es el principal     │
 │                                     │
-│  [ Cancelar ]    [ Siguiente → ]   │
+│  [ Cancelar ]    [ Siguiente > ]   │
 └─────────────────────────────────────┘
 ```
 
@@ -335,7 +335,7 @@ _High-level overview of this user flow._
 
 ```text
 ┌─────────────────────────────────────┐
-│  ← [Atrás]   Nuevo Producto (2/3)   │
+│  < [Atrás]   Nuevo Producto (2/3)   │
 ├─────────────────────────────────────┤
 │                                     │
 │  Precio de Venta                    │
@@ -351,7 +351,7 @@ _High-level overview of this user flow._
 │  INFO: El costo no será visible para   │
 │     vendedores sin permiso          │
 │                                     │
-│  [ ← Atrás ]     [ Siguiente → ]   │
+│  [ < Atrás ]     [ Siguiente > ]   │
 └─────────────────────────────────────┘
 ```
 
@@ -359,7 +359,7 @@ _High-level overview of this user flow._
 
 ```text
 ┌─────────────────────────────────────┐
-│  ← [Atrás]   Nuevo Producto (3/3)   │
+│  < [Atrás]   Nuevo Producto (3/3)   │
 ├─────────────────────────────────────┤
 │                                     │
 │  Cantidad Recibida *                │
@@ -374,10 +374,10 @@ _High-level overview of this user flow._
 │                                     │
 │  Fecha de Vencimiento (Opcional)    │
 │  ┌─────────────────────────────┐   │
-│  │ 📅 2026-12-31               │   │
+│  │  2026-12-31               │   │
 │  └─────────────────────────────┘   │
 │                                     │
-│  [ ← Atrás ]     [ 💾 Guardar ]    │
+│  [ < Atrás ]     [  Guardar ]    │
 └─────────────────────────────────────┘
 ```
 
@@ -488,7 +488,7 @@ _High-level overview of this user flow._
 
 ```html
 <button aria-label="Confirmar recepción de 12 piezas de Sabritas Adobadas">
-  ✓ Confirmar
+  Confirmar
 </button>
 
 <input
@@ -512,7 +512,7 @@ _High-level overview of this user flow._
 ### 6.1. Load Times
 
 - Initial screen: <200ms
-- Barcode scan → Product display: <500ms
+- Barcode scan > Product display: <500ms
 - Product creation: <1s (with optimistic UI)
 
 ### 6.2. Optimistic UI

@@ -1,3 +1,44 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "database-schema"
+module: "business"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "database"
+  - "schema"
+  - "business"
+  - "organization"
+  - "rbac"
+  - "roles"
+  - "permissions"
+  - "multi-tenant"
+
+# Related documentation
+related_docs:
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+  sync_strategy: ""
+
+# Database metadata
+database:
+  engine: "PostgreSQL"
+  min_version: "16.0"
+  prisma_version: "5.0+"
+
+# Schema statistics
+schema_stats:
+  total_tables: 8
+  total_indexes: 12
+  total_constraints: 15
+  estimated_rows: "1K-100K"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the BUSINESS SCHEMA.
@@ -30,7 +71,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

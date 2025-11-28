@@ -1,3 +1,36 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "architecture"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "preliminary-design"
+  - "architecture"
+  - "base-architecture"
+  - "module-structure"
+  - "technical-decisions"
+  - "blueprint"
+  - "system-design"
+
+# Related documentation
+related_docs:
+  database_schema: "docs/technical/backend/DATABASE-DESIGN.md"
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+
+# Document-specific metadata
+doc_metadata:
+  audience: "developers"
+  complexity: "high"
+  estimated_read_time: "40 min"
+---
+
 <!--
   ~ PRELIMINARY DESIGN AND BASE ARCHITECTURE
   ~ ============================================================================
@@ -29,7 +62,7 @@ Complete preliminary architecture design defining core patterns, module structur
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

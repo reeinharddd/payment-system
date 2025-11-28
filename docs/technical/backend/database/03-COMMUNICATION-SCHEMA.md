@@ -1,3 +1,39 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "database-schema"
+module: "communication"
+status: "ready"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Backend"
+
+# Keywords for semantic search
+keywords:
+  - "communication"
+  - "notifications"
+  - "email"
+  - "sms"
+  - "push-notifications"
+  - "templates"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+
+# Database metadata
+database:
+  engine: "PostgreSQL"
+  prisma_version: "5.0+"
+  schema_stats:
+    tables: 4
+    indexes: 8
+    constraints: 12
+    estimated_rows: 100000
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the COMMUNICATION SCHEMA.
@@ -29,7 +65,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

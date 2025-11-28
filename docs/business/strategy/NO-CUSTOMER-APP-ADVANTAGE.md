@@ -1,3 +1,36 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "business"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@ProductOwner"
+
+# Keywords for semantic search
+keywords:
+  - "strategy"
+  - "no-customer-app"
+  - "competitive-advantage"
+  - "adoption"
+  - "merchant-only"
+  - "b2b"
+  - "psp"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+
+# Document-specific metadata
+doc_metadata:
+  audience: "all"
+  complexity: "low"
+  estimated_read_time: "15 min"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the "NO CUSTOMER APP" STRATEGY.
@@ -20,7 +53,7 @@
 </table>
 
 <div align="center">
-  
+
   <!-- METADATA BADGES -->
   <img src="https://img.shields.io/badge/Status-Strategic-purple?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-Stakeholders-blue?style=flat-square" alt="Audience" />
@@ -30,7 +63,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
@@ -53,7 +86,7 @@ _This section contains mandatory instructions for AI Agents (Copilot, Cursor, et
 ┌─────────────────────────────────────────────────────────┐
 │  MERCHANT                                    CUSTOMER   │
 │                                                          │
-│  "I'll adopt when        ←─DEADLOCK─→   "I'll download │
+│  "I'll adopt when        <─DEADLOCK─>   "I'll download │
 │   customers have app"                    when merchants │
 │                                          accept it"      │
 │                                                          │
@@ -101,7 +134,7 @@ Final adoption rate: ~10-20% of merchants actually use it
 ┌─────────────────────────────────────────────────────────┐
 │  MERCHANT                                    CUSTOMER   │
 │                                                          │
-│  "I'll adopt because       →──WORKS──→   Uses existing │
+│  "I'll adopt because       >──WORKS──>   Uses existing │
 │   it works with ALL                      bank app       │
 │   customers TODAY"                       (BBVA, etc.)   │
 │                                                          │
@@ -129,7 +162,7 @@ Reality: Profitable and scalable
 ```
 Day 1:   Merchant signs up, gets QR code
 Day 2:   Shows QR to first customer
-         Customer scans with their BBVA app → pays in 5 seconds
+         Customer scans with their BBVA app > pays in 5 seconds
          Merchant: "This actually works!"
 Day 7:   80% of customers paying digitally
 Day 30:  95% digital payment adoption
@@ -171,13 +204,13 @@ Final adoption rate: 80-95% of merchants actively use it
 
 | Factor                    | Mercado Pago   | PayPal/Venmo   | Clip/SumUp    | **Our System** |
 | ------------------------- | -------------- | -------------- | ------------- | -------------- |
-| **Customer needs app?**   | ✓ YES          | ✓ YES          | ✗ NO          | **✗ NO**       |
+| **Customer needs app?**   | YES            | YES            | NO            | ** NO**        |
 | **Customer CAC**          | $20-50         | $25-60         | $0            | **$0**         |
 | **Merchant CAC**          | $85            | $120           | $85           | **$85**        |
 | **Total CAC/merchant**    | **$4,085**     | **$5,000+**    | $85           | **$85**        |
 | **Day 1 adoption rate**   | 10-20%         | 10-20%         | 95%           | **95%**        |
 | **Works with banks**      | Only MP wallet | Only PP wallet | All banks     | **All banks**  |
-| **Inventory integration** | ✗ NO           | ✗ NO           | ✗ NO          | **✓ YES**      |
+| **Inventory integration** | NO             | NO             | NO            | ** YES**       |
 | **Focus**                 | Consumers      | Consumers      | Payments only | **Merchants**  |
 
 ---
@@ -190,13 +223,13 @@ Final adoption rate: 80-95% of merchants actively use it
 
 > "Let us take your customers and put them in our app."
 
-**Bank response:** 😠 "You're a competitor. No."
+**Bank response:** [FRUSTRATED] "You're a competitor. No."
 
 **Our pitch to banks:**
 
 > "We increase usage of YOUR app. When merchants use our system, their customers open YOUR banking app more often."
 
-**Bank response:** 😍 "This helps us! Let's partner."
+**Bank response:** [HAPPY] "This helps us! Let's partner."
 
 **White-label opportunity:**
 

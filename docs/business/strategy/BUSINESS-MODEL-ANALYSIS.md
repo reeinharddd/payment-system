@@ -1,3 +1,37 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "business"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@ProductOwner"
+
+# Keywords for semantic search
+keywords:
+  - "business-model"
+  - "strategy"
+  - "value-proposition"
+  - "revenue"
+  - "market-analysis"
+  - "latam"
+  - "merchants"
+  - "payments"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+
+# Document-specific metadata
+doc_metadata:
+  audience: "all"
+  complexity: "medium"
+  estimated_read_time: "20 min"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the BUSINESS MODEL ANALYSIS.
@@ -30,7 +64,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
@@ -79,7 +113,7 @@ Unlike competitor apps that require BOTH merchant AND customer to have the app:
 
 - Our QR codes work with ANY banking app the customer already has
 - Payment links work in WhatsApp, SMS, email (no app needed)
-- Customer just scans → pays with their existing bank app → done
+- Customer just scans > pays with their existing bank app > done
 - Merchant gets payment + inventory updated + analytics
 - Customer never knows they used "our" system (invisible infrastructure)
 

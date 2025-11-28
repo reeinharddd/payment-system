@@ -1,11 +1,11 @@
 ---
 # YAML Frontmatter - Metadata for Semantic Search & RAG
-document_type: "sync-strategy"  # REQUIRED: Type identifier for MCP/RAG
-module: "[module-name]"  # REQUIRED: e.g., "inventory-sync", "sales-sync"
-status: "approved"  # REQUIRED: draft | in-review | approved | deprecated
-version: "1.0.0"  # REQUIRED: Semantic versioning
-last_updated: "YYYY-MM-DD"  # REQUIRED: ISO date format
-author: "@username"  # REQUIRED: GitHub username or team
+document_type: "sync-strategy" # REQUIRED: Type identifier for MCP/RAG
+module: "[module-name]" # REQUIRED: e.g., "inventory-sync", "sales-sync"
+status: "approved" # REQUIRED: draft | in-review | approved | deprecated
+version: "1.0.0" # REQUIRED: Semantic versioning
+last_updated: "YYYY-MM-DD" # REQUIRED: ISO date format
+author: "@username" # REQUIRED: GitHub username or team
 
 # Keywords for semantic search
 keywords:
@@ -13,7 +13,7 @@ keywords:
   - "synchronization"
   - "conflict-resolution"
   - "queue"
-  - "[entity-name]"  # e.g., "product-sync", "inventory-sync"
+  - "[entity-name]" # e.g., "product-sync", "inventory-sync"
   - "crdt"
   - "optimistic-locking"
   - "delta-sync"
@@ -21,19 +21,19 @@ keywords:
 
 # Related documentation
 related_docs:
-  database_schema: ""  # Path to DB schema
-  api_design: ""  # Path to API design
-  feature_design: ""  # Path to feature design
-  ux_flow: ""  # Path to UX flow (offline indicators)
+  database_schema: "" # Path to DB schema
+  api_design: "" # Path to API design
+  feature_design: "" # Path to feature design
+  ux_flow: "" # Path to UX flow (offline indicators)
 
 # Sync-specific metadata
 sync_metadata:
-  sync_type: ""  # "pull-only" | "push-only" | "bidirectional"
-  conflict_strategy: ""  # "last-write-wins" | "rebase" | "server-wins" | "manual"
+  sync_type: "" # "pull-only" | "push-only" | "bidirectional"
+  conflict_strategy: "" # "last-write-wins" | "rebase" | "server-wins" | "manual"
   max_queue_size: 1000
   retry_strategy: "exponential-backoff"
-  entities_synced: []  # List of entity names (e.g., ["Product", "Inventory"])
-  consistency_model: "eventual"  # "eventual" | "strong" | "causal"
+  entities_synced: [] # List of entity names (e.g., ["Product", "Inventory"])
+  consistency_model: "eventual" # "eventual" | "strong" | "causal"
 ---
 
 <!-- AI-INSTRUCTION: START -->
@@ -49,10 +49,10 @@ sync_metadata:
   4. FOCUS ON: Sync algorithms, conflict resolution rules, delta strategies, queue management
 
   WHERE TO DOCUMENT OTHER ASPECTS:
-  - Database Structure → docs/technical/backend/database/
-  - API Contracts → docs/technical/backend/api/
-  - UI Flows → docs/technical/frontend/ux-flows/
-  - Feature Implementation → docs/technical/backend/features/
+  - Database Structure > docs/technical/backend/database/
+  - API Contracts > docs/technical/backend/api/
+  - UI Flows > docs/technical/frontend/ux-flows/
+  - Feature Implementation > docs/technical/backend/features/
 -->
 <!-- AI-INSTRUCTION: END -->
 
@@ -184,7 +184,7 @@ _High-level overview of synchronization strategy._
 
 ### 3.1. Catalog Data (Products, Categories)
 
-**Type:** Pull Sync (Server → Client)
+**Type:** Pull Sync (Server > Client)
 
 **Characteristics:**
 
@@ -245,7 +245,7 @@ async function syncCatalog(): Promise<void> {
 
 ### 3.2. Stock Movements (Inventory Transactions)
 
-**Type:** Push Sync (Client → Server) + Delta-Based
+**Type:** Push Sync (Client > Server) + Delta-Based
 
 **Characteristics:**
 
@@ -734,7 +734,7 @@ T ≤ 60 seconds (worst case)
 ### 9.1. Sync Scenarios to Test
 
 1. **Happy Path:**
-   - Client online, server online → Immediate sync
+   - Client online, server online > Immediate sync
 2. **Client Offline:**
    - Client makes changes offline
    - Client comes online

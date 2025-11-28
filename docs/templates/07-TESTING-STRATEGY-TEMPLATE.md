@@ -1,11 +1,11 @@
 ---
 # YAML Frontmatter - Metadata for Semantic Search & RAG
-document_type: "testing-strategy"  # REQUIRED: Type identifier for MCP/RAG
-module: "[module-name]"  # REQUIRED: e.g., "inventory", "sales", "payments", "e2e"
-status: "approved"  # REQUIRED: draft | in-review | approved | deprecated
-version: "1.0.0"  # REQUIRED: Semantic versioning (Major.Minor.Patch)
-last_updated: "YYYY-MM-DD"  # REQUIRED: ISO date format
-author: "@username"  # REQUIRED: GitHub username or team
+document_type: "testing-strategy" # REQUIRED: Type identifier for MCP/RAG
+module: "[module-name]" # REQUIRED: e.g., "inventory", "sales", "payments", "e2e"
+status: "approved" # REQUIRED: draft | in-review | approved | deprecated
+version: "1.0.0" # REQUIRED: Semantic versioning (Major.Minor.Patch)
+last_updated: "YYYY-MM-DD" # REQUIRED: ISO date format
+author: "@username" # REQUIRED: GitHub username or team
 
 # Keywords for semantic search (5-10 keywords)
 keywords:
@@ -13,26 +13,26 @@ keywords:
   - "qa"
   - "quality-assurance"
   - "test-strategy"
-  - "[test-type]"  # e.g., "unit", "integration", "e2e", "performance"
-  - "[tool]"  # e.g., "jest", "playwright", "k6"
+  - "[test-type]" # e.g., "unit", "integration", "e2e", "performance"
+  - "[tool]" # e.g., "jest", "playwright", "k6"
   - "automation"
   - "ci-cd"
 
 # Related documentation
 related_docs:
-  database_schema: ""  # Path to DB schema (for integration tests)
-  api_design: ""  # Path to API design (for API tests)
-  feature_design: ""  # Path to feature design
-  ux_flow: ""  # Path to UX flow (for E2E tests)
+  database_schema: "" # Path to DB schema (for integration tests)
+  api_design: "" # Path to API design (for API tests)
+  feature_design: "" # Path to feature design
+  ux_flow: "" # Path to UX flow (for E2E tests)
 
 # Testing-specific metadata
 testing_metadata:
-  coverage_target: 80  # Percentage (e.g., 80 for 80%)
-  test_types: []  # e.g., ["unit", "integration", "e2e", "performance", "security"]
-  tools: []  # e.g., ["jest", "playwright", "k6", "supertest"]
-  automation_level: "full"  # "none" | "partial" | "full"
-  ci_integration: true  # Whether tests run in CI/CD pipeline
-  test_environments: []  # e.g., ["local", "staging", "production"]
+  coverage_target: 80 # Percentage (e.g., 80 for 80%)
+  test_types: [] # e.g., ["unit", "integration", "e2e", "performance", "security"]
+  tools: [] # e.g., ["jest", "playwright", "k6", "supertest"]
+  automation_level: "full" # "none" | "partial" | "full"
+  ci_integration: true # Whether tests run in CI/CD pipeline
+  test_environments: [] # e.g., ["local", "staging", "production"]
 ---
 
 <!-- AI-INSTRUCTION: START -->
@@ -48,10 +48,10 @@ testing_metadata:
   4. FOCUS ON: Test strategy, coverage targets, test types, tools, automation approach
 
   WHERE TO DOCUMENT OTHER ASPECTS:
-  - Test Code → apps/*/test/ directories with .spec.ts files
-  - Feature Logic → docs/technical/backend/features/ or docs/technical/frontend/features/
-  - CI/CD Setup → docs/technical/infrastructure/ or Deployment Runbook
-  - Bug Reports → GitHub Issues
+  - Test Code > apps/*/test/ directories with .spec.ts files
+  - Feature Logic > docs/technical/backend/features/ or docs/technical/frontend/features/
+  - CI/CD Setup > docs/technical/infrastructure/ or Deployment Runbook
+  - Bug Reports > GitHub Issues
 
   Keep this document as the Single Source of Truth for TESTING STRATEGY only.
 -->
@@ -84,13 +84,13 @@ testing_metadata:
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
-| Directive      | Instruction                                                                      |
-| :------------- | :------------------------------------------------------------------------------- |
-| **Context**    | This document defines the testing strategy for [Module/Feature Name].            |
+| Directive      | Instruction                                                                       |
+| :------------- | :-------------------------------------------------------------------------------- |
+| **Context**    | This document defines the testing strategy for [Module/Feature Name].             |
 | **Scope**      | ONLY test strategy, coverage targets, test types, tools, and automation approach. |
 | **Constraint** | NO test implementation code, NO feature logic, NO CI/CD infrastructure details.   |
-| **Related**    | [Feature Design], [API Design], [Database Schema]                                |
-| **Pattern**    | Test Pyramid (70% Unit, 20% Integration, 10% E2E), CI/CD integration.            |
+| **Related**    | [Feature Design], [API Design], [Database Schema]                                 |
+| **Pattern**    | Test Pyramid (70% Unit, 20% Integration, 10% E2E), CI/CD integration.             |
 
 ---
 
@@ -110,12 +110,12 @@ _High-level overview of testing strategy._
 
 **Coverage Targets:**
 
-| Test Type    | Coverage Target | Current Coverage | Status     |
-| :----------- | :-------------- | :--------------- | :--------- |
-| Unit         | 80%             | TBD              | PENDING    |
-| Integration  | 70%             | TBD              | PENDING    |
-| E2E          | 100% (critical) | TBD              | PENDING    |
-| Performance  | N/A             | TBD              | PENDING    |
+| Test Type   | Coverage Target | Current Coverage | Status  |
+| :---------- | :-------------- | :--------------- | :------ |
+| Unit        | 80%             | TBD              | PENDING |
+| Integration | 70%             | TBD              | PENDING |
+| E2E         | 100% (critical) | TBD              | PENDING |
+| Performance | N/A             | TBD              | PENDING |
 
 ---
 
@@ -128,13 +128,13 @@ We follow the **Test Pyramid** approach to balance speed, cost, and confidence:
 ```text
            /\
           /  \    E2E Tests (10%)
-         /----\   ← Slow, expensive, high confidence
+         /----\   < Slow, expensive, high confidence
         /      \
        /--------\ Integration Tests (20%)
-      /          \ ← Moderate speed, moderate cost
+      /          \ < Moderate speed, moderate cost
      /------------\
     /______________\ Unit Tests (70%)
-                    ← Fast, cheap, focused
+                    < Fast, cheap, focused
 ```
 
 **Rationale:**
@@ -168,13 +168,13 @@ We follow the **Test Pyramid** approach to balance speed, cost, and confidence:
 **Example Test Cases:**
 
 ```typescript
-describe('ProductService', () => {
-  describe('calculateAverageCost', () => {
-    it('should calculate weighted average cost correctly', () => {
+describe("ProductService", () => {
+  describe("calculateAverageCost", () => {
+    it("should calculate weighted average cost correctly", () => {
       // Test implementation
     });
 
-    it('should throw error when quantity is zero', () => {
+    it("should throw error when quantity is zero", () => {
       // Test implementation
     });
   });
@@ -186,7 +186,7 @@ describe('ProductService', () => {
 - Test files named `*.spec.ts` next to source files
 - Use `describe` blocks for organization
 - Mock all external dependencies (DB, HTTP, etc.)
-- AAA pattern: Arrange → Act → Assert
+- AAA pattern: Arrange > Act > Assert
 
 ---
 
@@ -211,17 +211,17 @@ describe('ProductService', () => {
 **Example Test Cases:**
 
 ```typescript
-describe('POST /api/v1/products', () => {
-  it('should create product with valid data', async () => {
+describe("POST /api/v1/products", () => {
+  it("should create product with valid data", async () => {
     const response = await request(app)
-      .post('/api/v1/products')
-      .send({ name: 'Test Product', price: 100 })
+      .post("/api/v1/products")
+      .send({ name: "Test Product", price: 100 })
       .expect(201);
 
-    expect(response.body).toHaveProperty('id');
+    expect(response.body).toHaveProperty("id");
   });
 
-  it('should return 400 for invalid data', async () => {
+  it("should return 400 for invalid data", async () => {
     // Test implementation
   });
 });
@@ -257,19 +257,19 @@ describe('POST /api/v1/products', () => {
 **Critical Flows:**
 
 1. **Inventory Management:**
-   - Scan barcode → Identify product → Update stock → Sync to server
+   - Scan barcode > Identify product > Update stock > Sync to server
 2. **Sales:**
-   - Add products to cart → Apply discount → Process payment → Generate receipt
+   - Add products to cart > Apply discount > Process payment > Generate receipt
 3. **Authentication:**
-   - Login → Verify JWT → Access protected resources → Logout
+   - Login > Verify JWT > Access protected resources > Logout
 
 **Example Test:**
 
 ```typescript
-test('User can add product via barcode scanning', async ({ page }) => {
-  await page.goto('/inventory');
+test("User can add product via barcode scanning", async ({ page }) => {
+  await page.goto("/inventory");
   await page.click('[data-testid="scan-barcode"]');
-  await page.fill('[data-testid="barcode-input"]', '7501234567890');
+  await page.fill('[data-testid="barcode-input"]', "7501234567890");
   await page.click('[data-testid="confirm-button"]');
 
   await expect(page.locator('[data-testid="success-message"]')).toBeVisible();
@@ -303,37 +303,37 @@ test('User can add product via barcode scanning', async ({ page }) => {
 
 **Performance Targets:**
 
-| Metric                  | Target       | Measurement Method |
-| :---------------------- | :----------- | :----------------- |
-| API Response Time (p95) | <200ms       | k6 load test       |
-| API Response Time (p99) | <500ms       | k6 load test       |
-| Database Query Time     | <50ms        | Prisma logging     |
-| Frontend Load Time      | <2s          | Lighthouse         |
-| Memory Usage (Node)     | <512MB       | Node.js profiler   |
+| Metric                  | Target | Measurement Method |
+| :---------------------- | :----- | :----------------- |
+| API Response Time (p95) | <200ms | k6 load test       |
+| API Response Time (p99) | <500ms | k6 load test       |
+| Database Query Time     | <50ms  | Prisma logging     |
+| Frontend Load Time      | <2s    | Lighthouse         |
+| Memory Usage (Node)     | <512MB | Node.js profiler   |
 
 **Example Load Test:**
 
 ```javascript
 // k6 script
-import http from 'k6/http';
-import { check } from 'k6';
+import http from "k6/http";
+import { check } from "k6";
 
 export let options = {
   stages: [
-    { duration: '2m', target: 100 }, // Ramp up to 100 users
-    { duration: '5m', target: 100 }, // Stay at 100 users
-    { duration: '2m', target: 0 },   // Ramp down
+    { duration: "2m", target: 100 }, // Ramp up to 100 users
+    { duration: "5m", target: 100 }, // Stay at 100 users
+    { duration: "2m", target: 0 }, // Ramp down
   ],
   thresholds: {
-    'http_req_duration': ['p(95)<200'], // 95% requests under 200ms
+    http_req_duration: ["p(95)<200"], // 95% requests under 200ms
   },
 };
 
 export default function () {
-  const res = http.get('http://api.example.com/products');
+  const res = http.get("http://api.example.com/products");
   check(res, {
-    'status is 200': (r) => r.status === 200,
-    'response time < 200ms': (r) => r.timings.duration < 200,
+    "status is 200": (r) => r.status === 200,
+    "response time < 200ms": (r) => r.timings.duration < 200,
   });
 }
 ```
@@ -394,16 +394,16 @@ export default function () {
 export async function seedTestData(prisma: PrismaClient) {
   await prisma.business.create({
     data: {
-      id: 'test-business-001',
-      name: 'Test Store',
+      id: "test-business-001",
+      name: "Test Store",
       // ...
     },
   });
 
   await prisma.product.createMany({
     data: [
-      { id: 'prod-001', name: 'Test Product 1', price: 100 },
-      { id: 'prod-002', name: 'Test Product 2', price: 200 },
+      { id: "prod-001", name: "Test Product 1", price: 100 },
+      { id: "prod-002", name: "Test Product 2", price: 200 },
     ],
   });
 }
@@ -423,10 +423,10 @@ export async function seedTestData(prisma: PrismaClient) {
 // test/fixtures/products.fixture.ts
 export const mockProducts = [
   {
-    id: '550e8400-e29b-41d4-a716-446655440001',
-    name: 'Sabritas Adobadas 45g',
-    barcode: '7501234567890',
-    price: 15.50,
+    id: "550e8400-e29b-41d4-a716-446655440001",
+    name: "Sabritas Adobadas 45g",
+    barcode: "7501234567890",
+    price: 15.5,
   },
   // ...
 ];
@@ -463,7 +463,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install dependencies
         run: bun install
@@ -502,10 +502,7 @@ jobs:
 // package.json
 {
   "lint-staged": {
-    "*.ts": [
-      "eslint --fix",
-      "jest --bail --findRelatedTests"
-    ]
+    "*.ts": ["eslint --fix", "jest --bail --findRelatedTests"]
   }
 }
 ```
@@ -531,7 +528,7 @@ jobs:
 
 ```typescript
 // Run tests 10 times to detect flakiness
-test.only.concurrent.each(Array(10).fill(null))('stability test', async () => {
+test.only.concurrent.each(Array(10).fill(null))("stability test", async () => {
   // Test logic
 });
 ```
@@ -578,13 +575,13 @@ Before merging:
 **Good Test:**
 
 ```typescript
-describe('ProductService.createProduct', () => {
-  it('should create product and return ID when data is valid', async () => {
-    const productData = { name: 'Test', price: 100 };
+describe("ProductService.createProduct", () => {
+  it("should create product and return ID when data is valid", async () => {
+    const productData = { name: "Test", price: 100 };
     const result = await service.createProduct(productData);
 
-    expect(result).toHaveProperty('id');
-    expect(result.name).toBe('Test');
+    expect(result).toHaveProperty("id");
+    expect(result.name).toBe("Test");
   });
 });
 ```
@@ -592,7 +589,7 @@ describe('ProductService.createProduct', () => {
 **Bad Test:**
 
 ```typescript
-it('should work', async () => {
+it("should work", async () => {
   const result = await service.doSomething();
   expect(result).toBeTruthy(); // Too vague
 });
@@ -602,13 +599,13 @@ it('should work', async () => {
 
 ## 8. Performance Benchmarks
 
-| Operation                   | Target   | Current | Status |
-| :-------------------------- | :------- | :------ | :----- |
-| Unit Test Suite             | <10s     | TBD     | PENDING |
-| Integration Test Suite      | <30s     | TBD     | PENDING |
-| E2E Test Suite              | <5min    | TBD     | PENDING |
-| API Response (GET /products) | <100ms   | TBD     | PENDING |
-| Database Query (complex)    | <50ms    | TBD     | PENDING |
+| Operation                    | Target | Current | Status  |
+| :--------------------------- | :----- | :------ | :------ |
+| Unit Test Suite              | <10s   | TBD     | PENDING |
+| Integration Test Suite       | <30s   | TBD     | PENDING |
+| E2E Test Suite               | <5min  | TBD     | PENDING |
+| API Response (GET /products) | <100ms | TBD     | PENDING |
+| Database Query (complex)     | <50ms  | TBD     | PENDING |
 
 ---
 
@@ -623,9 +620,9 @@ it('should work', async () => {
 
 ## Appendix A: Change Log
 
-| Date       | Version | Author | Changes                    |
-| :--------- | :------ | :----- | :------------------------- |
-| YYYY-MM-DD | 1.0.0   | @QA    | Initial testing strategy   |
+| Date       | Version | Author | Changes                  |
+| :--------- | :------ | :----- | :----------------------- |
+| YYYY-MM-DD | 1.0.0   | @QA    | Initial testing strategy |
 
 ---
 

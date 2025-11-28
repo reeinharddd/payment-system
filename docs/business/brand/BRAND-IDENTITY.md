@@ -1,3 +1,37 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "brand"
+status: "draft"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@ProductOwner"
+
+# Keywords for semantic search
+keywords:
+  - "brand"
+  - "identity"
+  - "vision"
+  - "mission"
+  - "visual-standards"
+  - "design"
+  - "marketing"
+  - "impulsa"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  ux_flow: "docs/technical/frontend/UI-DESIGN-SYSTEM.md"
+
+# Document-specific metadata
+doc_metadata:
+  audience: "all"
+  complexity: "low"
+  estimated_read_time: "10 min"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the BRAND IDENTITY.
@@ -29,7 +63,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

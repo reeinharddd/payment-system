@@ -1,3 +1,40 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "feature-design"
+module: "authentication"
+status: "draft"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Backend"
+
+# Keywords for semantic search
+keywords:
+  - "feature"
+  - "authentication"
+  - "jwt"
+  - "multi-provider"
+  - "nestjs"
+  - "passport"
+  - "rbac"
+  - "otp"
+
+# Related documentation
+related_docs:
+  database_schema: "docs/technical/backend/database/01-AUTH-SCHEMA.md"
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+  adr: "docs/technical/architecture/adr/001-AUTH-STRATEGY.md"
+
+# Feature-specific metadata
+feature_metadata:
+  priority: "critical"
+  complexity: "high"
+  estimated_hours: 80
+  dependencies: []
+  target_release: "v1.0.0"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document is a TEMPLATE for Feature Designs.
@@ -30,7 +67,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

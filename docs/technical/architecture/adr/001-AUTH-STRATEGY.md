@@ -1,3 +1,38 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "adr"
+module: "architecture"
+status: "accepted"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "adr"
+  - "authentication"
+  - "nestjs"
+  - "passport"
+  - "internal-auth"
+  - "jwt"
+  - "otp"
+  - "multi-provider"
+
+# Related documentation
+related_docs:
+  database_schema: "docs/technical/backend/database/01-AUTH-SCHEMA.md"
+  api_design: ""
+  feature_design: "docs/technical/backend/features/FEAT-001-AUTH-MODULE.md"
+  superseded_by: ""
+
+# ADR-specific metadata
+adr_metadata:
+  adr_number: 1
+  decision_date: "2025-11-25"
+  review_date: "2026-11-25"
+  stakeholders: ["@Architect", "@Backend"]
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document is a TEMPLATE for Architecture Decision Records (ADR).
@@ -31,7 +66,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

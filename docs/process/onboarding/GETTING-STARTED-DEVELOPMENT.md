@@ -1,3 +1,36 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "onboarding"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "onboarding"
+  - "getting-started"
+  - "development"
+  - "setup"
+  - "prerequisites"
+  - "installation"
+  - "workflow"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+
+# Document-specific metadata
+doc_metadata:
+  audience: "developers"
+  complexity: "low"
+  estimated_read_time: "20 min"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document is the MANDATORY ENTRY POINT for all developers.
@@ -30,7 +63,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
@@ -70,16 +103,16 @@ Before starting development, ensure you have:
 **EVERY feature, bug fix, or change follows this exact sequence from [Development Rules](../workflow/DEVELOPMENT-RULES.md):**
 
 ```
-1. PLAN       → Define acceptance criteria
-2. DESIGN     → Document interfaces and data model changes
-3. BRANCH     → Create feature branch (never work on main)
-4. IMPLEMENT  → Write failing test first, then implement
-5. DOCUMENT   → Update README, JSDoc, architecture docs
-6. TEST       → Unit, integration, E2E, manual testing
-7. REVIEW     → Self-review, check no secrets, no console.logs
-8. MERGE      → Get approval, resolve comments, merge
-9. DEPLOY     → CI/CD passes, staging, then production
-10. CLOSE     → Update ticket, document learnings, update changelog
+1. PLAN       > Define acceptance criteria
+2. DESIGN     > Document interfaces and data model changes
+3. BRANCH     > Create feature branch (never work on main)
+4. IMPLEMENT  > Write failing test first, then implement
+5. DOCUMENT   > Update README, JSDoc, architecture docs
+6. TEST       > Unit, integration, E2E, manual testing
+7. REVIEW     > Self-review, check no secrets, no console.logs
+8. MERGE      > Get approval, resolve comments, merge
+9. DEPLOY     > CI/CD passes, staging, then production
+10. CLOSE     > Update ticket, document learnings, update changelog
 ```
 
 **Time Allocation:** Planning 10% | Design 15% | Implementation 40% | Documentation 15% | Testing 20%
@@ -482,11 +515,11 @@ From [Development Rules](../workflow/DEVELOPMENT-RULES.md):
 
 From [Design Patterns](../../technical/architecture/DESIGN-PATTERNS.md):
 
-1. **God Objects** - Service doing everything → Split into focused services
-2. **Hardcoded Values** - Magic numbers/URLs → Use config injection
-3. **Callback Hell** - Nested callbacks → Use async/await
-4. **No Interfaces** - Directly using concrete classes → Use abstractions
-5. **Ignoring Errors** - Empty catch blocks → Log and rethrow appropriately
+1. **God Objects** - Service doing everything > Split into focused services
+2. **Hardcoded Values** - Magic numbers/URLs > Use config injection
+3. **Callback Hell** - Nested callbacks > Use async/await
+4. **No Interfaces** - Directly using concrete classes > Use abstractions
+5. **Ignoring Errors** - Empty catch blocks > Log and rethrow appropriately
 
 ## 12. Documentation Templates
 

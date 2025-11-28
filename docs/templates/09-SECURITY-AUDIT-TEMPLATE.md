@@ -1,11 +1,11 @@
 ---
 # YAML Frontmatter - Metadata for Semantic Search & RAG
-document_type: "security-audit"  # REQUIRED: Type identifier for MCP/RAG
-module: "[module-name]"  # REQUIRED: e.g., "authentication", "payments", "api", "database"
-status: "approved"  # REQUIRED: draft | in-review | approved | deprecated
-version: "1.0.0"  # REQUIRED: Semantic versioning (Major.Minor.Patch)
-last_updated: "YYYY-MM-DD"  # REQUIRED: ISO date format
-author: "@username"  # REQUIRED: GitHub username or team
+document_type: "security-audit" # REQUIRED: Type identifier for MCP/RAG
+module: "[module-name]" # REQUIRED: e.g., "authentication", "payments", "api", "database"
+status: "approved" # REQUIRED: draft | in-review | approved | deprecated
+version: "1.0.0" # REQUIRED: Semantic versioning (Major.Minor.Patch)
+last_updated: "YYYY-MM-DD" # REQUIRED: ISO date format
+author: "@username" # REQUIRED: GitHub username or team
 
 # Keywords for semantic search (5-10 keywords)
 keywords:
@@ -13,29 +13,29 @@ keywords:
   - "audit"
   - "vulnerability"
   - "penetration-test"
-  - "[compliance]"  # e.g., "pci-dss", "owasp", "gdpr", "iso27001"
-  - "[attack-vector]"  # e.g., "sql-injection", "xss", "csrf"
+  - "[compliance]" # e.g., "pci-dss", "owasp", "gdpr", "iso27001"
+  - "[attack-vector]" # e.g., "sql-injection", "xss", "csrf"
   - "risk-assessment"
   - "security-hardening"
 
 # Related documentation
 related_docs:
-  database_schema: ""  # Path to DB schema (for SQL injection analysis)
-  api_design: ""  # Path to API design (for auth/authz review)
-  feature_design: ""  # Path to feature design
-  deployment_runbook: ""  # Path to deployment runbook (for secure deployment)
-  adr: ""  # Path to security-related ADRs
+  database_schema: "" # Path to DB schema (for SQL injection analysis)
+  api_design: "" # Path to API design (for auth/authz review)
+  feature_design: "" # Path to feature design
+  deployment_runbook: "" # Path to deployment runbook (for secure deployment)
+  adr: "" # Path to security-related ADRs
 
 # Security-specific metadata
 security_metadata:
-  audit_date: "YYYY-MM-DD"  # Date of security audit
-  auditor: "@username"  # Security engineer or external auditor
-  audit_type: "internal"  # "internal" | "external" | "penetration-test" | "code-review"
-  severity_levels: []  # e.g., ["critical", "high", "medium", "low", "info"]
-  total_findings: 0  # Total number of vulnerabilities found
-  critical_findings: 0  # Number of critical vulnerabilities
-  compliance_standards: []  # e.g., ["PCI-DSS", "OWASP Top 10", "ISO 27001", "GDPR"]
-  remediation_deadline: "YYYY-MM-DD"  # Deadline for fixing critical issues
+  audit_date: "YYYY-MM-DD" # Date of security audit
+  auditor: "@username" # Security engineer or external auditor
+  audit_type: "internal" # "internal" | "external" | "penetration-test" | "code-review"
+  severity_levels: [] # e.g., ["critical", "high", "medium", "low", "info"]
+  total_findings: 0 # Total number of vulnerabilities found
+  critical_findings: 0 # Number of critical vulnerabilities
+  compliance_standards: [] # e.g., ["PCI-DSS", "OWASP Top 10", "ISO 27001", "GDPR"]
+  remediation_deadline: "YYYY-MM-DD" # Deadline for fixing critical issues
 ---
 
 <!-- AI-INSTRUCTION: START -->
@@ -51,10 +51,10 @@ security_metadata:
   4. FOCUS ON: Vulnerability findings, risk assessment, remediation actions, compliance status
 
   WHERE TO DOCUMENT OTHER ASPECTS:
-  - Security Architecture → docs/technical/architecture/SECURITY-ARCHITECTURE.md
-  - Security Standards → docs/process/standards/SECURITY-STANDARDS.md
-  - Secure Coding Patterns → docs/technical/DESIGN-PATTERNS.md
-  - Incident Response → Deployment Runbook (Section 6)
+  - Security Architecture > docs/technical/architecture/SECURITY-ARCHITECTURE.md
+  - Security Standards > docs/process/standards/SECURITY-STANDARDS.md
+  - Secure Coding Patterns > docs/technical/DESIGN-PATTERNS.md
+  - Incident Response > Deployment Runbook (Section 6)
 
   Keep this document as the Single Source of Truth for SECURITY AUDIT FINDINGS only.
 -->
@@ -91,7 +91,7 @@ _This section contains mandatory instructions for AI Agents (Copilot, Cursor, et
 | Directive      | Instruction                                                                         |
 | :------------- | :---------------------------------------------------------------------------------- |
 | **Context**    | This document contains security audit findings for [Module/System].                 |
-| **Scope**      | ONLY vulnerability findings, risk assessment, remediation actions, compliance gaps.  |
+| **Scope**      | ONLY vulnerability findings, risk assessment, remediation actions, compliance gaps. |
 | **Constraint** | NO security architecture design, NO coding standards, NO implementation details.    |
 | **Related**    | [Security Architecture], [API Design], [Database Schema], [Deployment Runbook]      |
 | **Pattern**    | OWASP Top 10, PCI-DSS compliance, risk-based prioritization.                        |
@@ -118,13 +118,13 @@ _High-level overview of security audit findings._
 
 **Findings Summary:**
 
-| Severity | Count | Status       |
-| :------- | :---- | :----------- |
-| Critical | 0     | RESOLVED     |
-| High     | 2     | IN_PROGRESS  |
-| Medium   | 5     | IN_PROGRESS  |
-| Low      | 10    | PLANNED      |
-| Info     | 8     | DOCUMENTED   |
+| Severity | Count | Status      |
+| :------- | :---- | :---------- |
+| Critical | 0     | RESOLVED    |
+| High     | 2     | IN_PROGRESS |
+| Medium   | 5     | IN_PROGRESS |
+| Low      | 10    | PLANNED     |
+| Info     | 8     | DOCUMENTED  |
 
 **Overall Risk Rating:** [Low / Medium / High / Critical]
 
@@ -290,7 +290,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'secret123', // HARDCODED WEAK SECRET
+      secretOrKey: "secret123", // HARDCODED WEAK SECRET
     });
   }
 }
@@ -383,7 +383,7 @@ npm install @nestjs/throttler
 
 ```typescript
 // apps/backend/src/app.module.ts
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from "@nestjs/throttler";
 
 @Module({
   imports: [
@@ -398,11 +398,11 @@ export class AppModule {}
 
 ```typescript
 // apps/backend/src/modules/auth/auth.controller.ts
-import { Throttle } from '@nestjs/throttler';
+import { Throttle } from "@nestjs/throttler";
 
-@Controller('auth')
+@Controller("auth")
 export class AuthController {
-  @Post('login')
+  @Post("login")
   @Throttle(5, 60) // Max 5 login attempts per minute
   async login(@Body() dto: LoginDto) {
     // ...
@@ -477,21 +477,23 @@ API allows HTTP requests, exposing data in transit.
 
 **Remediation:**
 
-- Configure load balancer to redirect HTTP → HTTPS
+- Configure load balancer to redirect HTTP > HTTPS
 - Add HSTS header
 
 ```typescript
 // apps/backend/src/main.ts
-import helmet from 'helmet';
+import helmet from "helmet";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.use(helmet.hsts({
-    maxAge: 31536000, // 1 year
-    includeSubDomains: true,
-    preload: true,
-  }));
+  app.use(
+    helmet.hsts({
+      maxAge: 31536000, // 1 year
+      includeSubDomains: true,
+      preload: true,
+    }),
+  );
 
   await app.listen(3000);
 }
@@ -525,18 +527,18 @@ _(List additional findings with brief descriptions)_
 
 ## 4. OWASP Top 10 (2021) Assessment
 
-| Risk                                | Status        | Notes                                       |
-| :---------------------------------- | :------------ | :------------------------------------------ |
-| A01: Broken Access Control          | PARTIAL       | VULN-002 (JWT secret), RBAC partially implemented |
-| A02: Cryptographic Failures         | PARTIAL       | VULN-005 (HTTPS), encryption at rest needed |
-| A03: Injection                      | CRITICAL      | VULN-001 (SQL injection) - CRITICAL         |
-| A04: Insecure Design                | OK            | No issues found                             |
-| A05: Security Misconfiguration      | PARTIAL       | VULN-007 (missing headers)                  |
-| A06: Vulnerable Components          | PARTIAL       | VULN-006 (outdated deps)                    |
-| A07: Identification/Auth Failures   | HIGH          | VULN-003 (no rate limiting)                 |
-| A08: Software/Data Integrity        | OK            | No issues found                             |
-| A09: Logging/Monitoring Failures    | PARTIAL       | VULN-004 (sensitive data in logs)           |
-| A10: Server-Side Request Forgery    | OK            | No issues found                             |
+| Risk                              | Status   | Notes                                             |
+| :-------------------------------- | :------- | :------------------------------------------------ |
+| A01: Broken Access Control        | PARTIAL  | VULN-002 (JWT secret), RBAC partially implemented |
+| A02: Cryptographic Failures       | PARTIAL  | VULN-005 (HTTPS), encryption at rest needed       |
+| A03: Injection                    | CRITICAL | VULN-001 (SQL injection) - CRITICAL               |
+| A04: Insecure Design              | OK       | No issues found                                   |
+| A05: Security Misconfiguration    | PARTIAL  | VULN-007 (missing headers)                        |
+| A06: Vulnerable Components        | PARTIAL  | VULN-006 (outdated deps)                          |
+| A07: Identification/Auth Failures | HIGH     | VULN-003 (no rate limiting)                       |
+| A08: Software/Data Integrity      | OK       | No issues found                                   |
+| A09: Logging/Monitoring Failures  | PARTIAL  | VULN-004 (sensitive data in logs)                 |
+| A10: Server-Side Request Forgery  | OK       | No issues found                                   |
 
 ---
 
@@ -544,20 +546,20 @@ _(List additional findings with brief descriptions)_
 
 _Required for payment processing systems._
 
-| Requirement                          | Status        | Notes                                |
-| :----------------------------------- | :------------ | :----------------------------------- |
-| 1. Firewall Configuration            | OK            | AWS Security Groups configured       |
-| 2. Default Passwords Changed         | OK            | No default passwords in use          |
-| 3. Protect Stored Cardholder Data    | OK            | No card data stored (tokenized)      |
-| 4. Encrypt Transmission              | PARTIAL       | VULN-005 (HTTPS not enforced)        |
-| 5. Use Anti-Virus                    | N/A           | Serverless architecture              |
-| 6. Secure Systems/Applications       | PARTIAL       | VULN-001, VULN-002, VULN-003         |
-| 7. Restrict Data Access              | PARTIAL       | RBAC partially implemented           |
-| 8. Identify/Authenticate Access      | PARTIAL       | VULN-002 (weak JWT secret)           |
-| 9. Restrict Physical Access          | OK            | AWS data center (PCI-compliant)      |
-| 10. Track/Monitor Network Access     | PARTIAL       | VULN-009 (incomplete audit logging)  |
-| 11. Test Security Systems            | OK            | This audit conducted                 |
-| 12. Information Security Policy      | PLANNED       | Security policy doc in progress      |
+| Requirement                       | Status  | Notes                               |
+| :-------------------------------- | :------ | :---------------------------------- |
+| 1. Firewall Configuration         | OK      | AWS Security Groups configured      |
+| 2. Default Passwords Changed      | OK      | No default passwords in use         |
+| 3. Protect Stored Cardholder Data | OK      | No card data stored (tokenized)     |
+| 4. Encrypt Transmission           | PARTIAL | VULN-005 (HTTPS not enforced)       |
+| 5. Use Anti-Virus                 | N/A     | Serverless architecture             |
+| 6. Secure Systems/Applications    | PARTIAL | VULN-001, VULN-002, VULN-003        |
+| 7. Restrict Data Access           | PARTIAL | RBAC partially implemented          |
+| 8. Identify/Authenticate Access   | PARTIAL | VULN-002 (weak JWT secret)          |
+| 9. Restrict Physical Access       | OK      | AWS data center (PCI-compliant)     |
+| 10. Track/Monitor Network Access  | PARTIAL | VULN-009 (incomplete audit logging) |
+| 11. Test Security Systems         | OK      | This audit conducted                |
+| 12. Information Security Policy   | PLANNED | Security policy doc in progress     |
 
 **Overall Compliance:** **PARTIAL**
 
@@ -575,13 +577,13 @@ _Required for payment processing systems._
 
 ```text
 ┌─────────────────────────────────────┐
-│ HIGH IMPACT  │  VULN-001, VULN-002  │ ← Fix FIRST
+│ HIGH IMPACT  │  VULN-001, VULN-002  │ < Fix FIRST
 │              │  VULN-003            │
 ├──────────────┼──────────────────────┤
-│ MEDIUM IMPACT│  VULN-004, VULN-005  │ ← Fix within 30 days
+│ MEDIUM IMPACT│  VULN-004, VULN-005  │ < Fix within 30 days
 │              │                      │
 ├──────────────┼──────────────────────┤
-│ LOW IMPACT   │  VULN-006 - VULN-025 │ ← Backlog
+│ LOW IMPACT   │  VULN-006 - VULN-025 │ < Backlog
 │              │                      │
 └──────────────┴──────────────────────┘
        LOW              HIGH
@@ -592,12 +594,12 @@ _Required for payment processing systems._
 
 ### 6.2. Remediation Timeline
 
-| Phase    | Duration | Vulnerabilities       | Deliverable                    |
-| :------- | :------- | :-------------------- | :----------------------------- |
-| Phase 1  | Week 1   | VULN-001, VULN-002    | Critical vulnerabilities fixed |
-| Phase 2  | Week 2-3 | VULN-003, VULN-005    | High vulnerabilities fixed     |
-| Phase 3  | Week 4-6 | VULN-004, VULN-006-08 | Medium vulnerabilities fixed   |
-| Phase 4  | Month 2  | VULN-009+             | Low/Info findings addressed    |
+| Phase   | Duration | Vulnerabilities       | Deliverable                    |
+| :------ | :------- | :-------------------- | :----------------------------- |
+| Phase 1 | Week 1   | VULN-001, VULN-002    | Critical vulnerabilities fixed |
+| Phase 2 | Week 2-3 | VULN-003, VULN-005    | High vulnerabilities fixed     |
+| Phase 3 | Week 4-6 | VULN-004, VULN-006-08 | Medium vulnerabilities fixed   |
+| Phase 4 | Month 2  | VULN-009+             | Low/Info findings addressed    |
 
 ---
 
@@ -653,9 +655,9 @@ _Required for payment processing systems._
 
 ## Appendix A: Change Log
 
-| Date       | Version | Author     | Changes                       |
-| :--------- | :------ | :--------- | :---------------------------- |
-| YYYY-MM-DD | 1.0.0   | @Security  | Initial security audit report |
+| Date       | Version | Author    | Changes                       |
+| :--------- | :------ | :-------- | :---------------------------- |
+| YYYY-MM-DD | 1.0.0   | @Security | Initial security audit report |
 
 ---
 

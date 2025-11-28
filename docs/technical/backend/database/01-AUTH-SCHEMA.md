@@ -1,3 +1,46 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "database-schema"
+module: "authentication"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "database"
+  - "schema"
+  - "authentication"
+  - "identity"
+  - "iam"
+  - "security"
+  - "users"
+  - "roles"
+  - "permissions"
+  - "audit-log"
+
+# Related documentation
+related_docs:
+  api_design: ""
+  feature_design: "docs/technical/backend/features/FEAT-001-AUTH-MODULE.md"
+  ux_flow: ""
+  sync_strategy: ""
+
+# Database metadata
+database:
+  engine: "PostgreSQL"
+  min_version: "16.0"
+  prisma_version: "5.0+"
+
+# Schema statistics
+schema_stats:
+  total_tables: 5
+  total_indexes: 8
+  total_constraints: 12
+  estimated_rows: "1K-10K"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the AUTH SCHEMA.
@@ -30,7 +73,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

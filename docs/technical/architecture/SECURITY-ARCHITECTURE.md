@@ -1,3 +1,38 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "architecture"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "security"
+  - "pci-dss"
+  - "defense-in-depth"
+  - "encryption"
+  - "authentication"
+  - "authorization"
+  - "tls"
+  - "rate-limiting"
+  - "compliance"
+
+# Related documentation
+related_docs:
+  database_schema: "docs/technical/backend/database/01-AUTH-SCHEMA.md"
+  api_design: ""
+  feature_design: "docs/technical/backend/features/FEAT-001-AUTH-MODULE.md"
+  ux_flow: ""
+
+# Document-specific metadata
+doc_metadata:
+  audience: "developers"
+  complexity: "high"
+  estimated_read_time: "20 min"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the Security Architecture for the Payment System.
@@ -30,7 +65,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

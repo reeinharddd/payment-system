@@ -1,3 +1,36 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "standards"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "tooling"
+  - "style-guide"
+  - "bun"
+  - "typescript"
+  - "eslint"
+  - "prettier"
+  - "coding-standards"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+
+# Document-specific metadata
+doc_metadata:
+  audience: "developers"
+  complexity: "low"
+  estimated_read_time: "20 min"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines TOOLING STANDARDS and STYLE GUIDE.
@@ -35,7 +68,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.)._
 
@@ -874,16 +907,16 @@ function calculateWeightedAverage(
 
 **What to Comment:**
 
-- ✅ **Why** the code exists (rationale, business rules)
-- ✅ Complex algorithms or non-obvious logic
-- ✅ Public APIs and interfaces
-- ✅ Workarounds or hacks (with ticket reference)
+- YES - Why the code exists (rationale, business rules)
+- YES - Complex algorithms or non-obvious logic
+- YES - Public APIs and interfaces
+- YES - Workarounds or hacks (with ticket reference)
 
 **What NOT to Comment:**
 
-- ❌ **What** the code does (code should be self-documenting)
-- ❌ Obvious statements (`// Increment counter`)
-- ❌ Commented-out code (use git history)
+- NO - What the code does (code should be self-documenting)
+- NO - Obvious statements (`// Increment counter`)
+- NO - Commented-out code (use git history)
 
 ### 8.2. Markdown Documentation
 

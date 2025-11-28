@@ -1,3 +1,38 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "architecture"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "offline"
+  - "pwa"
+  - "security"
+  - "fraud-prevention"
+  - "signed-state"
+  - "zero-trust"
+  - "cryptographic-snapshot"
+  - "hmac"
+  - "offline-sync"
+
+# Related documentation
+related_docs:
+  database_schema: "docs/technical/backend/database/01-AUTH-SCHEMA.md"
+  api_design: ""
+  feature_design: ""
+  sync_strategy: "docs/technical/frontend/OFFLINE-SYNC.md"
+
+# Document-specific metadata
+doc_metadata:
+  audience: "developers"
+  complexity: "high"
+  estimated_read_time: "25 min"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the Security Architecture for Offline POS Operations.
@@ -30,7 +65,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
@@ -90,14 +125,14 @@ When a user logs in (Online), the server returns a comprehensive payload:
 
 When the app detects it is offline, it switches to **Restricted Mode**:
 
-| Feature              | Status      | Reason                                                |
-| :------------------- | :---------- | :---------------------------------------------------- |
-| **Login**            | ❌ Blocked  | Cannot verify credentials. Must be already logged in. |
-| **POS (Sales)**      | ✅ Active   | Low risk. Revenue generation is priority.             |
-| **Refunds**          | ❌ Disabled | High risk. Requires real-time fraud check.            |
-| **Inventory Adjust** | ❌ Disabled | High risk. Prevents theft hiding.                     |
-| **Settings**         | ❌ Disabled | Configuration requires server validation.             |
-| **Reports**          | ⚠️ Cached   | Read-only view of last known state.                   |
+| Feature              | Status     | Reason                                                |
+| :------------------- | :--------- | :---------------------------------------------------- |
+| **Login**            | [BLOCKED]  | Cannot verify credentials. Must be already logged in. |
+| **POS (Sales)**      | [ACTIVE]   | Low risk. Revenue generation is priority.             |
+| **Refunds**          | [DISABLED] | High risk. Requires real-time fraud check.            |
+| **Inventory Adjust** | [DISABLED] | High risk. Prevents theft hiding.                     |
+| **Settings**         | [DISABLED] | Configuration requires server validation.             |
+| **Reports**          | [CACHED]   | Read-only view of last known state.                   |
 
 **The "Long Offline" Session:**
 

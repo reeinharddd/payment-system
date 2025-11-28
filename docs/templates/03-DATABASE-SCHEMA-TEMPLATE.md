@@ -52,11 +52,11 @@ schema_stats:
   5. FOCUS ON: Tables, columns, data types, relationships, indexes, constraints, triggers
 
   WHERE TO DOCUMENT OTHER ASPECTS:
-  - UI/UX Flows → docs/technical/frontend/ or Feature Design docs
-  - Business Logic → docs/technical/backend/features/
-  - API Design → Feature Design docs or ADRs
-  - Sync Strategy → docs/technical/architecture/ or ADRs
-  - Algorithms → Feature Design docs or specific technical docs
+  - UI/UX Flows > docs/technical/frontend/ or Feature Design docs
+  - Business Logic > docs/technical/backend/features/
+  - API Design > Feature Design docs or ADRs
+  - Sync Strategy > docs/technical/architecture/ or ADRs
+  - Algorithms > Feature Design docs or specific technical docs
 
   Keep this document as the Single Source of Truth for DATABASE STRUCTURE only.
 -->

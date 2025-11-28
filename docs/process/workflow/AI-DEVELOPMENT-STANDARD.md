@@ -1,3 +1,35 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "workflow"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "ai-development"
+  - "workflow"
+  - "ai-assisted"
+  - "development-standard"
+  - "copilot"
+  - "methodology"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+
+# Document-specific metadata
+doc_metadata:
+  audience: "developers"
+  complexity: "medium"
+  estimated_read_time: "15 min"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the AI-NATIVE DEVELOPMENT STANDARD (ADS).
@@ -30,7 +62,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

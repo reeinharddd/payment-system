@@ -1,3 +1,44 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "database-schema"
+module: "sales"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "database"
+  - "schema"
+  - "sales"
+  - "pos"
+  - "transactions"
+  - "orders"
+  - "tickets"
+  - "cash-register"
+
+# Related documentation
+related_docs:
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+  sync_strategy: ""
+
+# Database metadata
+database:
+  engine: "PostgreSQL"
+  min_version: "16.0"
+  prisma_version: "5.0+"
+
+# Schema statistics
+schema_stats:
+  total_tables: 10
+  total_indexes: 18
+  total_constraints: 20
+  estimated_rows: "100K-10M"
+---
+
 <!-- AI-INSTRUCTION: START -->
 <!--
   This document defines the SALES SCHEMA.
@@ -30,7 +71,7 @@
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 

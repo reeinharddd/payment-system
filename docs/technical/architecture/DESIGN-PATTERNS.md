@@ -1,3 +1,38 @@
+---
+# YAML Frontmatter - Metadata for Semantic Search & RAG
+document_type: "general"
+module: "architecture"
+status: "approved"
+version: "1.0.0"
+last_updated: "2025-11-27"
+author: "@Architect"
+
+# Keywords for semantic search
+keywords:
+  - "design-patterns"
+  - "best-practices"
+  - "factory-pattern"
+  - "strategy-pattern"
+  - "repository-pattern"
+  - "solid"
+  - "clean-code"
+  - "nestjs"
+  - "angular"
+
+# Related documentation
+related_docs:
+  database_schema: ""
+  api_design: ""
+  feature_design: ""
+  ux_flow: ""
+
+# Document-specific metadata
+doc_metadata:
+  audience: "developers"
+  complexity: "high"
+  estimated_read_time: "45 min"
+---
+
 <!--
   ~ DESIGN PATTERNS AND BEST PRACTICES
   ~ ============================================================================
@@ -30,7 +65,7 @@ Comprehensive guide to design patterns used throughout the system with concrete 
 
 ---
 
-## 🤖 Agent Directives (System Prompt)
+## Agent Directives (System Prompt)
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
