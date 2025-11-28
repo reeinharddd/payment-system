@@ -21,7 +21,7 @@
 <div align="center">
 
   <!-- METADATA BADGES -->
-  <img src="https://img.shields.io/badge/Status-Draft-warning?style=flat-square" alt="Status" />
+  <img src="https://img.shields.io/badge/Status-Ready-success?style=flat-square" alt="Status" />
   <img src="https://img.shields.io/badge/Audience-Backend-blue?style=flat-square" alt="Audience" />
   <img src="https://img.shields.io/badge/Last%20Updated-2025--11--27-lightgrey?style=flat-square" alt="Date" />
 
@@ -49,9 +49,10 @@ The **Communication Schema** centralizes how the platform talks to users. It abs
 
 Key capabilities:
 
-1.  **Omnichannel:** Send one event ("Payment Link"), deliver via the user's preferred channel (WhatsApp > SMS > Email).
-2.  **Business Customization:** Merchants can override default templates with their own branding (Logo, Colors).
-3.  **Priority Queues:** Ensures critical messages (2FA, Payment Requests) are delivered instantly, even during high traffic.
+1. **Omnichannel:** Send one event ("Payment Link"), deliver via the user's preferred channel (WhatsApp > SMS > Email).
+2. **Business Customization:** Merchants can override default templates with their own branding (Logo, Colors).
+3. **Priority Queues:** Ensures critical messages (2FA, Payment Requests) are delivered instantly, even during high traffic.
+4. **Real-Time & Secure:** Supports WebSocket pushes for `InAppNotification` and stores cryptographic proofs of delivery in `NotificationLog.metadata`.
 
 ---
 
@@ -120,6 +121,7 @@ package "communication" {
     status : ENUM (PENDING, SENT, FAILED, DELIVERED, READ)
     provider : VARCHAR(50)
     providerId : VARCHAR(100)
+    metadata : JSONB
     error : TEXT
     createdAt : TIMESTAMP
   }
@@ -163,4 +165,5 @@ Audit trail for all sent messages. Critical for debugging "I didn't get the link
 | `priority`   | ENUM    | Queue priority.           | `HIGH` for OTPs/Payments. `LOW` for Marketing.       |
 | `provider`   | VARCHAR | The actual sender.        | e.g., `Twilio`, `SendGrid`, `Meta`.                  |
 | `providerId` | VARCHAR | External ID for tracking. | Used to query the provider's API for status updates. |
+| `metadata`   | JSONB   | Proof of delivery.        | Stores raw webhook payloads (e.g., Read Receipts).   |
 | `status`     | ENUM    | Delivery state.           | Updated via Webhooks (e.g., WhatsApp Read Receipt).  |

@@ -186,6 +186,7 @@ package "communication" {
     status : ENUM
     provider : VARCHAR
     providerId : VARCHAR
+    metadata : JSONB
     error : TEXT
     createdAt : TIMESTAMP
   }
