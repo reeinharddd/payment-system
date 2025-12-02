@@ -1,0 +1,14 @@
+FROM oven/bun:1
+
+WORKDIR /app
+
+COPY package.json bun.lock ./
+COPY apps/web/package.json ./apps/web/
+
+RUN bun install
+
+COPY . .
+
+EXPOSE 4200
+
+CMD ["bun", "run", "--filter", "@impulsa/web", "start"]

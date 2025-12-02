@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "merchant-web": {
+    "web": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -59,10 +59,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "merchant-web:build:production"
+              "buildTarget": "web:build:production"
             },
             "development": {
-              "buildTarget": "merchant-web:build:development"
+              "buildTarget": "web:build:development"
             }
           },
           "defaultConfiguration": "development"

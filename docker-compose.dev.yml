@@ -34,17 +34,17 @@ services:
     networks:
       - payment-network
 
-  backend:
+  api:
     build:
       context: .
-      dockerfile: apps/backend/Dockerfile.dev
-    container_name: payment-backend
+      dockerfile: apps/api/Dockerfile.dev
+    container_name: impulsa-api
     volumes:
-      - ./apps/backend:/app/apps/backend
+      - ./apps/api:/app/apps/api
       - ./libs:/app/libs
       - ./prisma:/app/prisma
       - /app/node_modules
-      - /app/apps/backend/node_modules
+      - /app/apps/api/node_modules
     ports:
       - "3000:3000"
       - "9229:9229"
@@ -53,7 +53,7 @@ services:
       REDIS_URL: redis://redis:6379
       NODE_ENV: development
       JWT_SECRET: dev-secret-change-in-production
-    command: sh -c "find apps/backend/node_modules -mindepth 1 -delete && bun install && bun run --filter backend start:dev"
+    command: sh -c "find apps/api/node_modules -mindepth 1 -delete && bun install && bun run --filter @impulsa/api start:dev"
     depends_on:
       postgres:
         condition: service_healthy
@@ -62,19 +62,19 @@ services:
     networks:
       - payment-network
 
-  frontend:
+  web:
     build:
       context: .
-      dockerfile: apps/merchant-web/Dockerfile.dev
-    container_name: payment-frontend
+      dockerfile: apps/web/Dockerfile.dev
+    container_name: impulsa-web
     volumes:
-      - ./apps/merchant-web:/app/apps/merchant-web
+      - ./apps/web:/app/apps/web
       - ./libs:/app/libs
       - /app/node_modules
-      - /app/apps/merchant-web/node_modules
+      - /app/apps/web/node_modules
     ports:
       - "4200:4200"
-    command: sh -c "find apps/merchant-web/node_modules -mindepth 1 -delete && bun install && bun run --filter merchant-web start"
+    command: sh -c "find apps/web/node_modules -mindepth 1 -delete && bun install && bun run --filter @impulsa/web start"
     networks:
       - payment-network
 

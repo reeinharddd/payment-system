@@ -4,17 +4,17 @@ FROM oven/bun:1 AS builder
 WORKDIR /app
 
 COPY package.json ./
-COPY apps/backend/package.json ./apps/backend/
+COPY apps/api/package.json ./apps/api/
 COPY prisma ./prisma/
 
 # Install dependencies
 RUN bun install
 
-COPY apps/backend ./apps/backend
+COPY apps/api ./apps/api
 COPY libs ./libs
 
 RUN bunx prisma generate
-RUN bun run --filter backend build
+RUN bun run --filter @impulsa/api build
 
 # Stage 2: Production
 FROM oven/bun:1
@@ -22,11 +22,11 @@ FROM oven/bun:1
 WORKDIR /app
 
 COPY package.json ./
-COPY apps/backend/package.json ./apps/backend/
+COPY apps/api/package.json ./apps/api/
 
 RUN bun install --production
 
-COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY prisma ./prisma
 
@@ -42,4 +42,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
   CMD bun -e "fetch('http://localhost:3000/health').then(r => process.exit(r.status === 200 ? 0 : 1))"
 
-CMD ["bun", "apps/backend/dist/main.js"]
+CMD ["bun", "apps/api/dist/main.js"]

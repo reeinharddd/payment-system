@@ -4,20 +4,20 @@ FROM oven/bun:1 AS builder
 WORKDIR /app
 
 COPY package.json ./
-COPY apps/merchant-web/package.json ./apps/merchant-web/
+COPY apps/web/package.json ./apps/web/
 
 RUN bun install
 
-COPY apps/merchant-web ./apps/merchant-web
+COPY apps/web ./apps/web
 COPY libs ./libs
 
-RUN bun run --filter merchant-web build --configuration=production
+RUN bun run --filter @impulsa/web build --configuration=production
 
 # Stage 2: Serve
 FROM nginx:alpine
 
-COPY --from=builder /app/apps/merchant-web/dist/browser /usr/share/nginx/html
-COPY apps/merchant-web/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/apps/web/dist/web/browser /usr/share/nginx/html
+COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
 
 RUN echo 'add_header X-Frame-Options "SAMEORIGIN" always;' >> /etc/nginx/conf.d/security.conf && \
     echo 'add_header X-Content-Type-Options "nosniff" always;' >> /etc/nginx/conf.d/security.conf && \
