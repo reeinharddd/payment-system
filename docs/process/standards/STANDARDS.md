@@ -19,6 +19,7 @@ keywords:
 
 # Related documentation
 related_docs:
+  visual_identity: "docs/process/standards/VISUAL-IDENTITY.md"
   database_schema: ""
   api_design: ""
   feature_design: ""

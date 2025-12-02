@@ -66,12 +66,12 @@ doc_metadata:
 
 _This section contains mandatory instructions for AI Agents (Copilot, Cursor, etc.) interacting with this document._
 
-| Directive      | Instruction                                                                 |
-| :------------- | :-------------------------------------------------------------------------- |
-| **Context**    | This document defines how Humans and AI Agents collaborate.                 |
-| **Constraint** | Agents must adopt the "Personas" defined in Section 4.                      |
-| **Pattern**    | Follow the "Prompting Standard" (Section 3) for interpreting user requests. |
-| **Related**    | `docs/process/workflow/DEVELOPMENT-RULES.md`                                |
+| Directive      | Instruction                                                                                          |
+| :------------- | :--------------------------------------------------------------------------------------------------- |
+| **Context**    | This document defines how Humans and AI Agents collaborate.                                          |
+| **Constraint** | Agents must adopt the "Personas" defined in Section 4.                                               |
+| **Pattern**    | Follow the "Prompting Standard" (Section 3) for interpreting user requests.                          |
+| **Related**    | `docs/process/workflow/DEVELOPMENT-RULES.md`, `docs/process/standards/SCALABILITY-AND-GOVERNANCE.md` |
 
 ---
 
@@ -150,7 +150,36 @@ All requests to the AI agents must follow this mental structure. This ensures th
 
 > **User:** "@Frontend, Create a new `TransactionHistory` component. Context: Users need to see their past payments. Specs: Use a standalone component, implement a table with pagination, and fetch data from `PaymentsStore`."
 
-## 4. Agent Personas (Roles)
+## 4. Knowledge Acquisition & Context Strategy
+
+To ensure the AI always has the correct context, we follow a strict "Knowledge Hierarchy".
+
+### 4.1. The Knowledge Hierarchy
+
+1. **Internal Context (Primary):**
+   - **Source:** `docs/` folder via MCP Tools (`query_docs_by_module`, `search_full_text`).
+   - **Authority:** Highest. Internal rules override external patterns.
+   - **Mechanism:** YAML Frontmatter acts as the "Router" for the AI, defining relationships and types deterministically.
+
+2. **External Context (Secondary):**
+   - **Source:** Web Search (`webSearch`) or External Documentation Tools.
+   - **Authority:** Medium. Use for generic framework patterns (Angular, NestJS) or industry standards (PCI-DSS, ISO).
+   - **Trigger:** When internal search yields 0 results or when explicitly asked for "Industry Best Practices".
+
+### 4.2. The "Scribe Loop" (Codification Protocol)
+
+If the AI finds critical external information that is missing from the internal system, it MUST be codified immediately.
+
+**The Loop:**
+
+1. **Search Internal:** Agent looks for "How to handle 3DSecure". Result: `null`.
+2. **Search External:** Agent searches web. Result: "Use 3DS 2.0 flow...".
+3. **Execute:** Agent implements the code.
+4. **Codify (CRITICAL):** Agent invokes `@Scribe` to create a new doc (e.g., `docs/technical/backend/features/3D-SECURE.md`) using the `01-FEATURE-DESIGN-TEMPLATE.md`.
+
+**Why?** This turns "Tribal Knowledge" or "External Knowledge" into "System Knowledge" for the next agent.
+
+## 5. Agent Personas (Roles)
 
 The AI will assume specific roles based on the task. Each role has a specific "Knowledge Base" (RAG context) it prioritizes.
 
@@ -162,7 +191,7 @@ The AI will assume specific roles based on the task. Each role has a specific "K
 | **@QA**        | Testing, Mock Data, Validation.         | `CONSTRUCTION-CHECKLIST.md`                    | Spec files, E2E scripts             |
 | **@Scribe**    | Documentation, Commits, Changelogs.     | `MONOREPO-GUIDE.md`                            | Markdown, Git messages              |
 
-## 5. Automated Commit Protocol
+## 6. Automated Commit Protocol
 
 After every code generation task, the AI must suggest a commit message following the **Conventional Commits** standard, derived directly from the Prompt Template.
 
@@ -181,7 +210,7 @@ feat(payments): create TransactionHistory standalone component
 - Uses Angular Signals for state management
 ```
 
-## 6. Technical Standards (Global)
+## 7. Technical Standards (Global)
 
 - **Language:** English (Code, Comments, Commits, Documentation).
 - **Code Style:** Strict TypeScript, Functional patterns where possible.
