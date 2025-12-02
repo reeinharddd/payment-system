@@ -97,7 +97,7 @@ top to bottom direction
 skinparam componentStyle rectangle
 
 package "Client Layer" {
-    [Merchant Web App\nAngular 19] as WEB
+    [Merchant Web App\nAngular 21+] as WEB
     [Mobile App\nFuture] as MOBILE
 }
 
@@ -151,7 +151,7 @@ MCP --> API
 
 | Layer          | Technology               | Rationale                                                                        |
 | -------------- | ------------------------ | -------------------------------------------------------------------------------- |
-| **Frontend**   | Angular 19 Standalone    | Zoneless signals, modern reactive patterns, enterprise-ready                     |
+| **Frontend**   | Angular 21+ Standalone   | Zoneless signals, modern reactive patterns, enterprise-ready                     |
 | **Backend**    | NestJS 10+ (Bun Runtime) | TypeScript, modular architecture, built-in DI, extensive ecosystem, fast startup |
 | **Runtime**    | Bun 1.0+                 | High performance, built-in bundler/test runner, TypeScript support               |
 | **Database**   | PostgreSQL 16+           | JSONB for flexibility, full-text search, ACID compliance, proven at scale        |

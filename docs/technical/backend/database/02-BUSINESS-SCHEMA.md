@@ -105,7 +105,7 @@ Key capabilities:
 hide circle
 skinparam linetype ortho
 
-package "business" {
+package "business" #ECEFF1 {
   entity "Business" as business {
     *id : UUID <<PK>>
     --
@@ -133,6 +133,7 @@ package "business" {
     timezone : VARCHAR(50)
     address : JSONB
     phoneNumber : VARCHAR(20)
+    openingHours : JSONB
     isActive : BOOLEAN
     createdAt : TIMESTAMP
   }
@@ -197,17 +198,18 @@ Represents the legal and commercial entity using the system. This is the root of
 
 A physical store, warehouse, or logical point of sale. A business must have at least one branch (created automatically on signup).
 
-| Attribute     | Type         | Required | Description                                     | Constraints / Notes                                                                 |
-| :------------ | :----------- | :------- | :---------------------------------------------- | :---------------------------------------------------------------------------------- |
-| `id`          | UUID         | **Yes**  | Unique identifier for the branch.               | Primary Key.                                                                        |
-| `businessId`  | UUID         | **Yes**  | The business this branch belongs to.            | Foreign Key.                                                                        |
-| `name`        | VARCHAR(100) | **Yes**  | Internal name for the location.                 | Example: "Sucursal Centro", "Almacén Norte".                                        |
-| `code`        | VARCHAR(20)  | No       | Short code for internal reference.              | Example: "MTY-01". Useful for multi-branch inventory transfers.                     |
-| `isDefault`   | BOOLEAN      | **Yes**  | Primary location flag.                          | Default: `false`. One branch per business MUST be true. Used for "Single Store" UI. |
-| `timezone`    | VARCHAR(50)  | **Yes**  | IANA Timezone ID (e.g., `America/Mexico_City`). | **CRITICAL**. Determines "End of Day" calculation and shift closing times.          |
-| `address`     | JSONB        | No       | Structured address (street, city, zip).         | Used for printing on receipts.                                                      |
-| `phoneNumber` | VARCHAR(20)  | No       | Contact phone for this specific location.       |                                                                                     |
-| `isActive`    | BOOLEAN      | **Yes**  | Operational status.                             | Default: `true`. Set to `false` if the store closes permanently.                    |
+| Attribute      | Type         | Required | Description                                     | Constraints / Notes                                                                 |
+| :------------- | :----------- | :------- | :---------------------------------------------- | :---------------------------------------------------------------------------------- |
+| `id`           | UUID         | **Yes**  | Unique identifier for the branch.               | Primary Key.                                                                        |
+| `businessId`   | UUID         | **Yes**  | The business this branch belongs to.            | Foreign Key.                                                                        |
+| `name`         | VARCHAR(100) | **Yes**  | Internal name for the location.                 | Example: "Sucursal Centro", "Almacén Norte".                                        |
+| `code`         | VARCHAR(20)  | No       | Short code for internal reference.              | Example: "MTY-01". Useful for multi-branch inventory transfers.                     |
+| `isDefault`    | BOOLEAN      | **Yes**  | Primary location flag.                          | Default: `false`. One branch per business MUST be true. Used for "Single Store" UI. |
+| `timezone`     | VARCHAR(50)  | **Yes**  | IANA Timezone ID (e.g., `America/Mexico_City`). | **CRITICAL**. Determines "End of Day" calculation and shift closing times.          |
+| `address`      | JSONB        | No       | Structured address (street, city, zip).         | Used for printing on receipts.                                                      |
+| `phoneNumber`  | VARCHAR(20)  | No       | Contact phone for this specific location.       |                                                                                     |
+| `openingHours` | JSONB        | No       | Weekly schedule definition.                     | `{ "mon": { "open": "09:00", "close": "20:00" }, ... }`. Used for App/Maps display. |
+| `isActive`     | BOOLEAN      | **Yes**  | Operational status.                             | Default: `true`. Set to `false` if the store closes permanently.                    |
 
 ### 3.3. Employee (The Staff Link)
 

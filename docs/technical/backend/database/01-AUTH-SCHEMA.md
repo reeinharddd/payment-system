@@ -114,7 +114,7 @@ skinparam class {
     BorderColor #333
 }
 
-package "auth" {
+package "auth" #E3F2FD {
   entity "User" as user {
     *id : UUID <<PK>>
     --

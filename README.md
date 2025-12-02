@@ -117,18 +117,21 @@ bun run docker:dev
 #### Technical Guides
 
 - [Docker Guide](docs/technical/infrastructure/DOCKER-GUIDE.md) - Container configuration and deployment
-- [Angular Zoneless](docs/technical/frontend/ANGULAR-ZONELESS.md) - Angular 19 zoneless patterns
+- [Angular Zoneless](docs/technical/frontend/ANGULAR-ZONELESS.md) - Angular 21+ zoneless patterns
 - [TypeScript Strict](docs/technical/backend/TYPESCRIPT-STRICT.md) - Type safety patterns
 - [Technical Foundations](docs/technical/foundations/TECHNICAL-FOUNDATIONS.md) - Deep dive into core technologies
 
 ### 3.4. Technology Stack
 
-- **Backend:** NestJS 10+ + TypeScript 5.3+ (strict) + Prisma 5+ + PostgreSQL 16+
-- **Frontend:** Angular 19+ + Zoneless + Standalone Components + Signals
+- **Runtime:** Bun 1.3+ (Replaces Node.js/npm/Jest)
+- **Frontend:** Angular 21+ (Bleeding Edge)
+- **Backend:** NestJS 10+
+- **Database:** PostgreSQL 16+
+- **ORM:** Prisma 5+
+- **Language:** TypeScript 5.3+ (Strict)
 - **Cache/Queue:** Redis 7+ + Bull MQ
 - **Cloud:** AWS S3/SQS + GCP Cloud Run + Azure Storage (optional)
 - **AI/Agents:** Ollama + Model Context Protocol (MCP)
-- **Testing:** Jest + Jasmine + Playwright (80% coverage minimum)
 - **DevOps:** Docker + Kubernetes + GitHub Actions
 - **Monorepo:** Bun workspaces + Turborepo
 

@@ -105,7 +105,7 @@ Key capabilities:
 hide circle
 skinparam linetype ortho
 
-package "payments" {
+package "payments" #E0F7FA {
   entity "Transaction" as txn {
     *id : UUID <<PK>>
     --

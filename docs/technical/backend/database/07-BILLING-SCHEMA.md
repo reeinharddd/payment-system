@@ -105,7 +105,7 @@ Key capabilities:
 hide circle
 skinparam linetype ortho
 
-package "billing" {
+package "billing" #FFEBEE {
   entity "Invoice" as invoice {
     *id : UUID <<PK>>
     --

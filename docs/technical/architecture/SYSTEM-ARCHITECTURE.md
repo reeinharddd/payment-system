@@ -191,7 +191,7 @@ Specialized experiences activated by the `Business.type` field:
 !theme plain
 package "Presentation Layer" {
   [Web Application
-Angular 19] as WebApp
+Angular 21+] as WebApp
   [Mobile Application
 Ionic + Angular] as MobileApp
   [Admin Dashboard] as Dashboard

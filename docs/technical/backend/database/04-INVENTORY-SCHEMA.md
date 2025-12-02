@@ -113,6 +113,7 @@ Key capabilities:
 hide circle
 skinparam linetype ortho
 
+package "inventory" #FFF3E0 {
 entity "Category" as Category {
   *id : UUID
   *businessId : UUID
@@ -335,6 +336,7 @@ entity "StockMovement" as Movement {
   --
   *createdAt : TIMESTAMP
   createdBy : UUID
+}
 }
 
 Category ||..o{ Category : "children"

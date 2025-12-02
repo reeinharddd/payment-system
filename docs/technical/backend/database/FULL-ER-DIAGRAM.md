@@ -51,8 +51,20 @@ skinparam class {
     BorderColor #333
 }
 
+' LEYENDA DE COLORES
+legend right
+    | Color | Módulo | Descripción |
+    | <#E3F2FD> | **Auth** | Identidad y Seguridad |
+    | <#ECEFF1> | **Business** | Estructura Organizacional |
+    | <#F3E5F5> | **Communication** | Notificaciones y Mensajería |
+    | <#FFF3E0> | **Inventory** | Catálogo y Stock |
+    | <#E8F5E9> | **Sales** | Punto de Venta (POS) |
+    | <#E0F7FA> | **Payments** | Transacciones Financieras |
+    | <#FFEBEE> | **Billing** | Facturación Fiscal |
+endlegend
+
 ' --- SCHEMA: AUTH ---
-package "auth" {
+package "auth" #E3F2FD {
   entity "User" as user {
     *id : UUID <<PK>>
     --
@@ -137,7 +149,7 @@ package "auth" {
 }
 
 ' --- SCHEMA: BUSINESS ---
-package "business" {
+package "business" #ECEFF1 {
   entity "Business" as business {
     *id : UUID <<PK>>
     --
@@ -190,6 +202,7 @@ package "business" {
     name : VARCHAR
     address : JSONB
     timezone : VARCHAR
+    openingHours : JSONB
     isDefault : BOOLEAN
     createdAt : TIMESTAMP
     updatedAt : TIMESTAMP
@@ -210,7 +223,7 @@ package "business" {
 }
 
 ' --- SCHEMA: COMMUNICATION ---
-package "communication" {
+package "communication" #F3E5F5 {
   entity "NotificationLog" as notif {
     *id : UUID <<PK>>
     --
@@ -262,7 +275,7 @@ package "communication" {
 }
 
 ' --- SCHEMA: INVENTORY ---
-package "inventory" {
+package "inventory" #FFF3E0 {
   entity "Category" as category {
     *id : UUID <<PK>>
     --
@@ -334,52 +347,99 @@ package "inventory" {
 }
 
 ' --- SCHEMA: SALES ---
-package "sales" {
+package "sales" #E8F5E9 {
+  entity "Customer" as customer {
+    *id : UUID <<PK>>
+    --
+    *businessId : UUID <<FK>>
+    userId : UUID <<FK>>
+    fullName : VARCHAR
+    email : VARCHAR
+    phone : VARCHAR
+    taxId : VARCHAR
+    address : JSONB
+    preferences : JSONB
+    notes : TEXT
+    creditLimit : DECIMAL
+    currentDebt : DECIMAL
+    isActive : BOOLEAN
+    createdAt : TIMESTAMP
+    updatedAt : TIMESTAMP
+  }
+
   entity "CashRegister" as register {
     *id : UUID <<PK>>
     --
+    *businessId : UUID <<FK>>
     *branchId : UUID <<FK>>
     name : VARCHAR
-    status : ENUM
-    deletedAt : TIMESTAMP
+    status : ENUM (OPEN, CLOSED)
+    currentShiftId : UUID
+    metadata : JSONB
+    isActive : BOOLEAN
+    createdAt : TIMESTAMP
+    updatedAt : TIMESTAMP
   }
 
   entity "Shift" as shift {
     *id : UUID <<PK>>
     --
-    *cashRegisterId : UUID <<FK>>
+    *businessId : UUID <<FK>>
+    *registerId : UUID <<FK>>
     *employeeId : UUID <<FK>>
     startTime : TIMESTAMP
     endTime : TIMESTAMP
+    status : ENUM (OPEN, CLOSED)
+    startCash : DECIMAL
+    endCash : DECIMAL
+    expectedCash : DECIMAL
+    difference : DECIMAL
+    notes : TEXT
+    createdAt : TIMESTAMP
+    updatedAt : TIMESTAMP
   }
 
   entity "Sale" as sale {
     *id : UUID <<PK>>
     --
+    *businessId : UUID <<FK>>
+    *branchId : UUID <<FK>>
     *shiftId : UUID <<FK>>
+    *employeeId : UUID <<FK>>
     customerId : UUID <<FK>>
+    saleNumber : INT
+    status : ENUM (COMPLETED, VOIDED, PENDING)
+    paymentStatus : ENUM (PAID, PARTIAL, UNPAID)
+    subtotal : DECIMAL
+    taxTotal : DECIMAL
+    discountTotal : DECIMAL
     total : DECIMAL
-    status : ENUM
-    paymentMethod : ENUM
+    metadata : JSONB
     createdAt : TIMESTAMP
     updatedAt : TIMESTAMP
-    deletedAt : TIMESTAMP
   }
 
   entity "SaleItem" as sale_item {
     *id : UUID <<PK>>
     --
+    *businessId : UUID <<FK>>
     *saleId : UUID <<FK>>
     *productId : UUID <<FK>>
     variantId : UUID <<FK>>
+    productName : VARCHAR
+    sku : VARCHAR
     quantity : DECIMAL
     unitPrice : DECIMAL
-    productSnapshot : JSONB
+    taxRate : DECIMAL
+    discount : DECIMAL
+    total : DECIMAL
+    metadata : JSONB
+    createdAt : TIMESTAMP
   }
 }
 
 ' --- SCHEMA: PAYMENTS ---
-package "payments" {
+package "payments" #E0F7FA {
   entity "Transaction" as txn {
     *id : UUID <<PK>>
     --
@@ -405,7 +465,7 @@ package "payments" {
 }
 
 ' --- SCHEMA: BILLING ---
-package "billing" {
+package "billing" #FFEBEE {
   entity "Invoice" as invoice {
     *id : UUID <<PK>>
     --
@@ -463,6 +523,9 @@ branch ||..o{ register : "has"
 register ||..o{ shift : "records"
 employee ||..o{ shift : "opens"
 shift ||..o{ sale : "includes"
+employee ||..o{ sale : "performs"
+customer ||..o{ sale : "purchases"
+user ||..o{ customer : "linked to"
 sale ||..|{ sale_item : "contains"
 product ||..o{ sale_item : "sold as"
 variant ||..o{ sale_item : "sold as"

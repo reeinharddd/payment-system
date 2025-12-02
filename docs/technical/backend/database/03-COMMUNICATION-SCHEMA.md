@@ -100,7 +100,7 @@ Key capabilities:
 hide circle
 skinparam linetype ortho
 
-package "communication" {
+package "communication" #F3E5F5 {
   enum NotificationChannel {
     EMAIL
     SMS

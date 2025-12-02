@@ -77,17 +77,32 @@ _This section contains mandatory instructions for AI Agents (Copilot, Cursor, et
 
 ---
 
-## 1. JavaScript Runtime: Bun
+## 1. Standardized Stack Versions (Single Source of Truth)
 
-### 1.1. What Bun Actually Is
+This section defines the **mandatory** versions for all development in this monorepo. All documentation must reference these versions to maintain consistency.
+
+| Technology   | Version             | Status        | Rationale                                           |
+| :----------- | :------------------ | :------------ | :-------------------------------------------------- |
+| **Runtime**  | **Bun 1.3+**        | Stable        | Replaces Node.js/npm/Jest. Faster builds & runtime. |
+| **Backend**  | **NestJS 10+**      | Stable        | Enterprise standard for Node.js architectures.      |
+| **Frontend** | **Angular 21+**     | Bleeding Edge | Zoneless by default, Signals-first, Standalone.     |
+| **Database** | **PostgreSQL 16+**  | Stable        | JSONB support, performance, reliability.            |
+| **ORM**      | **Prisma 5+**       | Stable        | Type-safe database access.                          |
+| **Language** | **TypeScript 5.3+** | Strict        | Required for all code. No `any`.                    |
+
+---
+
+## 2. JavaScript Runtime: Bun
+
+### 2.1. What Bun Actually Is
 
 **Common Misconception:** "Bun is just another Node.js clone"
 
 **Reality:** Bun is an all-in-one toolkit (runtime, bundler, test runner, package manager) built from scratch in Zig, using Safari's JavaScriptCore engine (unlike Node's V8). It is designed for speed and developer experience.
 
-### 1.2. Core Concepts
+### 2.2. Core Concepts
 
-**1. Drop-in Node.js Compatibility**
+#### 1. Drop-in Node.js Compatibility
 
 Bun implements most of the Node.js API (fs, path, http, etc.), so existing libraries work.
 
@@ -97,7 +112,7 @@ import fs from "node:fs";
 const data = fs.readFileSync("file.txt");
 ```
 
-**2. Native TypeScript Support**
+#### 2. Native TypeScript Support
 
 Bun executes `.ts` files directly. No `tsc`, no `ts-node`, no build step for development.
 
@@ -106,23 +121,23 @@ Bun executes `.ts` files directly. No `tsc`, no `ts-node`, no build step for dev
 bun run index.ts
 ```
 
-**3. All-in-One Tooling**
+#### 3. All-in-One Tooling
 
 - **Runtime:** Replaces Node.js
 - **Package Manager:** Replaces npm/yarn/pnpm (`bun install` is 30x faster)
 - **Test Runner:** Replaces Jest/Vitest (`bun test`)
 - **Bundler:** Replaces Webpack/Rollup/Vite
 
-### 1.3. Bun Performance Characteristics
+### 2.3. Bun Performance Characteristics
 
-**What Bun is GOOD at:**
+#### What Bun is GOOD at
 
 - **Startup Time:** Near instant (great for serverless/CLI)
 - **I/O Operations:** Optimized system calls via Zig
 - **Package Installation:** Global cache, hard links, parallel downloads
 - **Testing:** Native test runner is significantly faster than Jest
 
-**Example: HTTP Server**
+#### Example: HTTP Server
 
 ```javascript
 // Bun.serve (Native API - 4x faster than Node http)
@@ -134,21 +149,21 @@ Bun.serve({
 });
 ```
 
-### 1.4. Alternatives to Bun
+### 2.4. Alternatives to Bun
 
-**Node.js (The Legacy Standard):**
+#### Node.js (The Legacy Standard)
 
 - Pros: Massive ecosystem, 10+ years of stability
 - Cons: Slower, fragmented tooling (npm + jest + tsc + nodemon)
 - Verdict: Use only if a specific legacy library is incompatible with Bun
 
-**Deno:**
+#### Deno
 
 - Pros: Secure by default, URL imports
 - Cons: Different philosophy (not drop-in Node compatible by default)
 - Verdict: Good, but Bun offers better migration path
 
-**Why We Choose Bun:**
+#### Why We Choose Bun
 
 - **Speed:** Faster builds, tests, and runtime
 - **Simplicity:** One tool replaces five (npm, jest, tsc, nodemon, webpack)
@@ -156,17 +171,17 @@ Bun.serve({
 
 ---
 
-## 2. TypeScript Type System
+## 3. TypeScript Type System
 
-### 2.1. What TypeScript Actually Is
+### 3.1. What TypeScript Actually Is
 
 **Common Misconception:** "TypeScript is a different language"
 
 **Reality:** TypeScript is a superset of JavaScript with a compile-time type checker. It compiles to plain JavaScript.
 
-### 2.2. Core Type System Concepts
+### 3.2. Core Type System Concepts
 
-**1. Structural Typing (Duck Typing)**
+#### 1. Structural Typing (Duck Typing)
 
 ```typescript
 // TypeScript uses STRUCTURE, not names
@@ -185,13 +200,13 @@ class ConektaGateway {
 const gateway: PaymentGateway = new ConektaGateway();
 ```
 
-**Why This Matters:**
+#### Why This Matters
 
 - Adapters work naturally (payment providers, tax calculators)
 - Easier testing (mock objects just need matching structure)
 - Interfaces document contracts without tight coupling
 
-**2. Type Inference (Smart Compiler)**
+#### 2. Type Inference (Smart Compiler)
 
 ```typescript
 // TypeScript infers types - you don't always need annotations
@@ -204,7 +219,7 @@ function getTotal(items: Array<{ price: number }>) {
 }
 ```
 
-**3. Union Types (Multiple Possibilities)**
+#### 3. Union Types (Multiple Possibilities)
 
 ```typescript
 // Payment can be in multiple states
@@ -226,7 +241,7 @@ function handlePayment(status: PaymentStatus) {
 }
 ```
 
-**4. Generics (Type Parameters)**
+#### 4. Generics (Type Parameters)
 
 ```typescript
 // Without generics: Lose type information
@@ -243,7 +258,7 @@ const firstNumber = getFirstElement([1, 2, 3]); // Type: number
 const firstString = getFirstElement(["a", "b"]); // Type: string
 ```
 
-**Use Case in Our System:**
+#### Use Case in Our System
 
 ```typescript
 // Generic repository pattern
@@ -262,7 +277,7 @@ const userRepo = new Repository<User>();
 const user = await userRepo.findById("123"); // Type: User | null
 ```
 
-### 2.3. TypeScript Strict Mode (Why We Use It)
+### 3.3. TypeScript Strict Mode (Why We Use It)
 
 ```json
 // tsconfig.json - All strict flags enabled
@@ -276,7 +291,7 @@ const user = await userRepo.findById("123"); // Type: User | null
 }
 ```
 
-**What Strict Mode Catches:**
+#### What Strict Mode Catches
 
 ```typescript
 // 1. Null/undefined errors
@@ -317,9 +332,11 @@ class PaymentProcessor {
 }
 ```
 
-### 2.4. Runtime Type Validation (TypeScript Limitation)
+### 3.4. Runtime Type Validation (TypeScript Limitation)
 
-**Critical Understanding:** TypeScript types DISAPPEAR at runtime!
+#### Critical Understanding
+
+TypeScript types DISAPPEAR at runtime!
 
 ```typescript
 // This type only exists during compilation
@@ -336,7 +353,7 @@ function processPayment(req: PaymentRequest) {
 }
 ```
 
-**Solution: Runtime Validation with Zod**
+#### Solution: Runtime Validation with Zod
 
 ```typescript
 import { z } from "zod";
@@ -359,15 +376,15 @@ function processPayment(req: unknown) {
 }
 ```
 
-### 2.5. Alternatives to TypeScript
+### 3.5. Alternatives to TypeScript
 
-**Flow (Facebook's type checker):**
+#### Flow (Facebook's type checker)
 
 - Pros: Similar to TypeScript, gradual typing
 - Cons: Smaller ecosystem, Facebook abandoned it
 - Verdict: Dead, don't use
 
-**JSDoc (Comments-based typing):**
+#### JSDoc (Comments-based typing)
 
 ```javascript
 /**
@@ -384,7 +401,7 @@ function processPayment(amount, currency) {
 - Cons: Verbose, weaker type checking
 - Verdict: Use for small scripts, not production apps
 
-**Why We Choose TypeScript:**
+#### Why We Choose TypeScript
 
 - Industry standard (90%+ of new projects)
 - Catches bugs before runtime
@@ -393,19 +410,19 @@ function processPayment(amount, currency) {
 
 ---
 
-## 3. Docker and Containerization
+## 4. Docker and Containerization
 
-### 3.1. What Docker Actually Is
+### 4.1. What Docker Actually Is
 
 **Common Misconception:** "Docker is a lightweight VM"
 
 **Reality:** Docker uses Linux kernel features (namespaces, cgroups) to isolate processes. Containers share the host OS kernel.
 
-### 3.2. Core Docker Concepts
+### 4.2. Core Docker Concepts
 
-**1. Images vs Containers**
+#### 1. Images vs Containers
 
-```
+```text
 Image: Immutable blueprint (like a class)
 Container: Running instance (like an object)
 
@@ -425,7 +442,7 @@ Container: Running instance (like an object)
 └─────────────────┘
 ```
 
-**2. Layers and Caching**
+#### 2. Layers and Caching
 
 ```dockerfile
 # Each instruction creates a layer
@@ -437,7 +454,7 @@ COPY . .                      # Layer 5 (application code)
 RUN bun run build             # Layer 6 (build application)
 ```
 
-**Why Layer Order Matters:**
+#### Why Layer Order Matters
 
 ```dockerfile
 # BAD: Code changes invalidate ALL layers below
@@ -454,7 +471,7 @@ COPY . .                      # Changes often
 RUN bun run build             # Only rebuilds when code changes
 ```
 
-**3. Multi-Stage Builds (Smaller Images)**
+#### 3. Multi-Stage Builds (Smaller Images)
 
 ```dockerfile
 # Stage 1: Build (includes dev dependencies, source code)
@@ -477,13 +494,13 @@ CMD ["bun", "dist/main.js"]
 # Image size here: ~150MB
 ```
 
-**Why Multi-Stage:**
+#### Why Multi-Stage
 
 - Smaller images = faster deployment
 - No dev dependencies in production = smaller attack surface
 - No source code in production image = IP protection
 
-**4. Volumes (Persistent Data)**
+#### 4. Volumes (Persistent Data)
 
 ```yaml
 # docker-compose.yml
@@ -503,9 +520,9 @@ volumes:
   postgres_data: # Persists even if container deleted
 ```
 
-**Volume Types:**
+#### Volume Types
 
-```
+```text
 Named Volume (Managed by Docker):
 Host:      /var/lib/docker/volumes/postgres_data/_data
 Container: /var/lib/postgresql/data
@@ -521,11 +538,11 @@ Container: /tmp
 Use case:  Temporary files, cache
 ```
 
-### 3.3. Docker Networking
+### 4.3. Docker Networking
 
-**Bridge Network (Default):**
+#### Bridge Network (Default)
 
-```
+```text
 Host Machine: 192.168.1.100
     ↓
 Docker Bridge: 172.17.0.0/16
@@ -537,7 +554,7 @@ Containers can talk to each other by name:
 postgres://postgres:5432  < "postgres" resolves to 172.17.0.3
 ```
 
-**Custom Networks (Better Isolation):**
+#### Custom Networks (Better Isolation)
 
 ```yaml
 networks:
@@ -557,36 +574,36 @@ services:
       - public-network # Can be accessed from outside
 ```
 
-### 3.4. Docker vs Alternatives
+### 4.4. Docker vs Alternatives
 
-**Podman (Docker alternative):**
+#### Podman (Docker alternative)
 
 - Pros: Rootless (more secure), daemonless, OCI-compliant
 - Cons: Docker Compose support incomplete, smaller ecosystem
 - Verdict: Good for security-critical environments, but Docker more mature
 
-**LXC/LXD (Linux Containers):**
+#### LXC/LXD (Linux Containers)
 
 - Pros: True system containers (full OS), better for VMs-like use
 - Cons: Heavier than Docker, slower startup
 - Verdict: Use for system-level isolation, not app containers
 
-**Kubernetes (Container Orchestration):**
+#### Kubernetes (Container Orchestration)
 
 - Not a Docker alternative, but orchestrates Docker containers
 - Use when: >10 services, need auto-scaling, multi-node clusters
 - Our case: Overkill for MVP, consider after 50K+ merchants
 
-**Why We Choose Docker:**
+#### Why We Choose Docker
 
 - Industry standard (all cloud providers support it)
 - Development-production parity (same image everywhere)
 - Easy local development (docker-compose)
 - Great for microservices (each service isolated)
 
-### 3.5. Docker Best Practices for Our System
+### 4.5. Docker Best Practices for Our System
 
-**1. Use Alpine Linux (Smaller Base Images)**
+#### 1. Use Alpine Linux (Smaller Base Images)
 
 ```dockerfile
 FROM oven/bun:1-alpine
@@ -594,7 +611,7 @@ FROM oven/bun:1-alpine
 FROM oven/bun:1
 ```
 
-**2. Run as Non-Root User**
+#### 2. Run as Non-Root User
 
 ```dockerfile
 USER bun  # Built-in user in Bun images
@@ -602,14 +619,14 @@ USER bun  # Built-in user in Bun images
 USER root  # < NEVER do this in production
 ```
 
-**3. Health Checks**
+#### 3. Health Checks
 
 ```dockerfile
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
   CMD bun healthcheck.js || exit 1
 ```
 
-**4. Environment-Specific Configs**
+#### 4. Environment-Specific Configs
 
 ```yaml
 # docker-compose.dev.yml (Development)
@@ -636,17 +653,17 @@ services:
 
 ---
 
-## 4. NestJS Architecture
+## 5. NestJS Architecture
 
-### 4.1. What NestJS Actually Is
+### 5.1. What NestJS Actually Is
 
 **Common Misconception:** "NestJS is a framework like Express"
 
 **Reality:** NestJS is an architectural framework built ON TOP of Express/Fastify that enforces patterns (Dependency Injection, Modules, Decorators).
 
-### 4.2. Core NestJS Concepts
+### 5.2. Core NestJS Concepts
 
-**1. Dependency Injection (IoC Container)**
+#### 1. Dependency Injection (IoC Container)
 
 ```typescript
 // Without DI (tightly coupled)
@@ -680,9 +697,9 @@ const mockGateway = { charge: jest.fn() };
 const service = new PaymentService(mockDb, mockGateway);
 ```
 
-**How NestJS Resolves Dependencies:**
+#### How NestJS Resolves Dependencies
 
-```
+```text
 Application Startup:
 1. NestJS scans for @Injectable() classes
 2. Builds dependency graph
@@ -704,7 +721,7 @@ Application Startup:
 └─────────────────────────┘
 ```
 
-**2. Modules (Organize Code)**
+#### 2. Modules (Organize Code)
 
 ```typescript
 // payments.module.ts
@@ -726,9 +743,9 @@ Application Startup:
 export class PaymentsModule {}
 ```
 
-**Module Dependency Graph:**
+#### Module Dependency Graph
 
-```
+```text
 AppModule
   ├─ AuthModule (exports: AuthService, JwtStrategy)
   ├─ PaymentsModule (imports: AuthModule, DatabaseModule)
@@ -738,7 +755,7 @@ AppModule
   └─ ConfigModule (global, exports: ConfigService)
 ```
 
-**3. Guards (Authentication/Authorization)**
+#### 3. Guards (Authentication/Authorization)
 
 ```typescript
 // JWT Guard: Checks if request has valid JWT
@@ -780,15 +797,15 @@ export class PaymentsController {
 }
 ```
 
-**Guard Execution Order:**
+#### Guard Execution Order
 
-```
+```text
 Request > Guard 1 > Guard 2 > Interceptor > Pipe > Controller > Service
           ↓ fail    ↓ fail     ↓           ↓        ↓           ↓
           401       403        Transform   Validate Process    DB
 ```
 
-**4. Pipes (Validation/Transformation)**
+#### 4. Pipes (Validation/Transformation)
 
 ```typescript
 // DTOs with validation
@@ -816,7 +833,7 @@ async create(@Body() dto: CreatePaymentDto) {
 }
 ```
 
-**5. Interceptors (AOP - Aspect Oriented Programming)**
+#### 5. Interceptors (AOP - Aspect Oriented Programming)
 
 ```typescript
 // Logging interceptor: Log all requests/responses
@@ -852,9 +869,9 @@ export class TransformInterceptor implements NestInterceptor {
 }
 ```
 
-### 4.3. NestJS vs Alternatives
+### 5.3. NestJS vs Alternatives
 
-**Express (Low-level):**
+#### Express (Low-level)
 
 ```javascript
 // Express: Manual everything
@@ -881,7 +898,7 @@ app.post("/payments", async (req, res) => {
 });
 ```
 
-**NestJS: Declarative**
+#### NestJS: Declarative
 
 ```typescript
 @Controller("payments")
@@ -900,14 +917,14 @@ export class PaymentsController {
 }
 ```
 
-**Fastify (NestJS Alternative Backend):**
+#### Fastify (NestJS Alternative Backend)
 
 - NestJS can use Fastify instead of Express
 - 2x faster than Express
 - Better TypeScript support
 - Use when: Performance critical (>10K req/s)
 
-**Why We Choose NestJS:**
+#### Why We Choose NestJS
 
 - Enforces clean architecture (SOLID principles)
 - Built-in: validation, auth, caching, queues, WebSockets
@@ -917,17 +934,17 @@ export class PaymentsController {
 
 ---
 
-## 5. Angular Framework
+## 6. Angular Framework
 
-### 5.1. What Angular Actually Is
+### 6.1. What Angular Actually Is
 
 **Common Misconception:** "Angular is just a UI library like React"
 
 **Reality:** Angular is a complete framework with: dependency injection, routing, forms, HTTP client, testing, CLI, build tools - all batteries included.
 
-### 5.2. Core Angular Concepts
+### 6.2. Core Angular Concepts
 
-**1. Components (Building Blocks)**
+#### 1. Components (Building Blocks)
 
 ```typescript
 // Traditional component with template
@@ -953,9 +970,9 @@ export class PaymentFormComponent {
 }
 ```
 
-**Component Lifecycle:**
+#### Component Lifecycle
 
-```
+```text
 Creation:
   constructor() > Called when class instantiated
   ↓
@@ -970,7 +987,7 @@ Destruction:
   ngOnDestroy() > Called before component destroyed (cleanup)
 ```
 
-**2. Signals (New Reactivity System - Angular 19+)**
+#### 2. Signals (New Reactivity System - Angular 19+)
 
 ```typescript
 // Old: RxJS Observables (complex)
@@ -994,14 +1011,14 @@ export class NewComponent {
 }
 ```
 
-**Why Signals:**
+#### Why Signals
 
 - Fine-grained reactivity (only update what changed)
 - No Zone.js needed (faster change detection)
 - Simpler than RxJS for simple state
 - Better performance (no unnecessary checks)
 
-**3. Dependency Injection (Services)**
+#### 3. Dependency Injection (Services)
 
 ```typescript
 // Service: Business logic + state
@@ -1038,7 +1055,7 @@ export class PaymentListComponent {
 }
 ```
 
-**4. Standalone Components (Angular 19+ - No Modules)**
+#### 4. Standalone Components (Angular 19+ - No Modules)
 
 ```typescript
 // Old: NgModule (boilerplate heavy)
@@ -1059,7 +1076,7 @@ export class PaymentsModule {}
 export class PaymentFormComponent {}
 ```
 
-**5. Control Flow Syntax (Angular 19+ - No *ngIf/*ngFor)**
+#### 5. Control Flow Syntax (Angular 19+ - No *ngIf/*ngFor)
 
 ```typescript
 // Old syntax (directives)
@@ -1088,7 +1105,7 @@ export class PaymentFormComponent {}
 })
 ```
 
-**6. Zoneless Change Detection (Angular 19+)**
+#### 6. Zoneless Change Detection (Angular 19+)
 
 ```typescript
 // Traditional: Zone.js patches all async operations
@@ -1114,9 +1131,9 @@ export class CounterComponent {
 }
 ```
 
-### 5.3. Angular vs Alternatives
+### 6.3. Angular vs Alternatives
 
-**React (Library, not framework):**
+#### React (Library, not framework)
 
 ```jsx
 // React: Manual everything
@@ -1156,7 +1173,7 @@ function PaymentForm() {
 }
 ```
 
-**Angular: Batteries included**
+#### Angular: Batteries included
 
 ```typescript
 @Component({
@@ -1184,19 +1201,19 @@ export class PaymentFormComponent {
 }
 ```
 
-**Vue (Simpler than Angular):**
+#### Vue (Simpler than Angular)
 
 - Pros: Easier learning curve, smaller bundle, flexible
 - Cons: Less opinionated, smaller enterprise adoption
 - Verdict: Good for small teams, but Angular better for large teams
 
-**Svelte (Compile-time framework):**
+#### Svelte (Compile-time framework)
 
 - Pros: No runtime, tiny bundles, fast
 - Cons: Smaller ecosystem, newer
 - Verdict: Promising but wait for maturity
 
-**Why We Choose Angular:**
+#### Why We Choose Angular
 
 - Complete framework (routing, forms, HTTP, testing)
 - TypeScript-first (strong typing everywhere)
@@ -1206,17 +1223,17 @@ export class PaymentFormComponent {
 
 ---
 
-## 6. PostgreSQL Database
+## 7. PostgreSQL Database
 
-### 6.1. What PostgreSQL Actually Is
+### 7.1. What PostgreSQL Actually Is
 
 **Common Misconception:** "PostgreSQL is just a SQL database"
 
 **Reality:** PostgreSQL is an object-relational database with: JSONB, full-text search, geospatial data, custom types, and extensibility.
 
-### 6.2. Core PostgreSQL Concepts
+### 7.2. Core PostgreSQL Concepts
 
-**1. ACID Transactions**
+#### 1. ACID Transactions
 
 ```sql
 -- Transaction: All or nothing
@@ -1233,14 +1250,14 @@ COMMIT;
 -- If ANY step fails, ALL steps roll back
 ```
 
-**ACID Guarantees:**
+#### ACID Guarantees
 
 - **Atomicity:** All or nothing (no partial updates)
 - **Consistency:** Database always in valid state
 - **Isolation:** Concurrent transactions don't interfere
 - **Durability:** Committed data survives crashes
 
-**2. Indexes (Performance)**
+#### 2. Indexes (Performance)
 
 ```sql
 -- Without index: Full table scan (slow)
@@ -1253,7 +1270,7 @@ SELECT * FROM transactions WHERE business_id = '123';
 -- Scans 100 rows > 5ms
 ```
 
-**Index Types:**
+#### Index Types
 
 ```sql
 -- B-Tree (default): Equality and range queries
@@ -1272,7 +1289,7 @@ SELECT * FROM transactions WHERE metadata @> '{"country": "MX"}';
 CREATE INDEX idx_pending ON transactions(created_at) WHERE status = 'PENDING';
 ```
 
-**3. JSONB (Schema Flexibility)**
+#### 3. JSONB (Schema Flexibility)
 
 ```sql
 -- Store flexible data
@@ -1298,20 +1315,20 @@ SELECT * FROM transactions WHERE metadata->'customer'->>'email' = 'user@example.
 CREATE INDEX idx_provider ON transactions USING gin((metadata->'provider'));
 ```
 
-**When to use JSONB:**
+#### When to use JSONB
 
 - Payment provider-specific data (varies by provider)
 - Webhook payloads (preserve exact structure)
 - Feature flags or settings (flexible schema)
 - Event logs (different event types)
 
-**When NOT to use JSONB:**
+#### When NOT to use JSONB
 
 - Core business data (use proper columns + foreign keys)
 - Frequently queried fields (indexes less efficient)
 - Data with relationships (use proper tables)
 
-**4. Row-Level Security (Multi-Tenancy)**
+#### 4. Row-Level Security (Multi-Tenancy)
 
 ```sql
 -- Enable RLS
@@ -1330,7 +1347,7 @@ SELECT * FROM transactions;
 -- Automatically adds: WHERE business_id = '123e4567...'
 ```
 
-**5. Full-Text Search**
+#### 5. Full-Text Search
 
 ```sql
 -- Add tsvector column
@@ -1354,27 +1371,27 @@ WHERE search_vector @@ query
 ORDER BY rank DESC;
 ```
 
-### 6.3. PostgreSQL vs Alternatives
+### 7.3. PostgreSQL vs Alternatives
 
-**MySQL:**
+#### MySQL
 
 - Pros: Slightly faster for simple queries, more hosts support it
 - Cons: Weaker data integrity, no JSONB, limited features
 - Verdict: Use PostgreSQL (better for complex apps)
 
-**MongoDB (NoSQL):**
+#### MongoDB (NoSQL)
 
 - Pros: Flexible schema, horizontal scaling
 - Cons: No ACID (multi-document), no joins, eventual consistency
 - Verdict: Use PostgreSQL with JSONB (same flexibility + ACID)
 
-**SQLite:**
+#### SQLite
 
 - Pros: Zero setup, embedded, perfect for dev
 - Cons: No concurrent writes, no network access
 - Verdict: Use for testing, not production
 
-**Why We Choose PostgreSQL:**
+#### Why We Choose PostgreSQL
 
 - ACID transactions (critical for payments!)
 - JSONB (flexibility when needed)
@@ -1384,17 +1401,17 @@ ORDER BY rank DESC;
 
 ---
 
-## 7. Redis and Caching
+## 8. Redis and Caching
 
-### 7.1. What Redis Actually Is
+### 8.1. What Redis Actually Is
 
 **Common Misconception:** "Redis is just a cache"
 
 **Reality:** Redis is an in-memory data structure server that can be used as: cache, queue, pub/sub, session store, rate limiter, leaderboard, etc.
 
-### 7.2. Core Redis Concepts
+### 8.2. Core Redis Concepts
 
-**1. Data Structures**
+#### 1. Data Structures
 
 ```redis
 # String (most common)
@@ -1420,9 +1437,9 @@ ZADD leaderboard 1000 "merchant1" 2000 "merchant2"
 ZRANGE leaderboard 0 9 WITHSCORES  # Top 10
 ```
 
-**2. Caching Strategies**
+#### 2. Caching Strategies
 
-**Cache-Aside (Lazy Loading):**
+##### Cache-Aside (Lazy Loading)
 
 ```typescript
 async getPayment(id: string): Promise<Payment> {
@@ -1442,7 +1459,7 @@ async getPayment(id: string): Promise<Payment> {
 }
 ```
 
-**Write-Through (Eager Loading):**
+##### Write-Through (Eager Loading)
 
 ```typescript
 async updatePayment(id: string, data: UpdatePaymentDto): Promise<Payment> {
@@ -1459,7 +1476,7 @@ async updatePayment(id: string, data: UpdatePaymentDto): Promise<Payment> {
 }
 ```
 
-**Cache Invalidation:**
+##### Cache Invalidation
 
 ```typescript
 async deletePayment(id: string): Promise<void> {
@@ -1472,7 +1489,7 @@ async deletePayment(id: string): Promise<void> {
 }
 ```
 
-**3. Rate Limiting**
+#### 3. Rate Limiting
 
 ```typescript
 async checkRateLimit(userId: string): Promise<boolean> {
@@ -1492,7 +1509,7 @@ if (!await checkRateLimit(user.id)) {
 }
 ```
 
-**4. Pub/Sub (Real-Time Notifications)**
+#### 4. Pub/Sub (Real-Time Notifications)
 
 ```typescript
 // Publisher: Payment confirmed
@@ -1516,7 +1533,7 @@ redis.subscribe("payment:confirmed", (message) => {
 });
 ```
 
-**5. Session Store**
+#### 5. Session Store
 
 ```typescript
 // Store session
@@ -1534,53 +1551,53 @@ if (!session) {
 }
 ```
 
-### 7.3. Redis Persistence Options
+### 8.3. Redis Persistence Options
 
-**RDB (Snapshotting):**
+#### RDB (Snapshotting)
 
-```
+```text
 Save entire dataset to disk periodically
 - Pros: Compact, fast restart
 - Cons: Can lose minutes of data if crash
 - Config: save 900 1  (save after 15min if 1 change)
 ```
 
-**AOF (Append-Only File):**
+#### AOF (Append-Only File)
 
-```
+```text
 Log every write operation
 - Pros: Minimal data loss (1 second)
 - Cons: Larger files, slower restart
 - Config: appendonly yes, appendfsync everysec
 ```
 
-**Our Strategy:**
+#### Our Strategy
 
 - Use AOF for critical data (sessions, rate limits)
 - Use RDB for cache (okay to lose on crash)
 - Persist to PostgreSQL for permanent data
 
-### 7.4. Redis vs Alternatives
+### 8.4. Redis vs Alternatives
 
-**Memcached:**
+#### Memcached
 
 - Pros: Simpler, slightly faster for pure caching
 - Cons: Only strings (no data structures), no persistence
 - Verdict: Redis is superset of Memcached, use Redis
 
-**Hazelcast (Distributed cache):**
+#### Hazelcast (Distributed cache)
 
 - Pros: Distributed by default, better for huge scale
 - Cons: Java-based, heavier, more complex
 - Verdict: Overkill for our scale, use Redis
 
-**DragonflyDB (Redis alternative):**
+#### DragonflyDB (Redis alternative)
 
 - Pros: 25x faster than Redis, drop-in replacement
 - Cons: Newer, less battle-tested
 - Verdict: Promising, revisit when mature
 
-**Why We Choose Redis:**
+#### Why We Choose Redis
 
 - Fast (sub-millisecond latency)
 - Versatile (cache, queue, pub/sub, rate limiter)
@@ -1589,15 +1606,15 @@ Log every write operation
 
 ---
 
-## 8. Summary: Technology Selection Rationale
+## 9. Summary: Technology Selection Rationale
 
-| Technology     | Why Chosen                                | When to Reconsider                        |
-| -------------- | ----------------------------------------- | ----------------------------------------- |
-| **Bun**        | Speed, DX, TypeScript support             | Legacy Node.js compatibility issues       |
-| **TypeScript** | Type safety, catches bugs early           | Never (industry standard)                 |
-| **NestJS**     | Enforces architecture, batteries included | Microservices (consider lightweight)      |
-| **Angular 19** | Complete framework, enterprise-ready      | Simple sites (overkill)                   |
-| **PostgreSQL** | ACID + JSONB, most versatile              | Pure key-value (use Redis)                |
-| **Redis**      | Fast caching, pub/sub, rate limiting      | Persistent primary storage (use Postgres) |
-| **Docker**     | Dev-prod parity, easy orchestration       | Single static binary (overkill)           |
-| **Prisma**     | Type-safe ORM, great DX                   | Complex queries (raw SQL)                 |
+| Technology      | Why Chosen                                | When to Reconsider                        |
+| --------------- | ----------------------------------------- | ----------------------------------------- |
+| **Bun**         | Speed, DX, TypeScript support             | Legacy Node.js compatibility issues       |
+| **TypeScript**  | Type safety, catches bugs early           | Never (industry standard)                 |
+| **NestJS**      | Enforces architecture, batteries included | Microservices (consider lightweight)      |
+| **Angular 21+** | Complete framework, enterprise-ready      | Simple sites (overkill)                   |
+| **PostgreSQL**  | ACID + JSONB, most versatile              | Pure key-value (use Redis)                |
+| **Redis**       | Fast caching, pub/sub, rate limiting      | Persistent primary storage (use Postgres) |
+| **Docker**      | Dev-prod parity, easy orchestration       | Single static binary (overkill)           |
+| **Prisma**      | Type-safe ORM, great DX                   | Complex queries (raw SQL)                 |
