@@ -1,0 +1,15 @@
+# This file defines who owns which files in the repository.
+# GitHub will automatically request reviews from these owners.
+
+* @reeinharddd
+
+# Backend
+apps/backend/ @reeinharddd
+libs/core/ @reeinharddd
+
+# Frontend
+apps/merchant-web/ @reeinharddd
+libs/ui/ @reeinharddd
+
+# Documentation
+docs/ @reeinharddd
